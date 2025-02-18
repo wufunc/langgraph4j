@@ -2,8 +2,6 @@ package org.bsc.langgraph4j.diagram;
 
 import org.bsc.langgraph4j.DiagramGenerator;
 
-import java.util.Objects;
-
 import static java.lang.String.format;
 import static org.bsc.langgraph4j.StateGraph.END;
 import static org.bsc.langgraph4j.StateGraph.START;
@@ -13,7 +11,7 @@ public class PlantUMLGenerator extends DiagramGenerator {
     @Override
     protected void appendHeader( Context ctx ) {
 
-        if( ctx.isSubgraph() ) {
+        if( ctx.isSubGraph() ) {
             ctx.sb()
                 .append(format("rectangle %s [ {{\ntitle \"%s\"\n", ctx.title(), ctx.title()))
                 .append(format("circle \" \" as %s\n", START))
@@ -38,7 +36,7 @@ public class PlantUMLGenerator extends DiagramGenerator {
 
     @Override
     protected void appendFooter(Context ctx ) {
-        if( ctx.isSubgraph() ) {
+        if( ctx.isSubGraph() ) {
             ctx.sb().append("\n}} ]\n");
         }
         else {
@@ -46,12 +44,21 @@ public class PlantUMLGenerator extends DiagramGenerator {
         }
     }
     @Override
-    protected void call( Context ctx, String from, String to ) {
-        ctx.sb().append( format( "\"%s\" -down-> \"%s\"\n", from, to ) );
+    protected void call( Context ctx, String from, String to, CallStyle style ) {
+        ctx.sb().append(
+                switch( style ) {
+                    case CONDITIONAL -> format( "\"%s\" .down.> \"%s\"\n", from, to );
+                    default ->  format( "\"%s\" -down-> \"%s\"\n", from, to );
+                });
     }
     @Override
-    protected void call( Context ctx, String from, String to, String description ) {
-        ctx.sb().append( format( "\"%s\" -down-> \"%s\": \"%s\"\n", from, to, description ) );
+    protected void call( Context ctx, String from, String to, String description, CallStyle style ) {
+
+        ctx.sb().append(
+                switch( style ) {
+                    case CONDITIONAL -> format( "\"%s\" .down.> \"%s\": \"%s\"\n", from, to, description );
+                    default ->  format( "\"%s\" -down-> \"%s\": \"%s\"\n", from, to, description );
+                });
     }
     @Override
     protected void declareConditionalStart( Context ctx, String name ) {

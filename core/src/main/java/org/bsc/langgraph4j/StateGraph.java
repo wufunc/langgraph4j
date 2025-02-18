@@ -1,12 +1,15 @@
 package org.bsc.langgraph4j;
 
-
-import lombok.Getter;
 import lombok.NonNull;
 import org.bsc.langgraph4j.action.AsyncEdgeAction;
 import org.bsc.langgraph4j.action.AsyncNodeAction;
 import org.bsc.langgraph4j.action.AsyncNodeActionWithConfig;
-import org.bsc.langgraph4j.action.NodeActionWithConfig;
+import org.bsc.langgraph4j.internal.edge.Edge;
+import org.bsc.langgraph4j.internal.edge.EdgeCondition;
+import org.bsc.langgraph4j.internal.edge.EdgeValue;
+import org.bsc.langgraph4j.internal.node.Node;
+import org.bsc.langgraph4j.internal.node.SubCompiledGraphNode;
+import org.bsc.langgraph4j.internal.node.SubStateGraphNode;
 import org.bsc.langgraph4j.serializer.StateSerializer;
 import org.bsc.langgraph4j.serializer.std.ObjectStreamStateSerializer;
 import org.bsc.langgraph4j.state.AgentState;
@@ -17,7 +20,6 @@ import java.util.*;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
-import static org.bsc.langgraph4j.utils.CollectionsUtils.mapOf;
 
 /**
  * Represents a state graph with nodes and edges.
@@ -28,18 +30,24 @@ public class StateGraph<State extends AgentState> {
     /**
      * Enum representing various error messages related to graph state.
      */
-    enum Errors {
+    public enum Errors {
         invalidNodeIdentifier("END is not a valid node id!"),
         invalidEdgeIdentifier("END is not a valid edge sourceId!"),
         duplicateNodeError("node with id: %s already exist!"),
         duplicateEdgeError("edge with id: %s already exist!"),
+        duplicateConditionalEdgeError("conditional edge from '%s' already exist!"),
         edgeMappingIsEmpty("edge mapping is empty!"),
         missingEntryPoint("missing Entry Point"),
         entryPointNotExist("entryPoint: %s doesn't exist!"),
         finishPointNotExist("finishPoint: %s doesn't exist!"),
-        missingNodeReferencedByEdge("edge sourceId: %s reference a not existent node!"),
+        missingNodeReferencedByEdge("edge sourceId '%s' refers to undefined node!"),
         missingNodeInEdgeMapping("edge mapping for sourceId: %s contains a not existent nodeId %s!"),
-        invalidEdgeTarget("edge sourceId: %s has an initialized target value!");
+        invalidEdgeTarget("edge sourceId: %s has an initialized target value!"),
+        duplicateEdgeTargetError("edge [%s] has duplicate targets %s!"),
+        unsupportedConditionalEdgeOnParallelNode("parallel node doesn't support conditional branch, but on [%s] a conditional branch on %s have been found!"),
+        illegalMultipleTargetsOnParallelNode("parallel node [%s] must have only one target, but %s have been found!"),
+        interruptionNodeNotExist( "node '%s' configured as interruption doesn't exist!")
+        ;
 
         private final String errorMessage;
 
@@ -53,7 +61,7 @@ public class StateGraph<State extends AgentState> {
          * @param args the arguments to format the error message
          * @return a new GraphStateException
          */
-        GraphStateException exception(String... args) {
+        public GraphStateException exception(Object... args) {
             return new GraphStateException(format(errorMessage, (Object[]) args));
         }
     }
@@ -62,9 +70,9 @@ public class StateGraph<State extends AgentState> {
      * Enum representing various error messages related to graph runner.
      */
     enum RunnableErrors {
-        missingNodeInEdgeMapping("cannot find edge mapping for id: %s in conditional edge with sourceId: %s "),
-        missingNode("node with id: %s doesn't exist!"),
-        missingEdge("edge with sourceId: %s doesn't exist!"),
+        missingNodeInEdgeMapping("cannot find edge mapping for id: '%s' in conditional edge with sourceId: '%s' "),
+        missingNode("node with id: '%s' doesn't exist!"),
+        missingEdge("edge with sourceId: '%s' doesn't exist!"),
         executionError("%s");
 
         private final String errorMessage;
@@ -87,16 +95,16 @@ public class StateGraph<State extends AgentState> {
     public static String END = "__END__";
     public static String START = "__START__";
 
-    Set<Node<State>> nodes = new LinkedHashSet<>();
-    Set<Edge<State>> edges = new LinkedHashSet<>();
+    final Nodes<State> nodes = new Nodes<>();
+    final Edges<State> edges = new Edges<>();
 
     private EdgeValue<State> entryPoint;
-    @Deprecated
+
+    @Deprecated( forRemoval = true )
     private String finishPoint;
 
     private final Map<String, Channel<?>> channels;
 
-    @Getter
     private final StateSerializer<State> stateSerializer;
 
     /**
@@ -116,7 +124,7 @@ public class StateGraph<State extends AgentState> {
      * @param stateSerializer the serializer to serialize the state
      */
     public StateGraph(@NonNull StateSerializer<State> stateSerializer) {
-        this( mapOf(), stateSerializer );
+        this( Map.of(), stateSerializer );
 
     }
 
@@ -126,7 +134,7 @@ public class StateGraph<State extends AgentState> {
      * @param stateFactory the factory to create agent states
      */
     public StateGraph(AgentStateFactory<State> stateFactory) {
-        this( mapOf(), stateFactory);
+        this( Map.of(), stateFactory);
 
     }
 
@@ -139,6 +147,10 @@ public class StateGraph<State extends AgentState> {
         this( channels, new ObjectStreamStateSerializer<>(stateFactory) );
     }
 
+    public StateSerializer<State> getStateSerializer() {
+         return stateSerializer;
+    }
+
     public final AgentStateFactory<State> getStateFactory() {
         return stateSerializer.stateFactory();
     }
@@ -147,12 +159,14 @@ public class StateGraph<State extends AgentState> {
         return unmodifiableMap(channels);
     }
 
-    @Deprecated
+    @Deprecated( forRemoval = true )
     public EdgeValue<State> getEntryPoint() {
-        return entryPoint;
+        return edges.edgeBySourceId( START )
+                .map( Edge::target )
+                .orElse( null );
     }
 
-    @Deprecated
+    @Deprecated( forRemoval = true )
     public String getFinishPoint() {
         return finishPoint;
     }
@@ -163,9 +177,13 @@ public class StateGraph<State extends AgentState> {
      * @param entryPoint the nodeId of the graph's entry-point
      * @deprecated  use addEdge(START, nodeId)
      */
-    @Deprecated
+    @Deprecated( forRemoval = true )
     public void setEntryPoint(String entryPoint) {
-        this.entryPoint = new EdgeValue<>(entryPoint, null);
+        try {
+            addEdge( START, entryPoint );
+        } catch (GraphStateException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -176,7 +194,7 @@ public class StateGraph<State extends AgentState> {
      * @throws GraphStateException if the edge mappings is null or empty
      * @deprecated use addConditionalEdge(START, consition, mappings)
      */
-    @Deprecated
+    @Deprecated( forRemoval = true )
     public void setConditionalEntryPoint(AsyncEdgeAction<State> condition, Map<String, String> mappings) throws GraphStateException {
         addConditionalEdges(START, condition, mappings);
     }
@@ -215,13 +233,13 @@ public class StateGraph<State extends AgentState> {
         if (Objects.equals(id, END)) {
             throw Errors.invalidNodeIdentifier.exception(END);
         }
-        Node<State> node = new Node<>(id, ( config ) -> actionWithConfig);
+        Node<State> node = new Node<>(id, (config ) -> actionWithConfig);
 
-        if (nodes.contains(node)) {
+        if (nodes.elements.contains(node)) {
             throw Errors.duplicateNodeError.exception(id);
         }
 
-        nodes.add(node);
+        nodes.elements.add(node);
         return this;
     }
 
@@ -239,13 +257,14 @@ public class StateGraph<State extends AgentState> {
         if (Objects.equals(id, END)) {
             throw Errors.invalidNodeIdentifier.exception(END);
         }
-        var node = new Node<>(id, ( config ) -> new SubgraphNodeAction<>(subGraph) );
 
-        if (nodes.contains(node)) {
+        var node = new SubCompiledGraphNode<>(id, subGraph);
+
+        if (nodes.elements.contains(node)) {
             throw Errors.duplicateNodeError.exception(id);
         }
 
-        nodes.add(node);
+        nodes.elements.add(node);
         return this;
 
     }
@@ -263,16 +282,16 @@ public class StateGraph<State extends AgentState> {
         if (Objects.equals(id, END)) {
             throw Errors.invalidNodeIdentifier.exception(END);
         }
-        var node = new Node<>(id, ( config ) -> {
-            var compiledGraph = subGraph.compile(config);
-            return new SubgraphNodeAction<>(compiledGraph);
-        });
 
-        if (nodes.contains(node)) {
+        subGraph.validateGraph();
+
+        var node = new SubStateGraphNode<>( id, subGraph );
+
+        if (nodes.elements.contains(node)) {
             throw Errors.duplicateNodeError.exception(id);
         }
 
-        nodes.add(node);
+        nodes.elements.add(node);
         return this;
     }
 
@@ -288,18 +307,23 @@ public class StateGraph<State extends AgentState> {
             throw Errors.invalidEdgeIdentifier.exception(END);
         }
 
-        if (Objects.equals(sourceId, START)) {
-            this.entryPoint = new EdgeValue<>(targetId, null);
-            return this;
+//        if (Objects.equals(sourceId, START)) {
+//            this.entryPoint = new EdgeValue<>(targetId);
+//            return this;
+//        }
+
+        var newEdge = new Edge<>(sourceId, new EdgeValue<State>(targetId) );
+
+        int index = edges.elements.indexOf( newEdge );
+        if( index >= 0 ) {
+            var newTargets = new ArrayList<>(edges.elements.get(index).targets());
+            newTargets.add( newEdge.target() );
+            edges.elements.set( index, new Edge<>(sourceId, newTargets) );
+        }
+        else {
+            edges.elements.add( newEdge );
         }
 
-        Edge<State> edge = new Edge<>(sourceId, new EdgeValue<>(targetId, null));
-
-        if (edges.contains(edge)) {
-            throw Errors.duplicateEdgeError.exception(sourceId);
-        }
-
-        edges.add(edge);
         return this;
     }
 
@@ -319,29 +343,32 @@ public class StateGraph<State extends AgentState> {
             throw Errors.edgeMappingIsEmpty.exception(sourceId);
         }
 
-        if (Objects.equals(sourceId, START)) {
-            this.entryPoint = new EdgeValue<>(null, new EdgeCondition<>(condition, mappings));
-            return this;
+//        if (Objects.equals(sourceId, START)) {
+//            this.entryPoint = new EdgeValue<>(new EdgeCondition<>(condition, mappings));
+//            return this;
+//        }
+
+        var newEdge =  new Edge<>(sourceId, new EdgeValue<>( new EdgeCondition<>(condition, mappings)) );
+
+        if( edges.elements.contains( newEdge ) ) {
+            throw Errors.duplicateConditionalEdgeError.exception(sourceId);
         }
-
-        Edge<State> edge = new Edge<State>(sourceId, new EdgeValue<>(null, new EdgeCondition<>(condition, mappings)));
-
-        if (edges.contains(edge)) {
-            throw Errors.duplicateEdgeError.exception(sourceId);
+        else {
+            edges.elements.add( newEdge );
         }
-
-        edges.add(edge);
         return this;
     }
 
-    /**
-     * Creates a fake node with the specified identifier.
-     *
-     * @param id the identifier of the fake node
-     * @return a new fake node
-     */
-    private Node<State> nodeById(String id) {
-        return new Node<>(id);
+    void validateGraph( ) throws GraphStateException {
+        var edgeStart = edges.edgeBySourceId(START)
+                .orElseThrow(Errors.missingEntryPoint::exception);
+
+        edgeStart.validate( nodes );
+
+        for (Edge<State> edge : edges.elements) {
+            edge.validate(nodes);
+        }
+
     }
 
     /**
@@ -354,40 +381,7 @@ public class StateGraph<State extends AgentState> {
     public CompiledGraph<State> compile( CompileConfig config ) throws GraphStateException {
         Objects.requireNonNull(config, "config cannot be null");
 
-        if (entryPoint == null) {
-            throw Errors.missingEntryPoint.exception();
-        }
-
-        if( entryPoint.id()!=null && !nodes.contains(nodeById(entryPoint.id()))) {
-            throw Errors.entryPointNotExist.exception(entryPoint.id());
-        }
-
-//        if (finishPoint != null) {
-//            if (!nodes.contains(nodeById(finishPoint))) {
-//                throw Errors.finishPointNotExist.exception(finishPoint);
-//            }
-//        }
-
-        for (Edge<State> edge : edges) {
-
-            if (!nodes.contains(nodeById(edge.sourceId()))) {
-                throw Errors.missingNodeReferencedByEdge.exception(edge.sourceId());
-            }
-
-            if (edge.target().id() != null) {
-                if (!Objects.equals(edge.target().id(), END) && !nodes.contains(nodeById(edge.target().id()))) {
-                    throw Errors.missingNodeReferencedByEdge.exception(edge.target().id());
-                }
-            } else if (edge.target().value() != null) {
-                for (String nodeId : edge.target().value().mappings().values()) {
-                    if (!Objects.equals(nodeId, END) && !nodes.contains(nodeById(nodeId))) {
-                        throw Errors.missingNodeInEdgeMapping.exception(edge.sourceId(), nodeId);
-                    }
-                }
-            } else {
-                throw Errors.invalidEdgeTarget.exception(edge.sourceId());
-            }
-        }
+        validateGraph();
 
         return new CompiledGraph<>(this, config);
     }
@@ -412,7 +406,7 @@ public class StateGraph<State extends AgentState> {
      */
     public GraphRepresentation getGraph( GraphRepresentation.Type type, String title, boolean printConditionalEdges ) {
 
-        String content = type.generator.generate( this, title, printConditionalEdges);
+        String content = type.generator.generate( nodes, edges, title, printConditionalEdges);
 
         return new GraphRepresentation( type, content );
     }
@@ -426,10 +420,66 @@ public class StateGraph<State extends AgentState> {
      */
     public GraphRepresentation getGraph( GraphRepresentation.Type type, String title ) {
 
-        String content = type.generator.generate( this, title, true);
+        String content = type.generator.generate( nodes, edges, title, true);
 
         return new GraphRepresentation( type, content );
     }
 
+    public static class Nodes<State extends AgentState> {
+        public final Set<Node<State>> elements;
+
+        public Nodes( Collection<Node<State>> elements ) {
+            this.elements = new LinkedHashSet<>(elements);
+        }
+
+        public Nodes( ) {
+            this.elements = new LinkedHashSet<>();
+        }
+
+        public boolean anyMatchById(String id ) {
+            return elements.stream()
+                    .anyMatch( n -> Objects.equals( n.id(), id) );
+        }
+
+        public List<SubStateGraphNode<State>> onlySubStateGraphNodes() {
+            return elements.stream()
+                    .filter(n -> n instanceof SubStateGraphNode<State>)
+                    .map(n -> (SubStateGraphNode<State>) n)
+                    .toList();
+        }
+
+        public List<Node<State>> exceptSubStateGraphNodes() {
+            return elements.stream()
+                    .filter(n ->  !(n instanceof SubStateGraphNode<State>) )
+                    .toList();
+        }
+    }
+
+    public static class Edges<State extends AgentState> {
+
+        public final List<Edge<State>> elements;
+
+        public Edges( Collection<Edge<State>> elements ) {
+            this.elements = new LinkedList<>(elements);
+        }
+
+        public Edges( ) {
+            this.elements = new LinkedList<>();
+        }
+
+        public Optional<Edge<State>> edgeBySourceId(String sourceId ) {
+            return elements.stream()
+                    .filter( e -> Objects.equals( e.sourceId(), sourceId ))
+                    .findFirst();
+        }
+
+        public List<Edge<State>> edgesByTargetId(String targetId ) {
+            return elements.stream()
+                    .filter( e -> e.anyMatchByTargetId(targetId)).toList();
+        }
+
+
+    }
 
 }
+

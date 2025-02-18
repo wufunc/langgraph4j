@@ -1,11 +1,10 @@
 package org.bsc.langgraph4j;
 
 
-import lombok.Builder;
-import lombok.Value;
-import lombok.experimental.Accessors;
-import org.bsc.langgraph4j.action.AsyncNodeActionWithConfig;
+import org.bsc.langgraph4j.internal.edge.EdgeCondition;
 import org.bsc.langgraph4j.state.AgentState;
+
+import java.util.Objects;
 
 import static java.lang.String.format;
 import static org.bsc.langgraph4j.StateGraph.START;
@@ -16,23 +15,46 @@ import static org.bsc.langgraph4j.StateGraph.START;
  */
 public abstract class DiagramGenerator {
 
-    /**
-     * Class that represents a context with various properties and methods.
-     *
-     * This class is designed to store and manipulate context-specific data such as
-     * a string builder, title, and conditional edge printing status. It also provides
-     * a method for converting the title to snake case. The class is annotated with {@code @Value},
-     * {@code @Accessors(fluent = true)}, and {@code @Builder} to facilitate value semantics,
-     * fluent interfaces, and builder patterns respectively.
-     */
-    @Value
-    @Accessors(fluent = true)
-    @Builder
-    public static class Context {
-        StringBuilder sb = new StringBuilder();
-        String title;
-        boolean printConditionalEdge;
-        boolean isSubgraph;
+    public enum CallStyle {
+        DEFAULT,
+        START,
+        END,
+        CONDITIONAL,
+        PARALLEL
+    }
+
+    public record Context( StringBuilder sb,
+                            String title,
+                            boolean printConditionalEdge,
+                            boolean isSubGraph ) {
+
+        static Builder builder() { return new Builder(); }
+
+        static public class Builder {
+                String title;
+                boolean printConditionalEdge ;
+                boolean IsSubGraph;
+
+                private Builder() {}
+
+                public Builder title( String title ) {
+                    this.title = title;
+                    return this;
+                }
+                public Builder printConditionalEdge( boolean value ) {
+                    this.printConditionalEdge = value;
+                    return this;
+                }
+                public Builder isSubGraph( boolean value ) {
+                    this.IsSubGraph = value;
+                    return this;
+                }
+
+                public Context build() {
+                    return new Context( new StringBuilder(), title,printConditionalEdge, IsSubGraph );
+                }
+
+        }
 
         /**
          * Converts a given title string to snake_case format by replacing all non-alphanumeric characters with underscores.
@@ -65,7 +87,7 @@ public abstract class DiagramGenerator {
      *
      * @param ctx Context object containing the necessary information.
      */
-    protected abstract void appendFooter(Context ctx) ;
+    protected abstract void appendFooter( Context ctx ) ;
     /**
      * This method is an abstract method that must be implemented by subclasses.
      * It is used to initiate a communication call between two parties identified by their phone numbers.
@@ -74,7 +96,7 @@ public abstract class DiagramGenerator {
      * @param from The phone number of the caller.
      * @param to The phone number of the recipient.
      */
-    protected abstract void call( Context ctx, String from, String to ) ;
+    protected abstract void call( Context ctx, String from, String to, CallStyle style  ) ;
     /**
      * Abstract method that must be implemented by subclasses to handle the logic of making a call.
      *
@@ -83,10 +105,9 @@ public abstract class DiagramGenerator {
      * @param to The phone number of the recipient.
      * @param description A brief description of the call.
      */
-    protected abstract void call( Context ctx, String from, String to, String description );
+    protected abstract void call( Context ctx, String from, String to, String description, CallStyle style );
     /**
      * Declares a conditional element in the configuration or template.
-     *
      * This method is used to mark the start of a conditional section based on the provided {@code name}.
      * It takes a {@code Context} object that may contain additional parameters necessary for the declaration,
      * and a {@code name} which identifies the type or key associated with the conditional section.
@@ -120,16 +141,17 @@ public abstract class DiagramGenerator {
     /**
      * Generate a textual representation of the given graph.
      *
-     * @param stateGraph The graph to generate a diagram from.
+     * @param nodes       the state graph nodes used to generate the context, which must not be null
+     * @param edges       the state graph edges used to generate the context, which must not be null
      * @param title The title of the graph.
      * @param printConditionalEdge Whether to print the conditional edge condition.
      * @return A string representation of the graph.
      */
-    public final <State extends AgentState> String generate( StateGraph<State> stateGraph, String title, boolean printConditionalEdge ) {
+    public final <State extends AgentState> String generate( StateGraph.Nodes<State> nodes,  StateGraph.Edges<State> edges, String title, boolean printConditionalEdge ) {
 
-        return generate( stateGraph, Context.builder()
+        return generate( nodes, edges, Context.builder()
                                         .title( title )
-                                        .isSubgraph( false )
+                                        .isSubGraph( false )
                                         .printConditionalEdge( printConditionalEdge )
                                         .build() ).toString();
 
@@ -139,71 +161,89 @@ public abstract class DiagramGenerator {
      * Generates a context based on the given state graph.
      *
      * @param <State>     the type of agent state, constrained to extend {@link AgentState}
-     * @param stateGraph  the state graph used to generate the context, which must not be null
+     * @param nodes       the state graph nodes used to generate the context, which must not be null
+     * @param edges       the state graph edges used to generate the context, which must not be null
      * @param ctx         the initial context, which must not be null
      * @return            the generated context, which will not be null
      */
-    protected final <State extends AgentState> Context generate( StateGraph<State> stateGraph, Context ctx) {
+    protected final <State extends AgentState> Context generate( StateGraph.Nodes<State> nodes, StateGraph.Edges<State> edges, Context ctx) {
 
         appendHeader( ctx );
 
-        stateGraph.nodes
-                .forEach( n -> {
+        for( var n :  nodes.elements )  {
 
-                    try {
-                        var action = n.actionFactory().apply( CompileConfig.builder().build() );
-                        if( action instanceof SubgraphNodeAction<?>  subgraphNodeAction) {
-                            Context subgraphCtx = generate( subgraphNodeAction.subGraph().stateGraph,
-                                    Context.builder()
-                                            .title( n.id() )
-                                            .printConditionalEdge( ctx.printConditionalEdge )
-                                            .isSubgraph( true )
-                                            .build() );
-                            ctx.sb().append( subgraphCtx );
-                        }
-                        else {
-                            declareNode(ctx, n.id());
-                        }
-                    } catch (GraphStateException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+            if( n instanceof SubGraphNode<?> subGraphNode ) {
+
+                    @SuppressWarnings("unchecked")
+                    var subGraph = (StateGraph<State>) subGraphNode.subGraph();
+                    Context subgraphCtx = generate(
+                                subGraph.nodes,
+                                subGraph.edges,
+                                Context.builder()
+                                    .title( n.id() )
+                                    .printConditionalEdge( ctx.printConditionalEdge )
+                                    .isSubGraph( true )
+                                    .build() );
+                    ctx.sb().append( subgraphCtx );
+            }
+            else {
+                declareNode(ctx, n.id());
+            }
+        }
 
         final int[] conditionalEdgeCount = { 0 };
 
-        stateGraph.edges.forEach( e -> {
-            if( e.target().value() != null ) {
-                conditionalEdgeCount[0] += 1;
-                commentLine( ctx, !ctx.printConditionalEdge() );
-                declareConditionalEdge( ctx, conditionalEdgeCount[0] );
-            }
-        });
+        edges.elements.stream()
+            .filter( e -> !Objects.equals(e.sourceId(), START) )
+                .filter( e -> !e.isParallel() )
+            .forEach( e -> {
+                if( e.target().value() != null ) {
+                    conditionalEdgeCount[0] += 1;
+                    commentLine( ctx, !ctx.printConditionalEdge() );
+                    declareConditionalEdge( ctx, conditionalEdgeCount[0] );
+                }
+            });
 
-        EdgeValue<State> entryPoint = stateGraph.getEntryPoint();
-        if( entryPoint.id() != null  ) {
-            call( ctx, START, entryPoint.id() );
+        var edgeStart = edges.elements.stream()
+                .filter( e -> Objects.equals( e.sourceId(), START) )
+                .findFirst()
+                .orElseThrow();
+        if( edgeStart.isParallel() ) {
+            edgeStart.targets().forEach( target -> {
+                call( ctx, START, target.id(), CallStyle.START );
+            });
         }
-        else if( entryPoint.value() != null ) {
+        else if( edgeStart.target().id() != null  ) {
+            call( ctx, START, edgeStart.target().id(), CallStyle.START );
+        }
+        else if( edgeStart.target().value() != null ) {
             String conditionName = "startcondition";
             commentLine( ctx, !ctx.printConditionalEdge() );
             declareConditionalStart( ctx , conditionName );
-            edgeCondition( ctx, entryPoint.value(), START, conditionName ) ;
+            edgeCondition( ctx, edgeStart.target().value(), START, conditionName ) ;
         }
 
         conditionalEdgeCount[0] = 0; // reset
 
-        stateGraph.edges.forEach( v -> {
-            if( v.target().id() != null ) {
-                call(ctx, v.sourceId(), v.target().id());
-            }
-            else if( v.target().value() != null ) {
-                conditionalEdgeCount[0] += 1;
-                String conditionName = format("condition%d", conditionalEdgeCount[0]);
+        edges.elements.stream()
+            .filter( e -> !Objects.equals(e.sourceId(), START) )
+            .forEach( v -> {
 
-                edgeCondition( ctx, v.target().value(), v.sourceId(), conditionName );
+                if( v.isParallel()) {
+                    v.targets().forEach( target -> {
+                        call(ctx, v.sourceId(), target.id(), CallStyle.PARALLEL);
+                    });
+                }
+                else if( v.target().id() != null ) {
+                    call(ctx, v.sourceId(), v.target().id(), CallStyle.DEFAULT);
+                }
+                else if( v.target().value() != null ) {
+                    conditionalEdgeCount[0] += 1;
+                    String conditionName = format("condition%d", conditionalEdgeCount[0]);
 
-            }
-        });
+                    edgeCondition( ctx, v.targets().get(0).value(), v.sourceId(), conditionName );
+                }
+            });
 
         appendFooter( ctx );
 
@@ -225,13 +265,13 @@ public abstract class DiagramGenerator {
                                                           String k,
                                                           String conditionName) {
         commentLine( ctx, !ctx.printConditionalEdge() );
-        call( ctx,  k, conditionName);
+        call( ctx,  k, conditionName, CallStyle.CONDITIONAL);
 
         condition.mappings().forEach( (cond, to) -> {
                 commentLine( ctx, !ctx.printConditionalEdge() );
-                call( ctx, conditionName, to, cond );
+                call( ctx, conditionName, to, cond, CallStyle.CONDITIONAL );
                 commentLine( ctx, ctx.printConditionalEdge() );
-                call( ctx, k, to, cond );
+                call( ctx, k, to, cond, CallStyle.CONDITIONAL );
         });
     }
 

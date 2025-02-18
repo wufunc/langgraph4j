@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<site xmlns="http://maven.apache.org/SITE/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd"
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd"
       name="LangGraph4j">
+    
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
         <version>2.0.0-M11</version>
     </skin>
+
     <custom>
         <fluidoSkin>
             <sideBarEnabled>true</sideBarEnabled>
         </fluidoSkin>
     </custom>
 
-    <bannerLeft href="/">
-        <image src="langgraph4j.png"/>
+    <bannerLeft>
+        <!-- <name>LangGraph4j</name> -->
+        <href>/</href>
+        <src>langgraph4j.png</src>
     </bannerLeft>
+
     <bannerRight>
     </bannerRight>
     <body>
@@ -36,11 +41,11 @@
             <item name="Core module" href="core/langgraph4j-core/index.html"/>
             <item name="Langchain4j integration module" href="langchain4j/langgraph4j-langchain4j/index.html"/>
             <item name="Agent Executor" href="agent-executor/langgraph4j-agent-executor/index.html"/>
-            <item name="Studio (jetty implementation)" href="studio/langgraph4j-studio/index.html"/>
+            <item name="Studio" href="studio/core/studio/langgraph4j-studio/index.html"/>
         </menu>
         <menu name="References">
             <item name="How To(s)" href="how-tos/langgraph4j-howtos/index.html"/>
             <item name="JavaDocs" href="apidocs/index.html"/>
         </menu>
     </body>
-</site>
+</project>

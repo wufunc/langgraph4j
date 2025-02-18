@@ -1,7 +1,7 @@
 
 # 🦜🕸️ LangGraph for Java
 
-[![Javadoc](https://img.shields.io/badge/Javadoc-Documentation-blue)][javadocs] [![Static Badge](https://img.shields.io/badge/maven--snapshots-1.0--SNAPSHOT-blue)][snapshots] [![Maven Central](https://img.shields.io/maven-central/v/org.bsc.langgraph4j/langgraph4j-core.svg)][releases]
+[![Javadoc](https://img.shields.io/badge/Javadoc-Documentation-blue)][javadocs] [![Maven Central](https://img.shields.io/maven-central/v/org.bsc.langgraph4j/langgraph4j-core.svg)][releases]
 
 LangGraph for Java. A library for building stateful, multi-agents applications with LLMs, built for work with [langchain4j]
 > It is a porting of original [LangGraph] from [LangChain AI project][langchain.ai] in Java fashion
@@ -15,24 +15,43 @@ LangGraph for Java. A library for building stateful, multi-agents applications w
 - [x] Entry Points
 - [x] Conditional Entry Points
 - [x] State
-    - [x] Schema (_a series of Channels_)
-        - [x] Reducer (_how apply  updates to the state attributes_)
-        - [x] Default provider
-        - [x] AppenderChannel (_values accumulator_)
-- [x] Compiling graph
+  - [x] Schema (_a series of Channels_)
+    - [x] Reducer (_how apply  updates to the state attributes_)
+    - [x] Default provider
+    - [x] AppenderChannel (_values accumulator_)
+        - [x] delete messages
+- [x] Compiling graph    
 - [x] Async support (_throught [CompletableFuture]_)
 - [x] Streaming support (_throught [java-async-generator]_)
 - [x] Checkpoints (_save and replay feature_)
 - [x] Graph visualization
-    - [x] [PlantUML]
-    - [x] [Mermaid]
+  - [x] [PlantUML]
+  - [x] [Mermaid]
 - [x] Playground (_Embeddable Webapp that plays with LangGraph4j_)
 - [x] Threads (_checkpointing of multiple different runs_)
 - [x] Update state (_interact with the state directly and update it_)
 - [x] Breakpoints (_pause and resume feature_)
+- [x] [Studio] (_Playground Webapp_)
+  - [x] [Spring Boot]
+  - [x] [Jetty]
 - [X] Streaming response from LLM results
 - [X] Child Graphs
-- [ ] Parallel Node Execution
+- [X] Parallel Node Execution
+    - _With some constraints_ 
+
+## How To - _(Java Notebook)_
+
+* [How to add persistence ("memory") to your graph](https://github.com/bsorrentino/langgraph4j/blob/main/how-tos/persistence.ipynb)
+* [How to view and update past graph state](https://github.com/bsorrentino/langgraph4j/blob/main/how-tos/time-travel.ipynb)
+* [How to parallel branch](https://github.com/bsorrentino/langgraph4j/blob/main/how-tos/parallel-branch.ipynb)
+* [How to wait for user input](https://github.com/bsorrentino/langgraph4j/blob/main/how-tos/wait-user-input.ipynb)
+* **How to sub-graph**
+  * [How to add a sub-grah in a node](https://github.com/bsorrentino/langgraph4j/blob/main/how-tos/subgraph-as-nodeaction.ipynb)
+  * [How to add a compiled sub-graph (by composition)](https://github.com/bsorrentino/langgraph4j/blob/main/how-tos/subgraph-as-compiledgraph.ipynb)
+  * [How to add a state sub-graph (by merging)](https://github.com/bsorrentino/langgraph4j/blob/main/how-tos/subgraph-as-stategraph.ipynb)
+* **Use Case**
+  * [How to multi-agent supervisor](https://github.com/bsorrentino/langgraph4j/blob/main/how-tos/multi-agent-supervisor.ipynb)
+
 
 ## Samples
 
@@ -44,11 +63,6 @@ LangGraph for Java. A library for building stateful, multi-agents applications w
 [Adaptive RAG][adaptive-rag] | [Langchain4j][langchain4j]
 
 
-## How To(s)
-
-* [How to add persistence ("memory") to your graph][howto-presistence]
-* [How to view and update past graph state][howto-timetravel]
-
 ## Releases
 
 **Note: ‼️**
@@ -57,7 +71,7 @@ LangGraph for Java. A library for building stateful, multi-agents applications w
 
 | Date         | Release        | info
 |--------------|----------------| ---
-| Jan 13, 2025 | `1.2.3` | official release
+| Feb 17, 2025 | `1.4.0` | official release
 
 
 ## Quick Start
@@ -71,7 +85,7 @@ LangGraph for Java. A library for building stateful, multi-agents applications w
 <dependency>
     <groupId>org.bsc.langgraph4j</groupId>
     <artifactId>langgraph4j-core</artifactId>
-    <version></version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
@@ -82,7 +96,7 @@ LangGraph for Java. A library for building stateful, multi-agents applications w
 <dependency>
     <groupId>org.bsc.langgraph4j</groupId>
     <artifactId>langgraph4j-core</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -176,7 +190,7 @@ Below you can find a piece of code of the `AgentExecutor` to give you an idea of
 public static class State implements AgentState {
 
     // the state's (partial) schema 
-    static Map<String, Channel<?>> SCHEMA = mapOf(
+    static Map<String, Channel<?>> SCHEMA = Map.of(
         "intermediate_steps", AppenderChannel.<IntermediateStep>of(ArrayList::new)
     );
 
@@ -224,7 +238,7 @@ var app = new StateGraph<>(State.SCHEMA,State::new)
                             }
                             return "continue";
                         }),
-                        mapOf("continue", "action", "end", END)
+                        Map.of("continue", "action", "end", END)
                 )
                 .addEdge("action", "agent")
                 .compile();
