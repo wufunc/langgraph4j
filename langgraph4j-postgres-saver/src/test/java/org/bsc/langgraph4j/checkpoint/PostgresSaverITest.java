@@ -20,12 +20,12 @@ import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PostgresSaverTest {
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PostgresSaverTest.class);
+public class PostgresSaverITest {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PostgresSaverITest.class);
 
     @BeforeAll
     public static void initLogging() throws IOException {
-        try( var is = PostgresSaverTest.class.getResourceAsStream("/logging.properties") ) {
+        try( var is = PostgresSaverITest.class.getResourceAsStream("/logging.properties") ) {
             LogManager.getLogManager().readConfiguration(is);
         }
     }
