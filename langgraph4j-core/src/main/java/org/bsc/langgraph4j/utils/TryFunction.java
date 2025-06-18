@@ -1,23 +1,24 @@
 package org.bsc.langgraph4j.utils;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @FunctionalInterface
-public interface TryConsumer<T, Ex extends Throwable> extends Consumer<T> {
-    org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TryConsumer.class);
+public interface TryFunction<T, R, Ex extends Throwable> extends Function<T,R> {
+    org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TryFunction.class);
 
-    void tryAccept( T t ) throws Ex;
+    R tryApply( T t ) throws Ex;
 
-    default void accept( T t ) {
+    default R apply( T t ) {
         try {
-            tryAccept(t);
+            return tryApply(t);
         } catch (Throwable ex) {
             log.error( ex.getMessage(), ex );
             throw new RuntimeException(ex);
         }
     }
 
-    static <T,Ex extends Throwable> Consumer<T> Try( TryConsumer<T, Ex> consumer ) {
-        return consumer;
+    static <T,R,Ex extends Throwable> Function<T,R> Try( TryFunction<T,R,Ex> function ) {
+        return function;
     }
 }
