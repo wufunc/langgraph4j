@@ -26,11 +26,11 @@ public class PostgresSaverITest {
     @BeforeAll
     public static void initLogging() throws IOException {
         try( var is = PostgresSaverITest.class.getResourceAsStream("/logging.properties") ) {
-            LogManager.getLogManager().readConfiguration(is);
+            if( is!=null ) LogManager.getLogManager().readConfiguration(is);
         }
     }
 
-    PostgresSaver createPostgresSaver() throws SQLException {
+    PostgresSaver.Builder buildPostgresSaver() throws SQLException {
         return PostgresSaver.builder()
                 .host("localhost")
                 .port(5432)
@@ -38,13 +38,15 @@ public class PostgresSaverITest {
                 .password("bsorrentino")
                 .database("lg4j-store")
                 .stateSerializer(new ObjectStreamStateSerializer<>( AgentState::new ) )
-                .build();
+                ;
     }
 
     @Test
     public void testCheckpointWithReleasedThread() throws Exception {
 
-        var saver = createPostgresSaver();
+        var saver = buildPostgresSaver()
+                        .dropTablesFirst(true)
+                        .build();
 
         NodeAction<AgentState> agent_1 = state -> {
             log.info( "agent_1");
@@ -80,7 +82,10 @@ public class PostgresSaverITest {
 
     @Test
     public void testCheckpointWithNotReleasedThread() throws Exception {
-        var saver = createPostgresSaver();
+        var saver = buildPostgresSaver()
+                        .dropTablesFirst(true)
+                        .build();
+
 
         NodeAction<AgentState> agent_1 = state -> {
             log.info( "agent_1");
@@ -119,7 +124,7 @@ public class PostgresSaverITest {
         assertEquals( END, lastSnapshot.get().next() );
 
         // test checkpoints reloading from database
-        saver = createPostgresSaver(); // create a new saver (reset cache)
+        saver = buildPostgresSaver().build(); // create a new saver (reset cache)
 
         compileConfig = CompileConfig.builder()
                 .checkpointSaver(saver)

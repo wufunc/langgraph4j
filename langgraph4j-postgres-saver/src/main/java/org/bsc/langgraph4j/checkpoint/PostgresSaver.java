@@ -27,8 +27,7 @@ public class PostgresSaver extends MemorySaver {
     protected PostgresSaver( Builder builder ) throws SQLException {
         this.datasource = builder.datasource;
         this.stateSerializer =  builder.stateSerializer;
-        initTable( builder.dropTablesFirst,
-                builder.createTables);
+        initTable( builder.dropTablesFirst, builder.createTables);
     }
 
     public static Builder builder() {
@@ -56,15 +55,19 @@ public class PostgresSaver extends MemorySaver {
     }
 
     protected void initTable(boolean dropTablesFirst, boolean createTables) throws SQLException {
+        var sqlDropTables = """
+        DROP TABLE IF EXISTS LG4JCheckpoint CASCADE;
+        DROP TABLE IF EXISTS LG4JThread CASCADE;
+        """;
 
         var sqlCreateTables = """
-                CREATE TABLE LG4JThread (
+                CREATE TABLE IF NOT EXISTS LG4JThread (
                      thread_id UUID PRIMARY KEY,
                      thread_name VARCHAR(255),
                      is_released BOOLEAN DEFAULT FALSE NOT NULL
                  );
                 
-                 CREATE TABLE LG4JCheckpoint (
+                 CREATE TABLE IF NOT EXISTS LG4JCheckpoint (
                      checkpoint_id UUID PRIMARY KEY,
                      parent_checkpoint_id UUID,
                      thread_id UUID NOT NULL,
@@ -85,18 +88,16 @@ public class PostgresSaver extends MemorySaver {
                  CREATE UNIQUE INDEX idx_unique_lg4jthread_thread_name_unreleased  ON LG4JThread(thread_name) WHERE is_released = FALSE;
                 """;
 
-        var sqlDropTables = """
-        DROP TABLE IF EXISTS LG4JCheckpoint CASCADE;
-        DROP TABLE IF EXISTS LG4JThread CASCADE;
-        """;
 
         String sqlCommand = null;
         try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
             if (dropTablesFirst) {
+                log.trace( "Executing drop tables:\n---\n{}---", sqlDropTables);
                 sqlCommand = sqlDropTables;
                 statement.executeUpdate(sqlCommand);
             }
             if (createTables) {
+                log.trace( "Executing create tables:\n---\n{}---", sqlCreateTables);
                 sqlCommand = sqlCreateTables;
                 statement.executeUpdate(sqlCommand);
             }
@@ -436,6 +437,7 @@ public class PostgresSaver extends MemorySaver {
             ds.setServerNames( new String[] { requireNotBlank(host, "host") } );
 
             datasource = ds;
+            createTables = createTables || dropTablesFirst;
 
             return new PostgresSaver( this );
         }
