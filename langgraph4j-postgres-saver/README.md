@@ -36,13 +36,13 @@ Add the following to your project's build configuration:
 <dependency>
     <groupId>langgraph4j</groupId>
     <artifactId>langgraph4j-postgres-saver</artifactId>
-    <version>YOUR_VERSION_HERE</version>
+    <version>1.6.0-beta4</version>
 </dependency>
 ```
 
 **Gradle**
 ```gradle
-implementation 'langgraph4j:langgraph4j-postgres-saver:YOUR_VERSION_HERE'
+implementation 'langgraph4j:langgraph4j-postgres-saver:1.6.0-beta4'
 ```
 
 ### Initialize the PostgresSaver
