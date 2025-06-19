@@ -217,5 +217,5 @@ var workflow = new MessagesStateGraph<String>()
 Take a look 👀 to [parallel-branch.ipynb] to understand the run-time behaviours
 
 
-[parallel-branch.ipynb]: /langgraph4j/how-tos/parallel-branch.ipynb
+[parallel-branch.ipynb]: /langgraph4j/how-tos/parallel-branch
 
