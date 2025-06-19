@@ -1,6 +1,6 @@
 # langgraph4j-postgres-saver
 
-**Persist and manage your [langgraph4j](https://github.com/langgraph4j/langgraph4j) workflow state in a PostgreSQL database for its durability**
+> Persist and manage your [langgraph4j](https://github.com/langgraph4j/langgraph4j) workflow state in a PostgreSQL database for its durability**
 
 ## Overview
 
@@ -60,7 +60,7 @@ var saver = PostgresSaver saver = PostgresSaver.builder()
     .createTables( true | false ) // create tables if don't exist. default is false except if dropTablesFirst = true
 ```
 
-### Example Usage
+#### Example Usage
 
 Below is a complete example of how to use langgraph4j-postgres-saver to persist, reload, and verify workflow state:
 
