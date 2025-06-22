@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 import static org.bsc.langgraph4j.StateGraph.END;
+import static org.bsc.langgraph4j.StateGraph.START;
 
 /**
  * Represents the output of a node in a graph.
@@ -58,10 +59,18 @@ public class NodeOutput<State extends AgentState> {
     }
 
     /**
-     * Checks if the current node refers to the end of the graph.
+     * Checks if the current node refers to the start of the graph processing.
+     *
+     * @return {@code true} if the current node refers to the start of the graph processing
+     */
+    public boolean isSTART() {
+        return Objects.equals(node(),START);
+    }
+    /**
+     * Checks if the current node refers to the end of the graph processing.
      * useful to understand if the workflow has been interrupted.
      *
-     * @return {@code true} if the current node refers to the end of the graph
+     * @return {@code true} if the current node refers to the end of the graph processing
      */
     public boolean isEND() {
         return Objects.equals(node(),END);
