@@ -1,12 +1,11 @@
+# Logging 
 
 ## Initialize Logger 
 
 
 ```java
-var lm = java.util.logging.LogManager.getLogManager();
-lm.checkAccess(); 
 try( var file = new java.io.FileInputStream("./logging.properties")) {
-    lm.readConfiguration( file );
+    java.util.logging.LogManager.getLogManager().readConfiguration( file );
     java.util.logging.Logger.getLogger("").addHandler(new java.util.logging.ConsoleHandler());
 }
 ```

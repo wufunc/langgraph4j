@@ -4,11 +4,11 @@
 
   <groupId>org.bsc.langgraph4j</groupId>
   <artifactId>langgraph4j-parent</artifactId>
-  <version>1.4.0</version>
+  <version>1.6-beta4</version>
   <packaging>pom</packaging>
 
   <name>langgraph4j::parent</name>
-  <url>https://github.com/bsorrentino/langgraph4j</url>
+  <url>https://github.com/langgraph4j/langgraph4j</url>
   <description>A library for building stateful, multi-agents applications with LLMs</description>
   <licenses>
     <license>
@@ -21,6 +21,11 @@
       <id>bsorrentino</id>
       <name>Bartolomeo Sorrentino</name>
       <email>bartolomeo.sorrentino@gmail.com</email>
+    </developer>
+    <developer>
+      <id>lambochen</id>
+      <name>lambochen</name>
+      <email>lambochen@yeah.net</email>
     </developer>
   </developers>
   <scm>
@@ -35,8 +40,14 @@
   </issueManagement>
 
   <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <langchain4j.version>1.0.0-beta1</langchain4j.version>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <langchain4j.version>1.0.1</langchain4j.version>
+    <langchain4j.beta>1.0.1-beta6</langchain4j.beta>
+    <spring-ai.version>1.0.0</spring-ai.version>
+    <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
   </properties>
 
   <distributionManagement>
@@ -59,12 +70,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <version>1.18.32</version>
-        <scope>provided</scope>
-      </dependency>
 
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -166,7 +171,11 @@
 
         </plugin>
 
-
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
       </plugins>
 
     </pluginManagement>
@@ -185,16 +194,26 @@
  </build>
 
   <modules>
-    <module>core</module>
-    <module>langchain4j</module>
-    <module>agent-executor</module>
-    <module>how-tos</module>
-    <module>samples/image-to-diagram</module>
-    <module>samples/adaptive-rag</module>
-    <module>samples/springai-agentexecutor</module>
+    <module>langgraph4j-core</module>
+    <module>langgraph4j-bom</module>
+
+    <!-- Integrating LangGraph4j with LangChain4j -->
+    <module>langchain4j/langchain4j-core</module>
+    <module>langchain4j/langchain4j-agent</module>
+
+    <!-- Integrating LangGraph4j with Spring AI -->
+    <module>spring-ai/spring-ai-core</module>
+    <module>spring-ai/spring-ai-agent</module>
+
+    <!-- LangGraph4j studio and implementations-->
     <module>studio/base</module>
     <module>studio/jetty</module>
+    <module>studio/quarkus</module>
     <module>studio/springboot</module>
+
+    <!-- LangGraph4j how-tos and examples, new examples repository: https://github.com/langgraph4j/langgraph4j-examples -->
+    <module>how-tos</module>
+      <module>langgraph4j-postgres-saver</module>
   </modules>
 
   <profiles>

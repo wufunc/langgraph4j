@@ -5,6 +5,11 @@ import { html, css, LitElement, CSSResult } from 'lit';
 
 import { imageToDiagram as test } from './lg4j-executor-test.js';
 
+import { debug } from './debug.js';
+
+const _DBG = debug( { on: true, topic: 'LG4JExecutor' } )
+
+
 /**
  * @file
  * @typedef {import('./types.js').ResultData} ResultData * 
@@ -34,13 +39,25 @@ async function* streamingResponse(response) {
   // Attach Reader
   const reader = response.body?.getReader();
 
+  const decoder = new TextDecoder();
+
+  let buffer = '';
   while (true && reader) {
     // wait for next encoded chunk
     const { done, value } = await reader.read();
     // check if stream is done
     if (done) break;
+
+    try {
+      buffer += decoder.decode(value);
+      const data = JSON.parse(buffer);
+      buffer = '';
+      yield data;
+    } catch (err) {
+      console.warn('JSON parse error:', err );
+    }
     // Decodes data chunk and yields it
-    yield (new TextDecoder().decode(value));
+    // yield (new TextDecoder().decode(value));
   }
 }
 
@@ -113,7 +130,6 @@ export class LG4JExecutorElement extends LitElement {
    */
   #updatedState = null
 
-
   /**
    * Creates an instance of LG4JInputElement.
    * 
@@ -128,13 +144,58 @@ export class LG4JExecutorElement extends LitElement {
 
   }
 
+  #startExecution() {
+
+    this._executing = true
+    this.dispatchEvent(new CustomEvent('state-updated', {
+      detail: 'start',
+      bubbles: true,
+      composed: true,
+      cancelable: true
+    }));
+  }
+
+  /**
+   * 
+   * @param {[ string, UpdatedState & { next: string } ]|Error|null} result 
+   */
+  #stopExecution( result ) {
+    this._executing = false
+    
+    // NO ACTION
+    if( !result ) {
+      return
+    }
+
+    // ON ERROR
+    if( result instanceof Error ) {
+      this.dispatchEvent(new CustomEvent('state-updated', {
+        detail: 'error',
+        bubbles: true,
+        composed: true,
+        cancelable: true
+      }));
+      return 
+    }
+    // ON SUCCESS
+    const [ thread, { node } ] = result
+    // Asuume that flow is interrupted if last node is different by last node (__END__) 
+    this.dispatchEvent(new CustomEvent('state-updated', {
+        detail: ( node!=='__END__' ) ? 'interrupted' : 'stop',
+        bubbles: true,
+        composed: true,
+        cancelable: true
+      }));
+  }
+  
+
   /**
    * Event handler for the 'update slected thread' event.
    * 
    * @param {CustomEvent<string>} e - The event object containing the updated data.
    */
   #onThreadUpdated(e) {
-    console.debug('thread-updated', e.detail)
+    _DBG('thread-updated', e.detail)
     this.#selectedThread = e.detail
     this.#updatedState = null
     this.requestUpdate()
@@ -145,7 +206,7 @@ export class LG4JExecutorElement extends LitElement {
    * @param {CustomEvent<UpdatedState>} e - The event object containing the result data.
    */
   #onNodeUpdated(e) {
-    console.debug('onNodeUpdated', e)
+    _DBG('onNodeUpdated', e)
     this.#updatedState = e.detail
     this.requestUpdate()
   }
@@ -181,7 +242,6 @@ export class LG4JExecutorElement extends LitElement {
     this.removeEventListener("thread-updated", this.#onThreadUpdated)
     // @ts-ignore
     this.removeEventListener('node-updated', this.#onNodeUpdated)
-
   }
 
   /**
@@ -191,17 +251,16 @@ export class LG4JExecutorElement extends LitElement {
    */
   render() {
 
-    // console.debug( 'render', this.formMetaData )
     return html`
         <div class="container">
           ${this.formMetaData.map(({ name, type }) => {
-      switch (type) {
-        case 'STRING':
-          return html`<textarea id="${name}" class="textarea textarea-primary" placeholder="${name}"></textarea>`
-        case 'IMAGE':
-          return html`<lg4j-image-uploader id="${name}"></lg4j-image-uploader>`
-      }
-    })}
+            switch (type) {
+              case 'STRING':
+                return html`<textarea id="${name}" class="textarea textarea-primary" placeholder="${name}"></textarea>`
+              case 'IMAGE':
+                return html`<lg4j-image-uploader id="${name}"></lg4j-image-uploader>`
+            }
+          })}
           <div class="commands">
             <button id="submit" ?disabled=${this._executing} @click="${this.#callSubmit}" class="btn btn-primary item1">Submit</button>
             <button id="resume" ?disabled=${!this.#updatedState || this._executing} @click="${this.#callResume}" class="btn btn-secondary item2">
@@ -209,17 +268,72 @@ export class LG4JExecutorElement extends LitElement {
             </button>
           </div>
         </div>
+        <!--
+        ==============
+        ERROR DIALOG 
+        ==============
+        -->
+        <dialog id="error_dialog" class="modal">
+          <div class="modal-box">
+            <form method="dialog">
+              <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+              <div class="flex items-center gap-2 mb-4 text-error">
+              <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 shrink-0 stroke-current"
+              fill="none"
+              viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p id="error_message" class="text-lg font-bold">ERROR</p>
+          </div>
+          </div>
+        </dialog>        
         `;
+  }
+
+  /**
+   * 
+   * @param {string} detail 
+   */
+  #requestShowError( detail ) {
+
+    const elem = this.shadowRoot?.getElementById('error_dialog')
+    if (elem && 'showModal' in elem ) {
+      const msgElem = elem.querySelector('#error_message')
+      if( msgElem ) {
+        msgElem.textContent = detail
+      }
+      //@ts-ignore
+      elem.showModal()
+      
+      // if( timeout ) {
+      //   await delay(timeout)
+      //   //@ts-ignore
+      //   elem.close()
+      // }
+   }
+  
   }
 
   async #callInit() {
 
     const initResponse = await fetch(`${this.url}/init`)
 
+    if( !initResponse.ok ) {
+      this.#requestShowError(initResponse.statusText) 
+      return null
+    }
+  
     /** @type {InitData} */
     const initData = await initResponse.json()
 
-    console.debug('initData', initData);
+    _DBG('initData', initData);
 
     this.dispatchEvent(new CustomEvent('init', {
       detail: initData,
@@ -234,7 +348,10 @@ export class LG4JExecutorElement extends LitElement {
   }
 
   async #callResume() {
-    this._executing = true
+
+    this.#startExecution()
+    let result = null
+
     try {
 
       if (this.test) {
@@ -242,58 +359,81 @@ export class LG4JExecutorElement extends LitElement {
         return
       }
 
-      await this.#callResumeAction()
-
+      result =  await this.#callResumeAction()
 
     }
+    catch (err) {
+      if(err instanceof Error) {
+        this.#requestShowError(err.message)
+        result = err
+      }
+    }
     finally {
-      this._executing = false
+      this.#stopExecution(result)
     }
 
   }
 
   async #callResumeAction() {
 
-    const execResponse = await fetch(`${this.url}/stream?thread=${this.#selectedThread}&resume=true&node=${this.#updatedState?.node}&checkpoint=${this.#updatedState?.checkpoint}`, {
+    const execResponse = await fetch(`${ this.url}/stream?thread=${this.#selectedThread}&resume=true&node=${this.#updatedState?.node}&checkpoint=${this.#updatedState?.checkpoint}`, {
       method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(this.#updatedState?.data)
+      body: JSON.stringify( this.#updatedState?.data )
     });
+
+    if( !execResponse.ok ) {
+      throw new Error( execResponse.statusText )
+    }
 
     this.#updatedState = null
 
-    for await (let chunk of streamingResponse(execResponse)) {
-      console.debug(chunk)
+    /** @type [ string, UpdatedState & { next: string } ]|null */
+    let lastChunk = null
+
+    for await (let detail of streamingResponse(execResponse)) {
+      _DBG( detail)
+      
+      lastChunk = detail
 
       this.dispatchEvent(new CustomEvent('result', {
-        detail: JSON.parse(chunk),
+        detail,
         bubbles: true,
         composed: true,
         cancelable: true
       }));
-
     }
 
+    return lastChunk
 
   }
 
   async #callSubmit() {
 
-    this._executing = true
+    this.#startExecution()
+    let result = null
+
     try {
 
       if (this.test) {
         await test.callSubmitAction(this, this.#selectedThread);
-        return
+        // await delay(1000);
+        // throw new Error('Error test')
       }
 
-      await this.#callSubmitAction()
-
+      result = await this.#callSubmitAction()
+    }
+    catch (err) {
+      if(err instanceof Error) {
+        this.#requestShowError(err.message)
+        result = err
+      }
     }
     finally {
-      this._executing = false
+        this.#stopExecution(result)
+
     }
   }
 
@@ -322,28 +462,41 @@ export class LG4JExecutorElement extends LitElement {
       return acc
     }, result);
 
+    
+    // const execResponse = await fetch(`${this.url}/stream?thread=${this.#selectedThread}&resume=${interrupted}&node=${this.#updatedState?.node}&checkpoint=${this.#updatedState?.checkpoint}`, {
     const execResponse = await fetch(`${this.url}/stream?thread=${this.#selectedThread}`, {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
     });
+  
+    if( !execResponse.ok ) {
+      throw new Error( execResponse.statusText )
+    }
 
-    for await (let chunk of streamingResponse(execResponse)) {
-      console.debug(chunk)
+    /** @type [ string, UpdatedState & { next: string } ]|null */
+    let lastChunk = null
+    
+    for await (let detail of streamingResponse(execResponse)) {
+      _DBG( "SUBMIT RESULT", detail)
+
+      // lastChunk = JSON.parse(chunk);
+      lastChunk = detail
 
       this.dispatchEvent(new CustomEvent('result', {
-        detail: JSON.parse(chunk),
+        detail,
         bubbles: true,
         composed: true,
         cancelable: true
       }));
 
     }
+    
+    return lastChunk
 
   }
 
 }
-
 window.customElements.define('lg4j-executor', LG4JExecutorElement);

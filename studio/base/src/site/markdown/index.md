@@ -11,7 +11,7 @@ An **embed playground webapp** that runs a Langgraph4j workflow in visual way.
 - [x] show which step is currently running
 - [x] Show state data for each executed step
 - [x] Allow edit state data and resume execution
-- [ ] Manage Interruptions
+- [x] Manage Interruptions
 
 ## Demo Code 
 
@@ -22,7 +22,7 @@ An **embed playground webapp** that runs a Langgraph4j workflow in visual way.
 <dependency>
     <groupId>org.bsc.langgraph4j</groupId>
     <artifactId>langgraph4j-studio-jetty</artifactId>
-    <version>1.4.0</version>
+    <version>1.6.0-beta4</version>
 </dependency>
 ```
 
@@ -58,7 +58,7 @@ public static void main(String[] args) throws Exception {
 <dependency>
     <groupId>org.bsc.langgraph4j</groupId>
     <artifactId>langgraph4j-studio-springboot</artifactId>
-    <version>1.4.0</version>
+    <version>1.6.0-beta4</version>
 </dependency>
 ```
 

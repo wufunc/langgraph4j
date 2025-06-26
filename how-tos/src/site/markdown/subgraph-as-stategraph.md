@@ -1,6 +1,8 @@
 # Subgraph as state graph sample
 
+
 **utility to render graph respresentation in PlantUML**
+
 
 ```java
 import net.sourceforge.plantuml.SourceStringReader;
@@ -32,7 +34,6 @@ void displayDiagram( GraphRepresentation representation ) throws IOException {
 ```java
 import org.bsc.langgraph4j.prebuilt.MessagesState;
 import org.bsc.langgraph4j.state.Channel;
-import org.bsc.langgraph4j.state.AppenderChannel;
 
 public class State extends MessagesState<String> {
 
@@ -89,7 +90,7 @@ var workflow = new StateGraph<>(State.SCHEMA, State::new)
                     .addNode("step_1",  makeNode("step1"))
                     .addNode("step_2",  makeNode("step2"))
                     .addNode("step_3",  makeNode("step3"))
-                    .addSubgraph( "subgraph", workflowChild )
+                    .addNode( "subgraph", workflowChild )
                     .addEdge(START, "step_1")
                     .addEdge("step_1", "step_2")
                     .addEdge("step_2", "subgraph")

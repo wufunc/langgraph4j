@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.bsc.langgraph4j</groupId>
         <artifactId>langgraph4j-parent</artifactId>
-        <version>1.4.0</version>
+        <version>1.6-beta4</version>
     </parent>
 
     <artifactId>langgraph4j-howtos</artifactId>
@@ -17,7 +17,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+        </properties>
 
     <dependencies>
         <dependency>
@@ -33,15 +33,22 @@
         </dependency>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
+            <groupId>org.bsc.langgraph4j</groupId>
+            <artifactId>langgraph4j-agent-executor</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
 
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j</artifactId>
             <version>${langchain4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-mcp</artifactId>
+            <version>${langchain4j.beta}</version>
         </dependency>
 
         <dependency>
@@ -53,7 +60,13 @@
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-ollama</artifactId>
-            <version>${langchain4j.version}</version>
+            <version>${langchain4j.beta}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-web-search-engine-tavily</artifactId>
+            <version>${langchain4j.beta}</version>
         </dependency>
 
         <dependency>
@@ -80,7 +93,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <excludes>
+                        <exclude>**/*ITest.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 

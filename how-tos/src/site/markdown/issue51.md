@@ -1,13 +1,12 @@
 # Use case proposed in [issue #51](https://github.com/bsorrentino/langgraph4j/issues/51) by [pakamona](https://github.com/pakamona)
 
+
 **Initialize Logger**
 
 
 ```java
 try( var file = new java.io.FileInputStream("./logging.properties")) {
-    var lm = java.util.logging.LogManager.getLogManager();
-    lm.checkAccess(); 
-    lm.readConfiguration( file );
+    java.util.logging.LogManager.getLogManager().readConfiguration( file );
 }
 
 var log = org.slf4j.LoggerFactory.getLogger("AdaptiveRag");
@@ -48,16 +47,17 @@ import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.model.output.Response;
+import dev.langchain4j.model.chat.request.ChatRequest;
 
 class OrchestratorAgent implements NodeAction<MyAgentState> {
 
-    private final ChatLanguageModel chatLanguageModel;
+    private final ChatModel chatModel;
 
-    public OrchestratorAgent( ChatLanguageModel chatLanguageModel ) {
-        this.chatLanguageModel = chatLanguageModel;
+    public OrchestratorAgent( ChatModel chatModel ) {
+        this.chatModel = chatModel;
     }
  
     public Map<String, Object> apply(MyAgentState state) throws Exception {
@@ -73,9 +73,12 @@ class OrchestratorAgent implements NodeAction<MyAgentState> {
         """));
         messages.add(new UserMessage(userMessageTemplate.text()));
 
-        var result = chatLanguageModel.generate( messages );
+        var request = ChatRequest.builder()
+                .messages( messages )
+                .build();
+       var result = model.chat(request );
 
-        return Map.of( "orchestrator_outcome", result.content().text() );
+        return Map.of( "orchestrator_outcome", result.aiMessage().text() );
     }
 
 };

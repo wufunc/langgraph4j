@@ -2,18 +2,1778 @@
 
 
 
-<!-- "name: Unreleased" is a release tag -->
+<!-- "name: v1.6-beta4" is a release tag -->
 
-## [Unreleased](https://github.com/bsorrentino/langgraph4j/releases/tag/Unreleased) ()
+## [v1.6-beta4](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6-beta4) (2025-06-19)
+
+### Features
+
+ *  **PostgresSaver**  add module langgraph4j-postgres-saver ([02420db2871e873](https://github.com/bsorrentino/langgraph4j/commit/02420db2871e873b237259db90f5b5501149c7eb))
+     > - first reference implementation
+     > work on #133
+   
+ *  **core**  enforce attributes validation ([361c55f55dab709](https://github.com/bsorrentino/langgraph4j/commit/361c55f55dab70905a1e97dfa21995bc1234e317))
+   
+ *  **core**  add TryConsumer functional interface ([942754a3976230a](https://github.com/bsorrentino/langgraph4j/commit/942754a3976230a8279cb9e54579db697638952c))
+     > Added a new &#x60;TryConsumer&#x60; functional interface to handle exceptions within lambda expressions
+   
+ *  **core**  add TryConsumer functional interface ([39e1a3e80027546](https://github.com/bsorrentino/langgraph4j/commit/39e1a3e80027546acd0521ab87099a2aa92c1caf))
+     > Added a new &#x60;TryConsumer&#x60; functional interface to handle exceptions within lambda expressions
+   
+ *  **postgres**  start implementation of PostgresSaver ([7915c3077dc991a](https://github.com/bsorrentino/langgraph4j/commit/7915c3077dc991a368852c26384ad6fdae8b814b))
+     > work #133
+   
+
+### Bug Fixes
+
+ -  **how-to**  fix time-travel notebook replace getState() with state() ([e3652e3704eb8dd](https://github.com/bsorrentino/langgraph4j/commit/e3652e3704eb8ddb10e857d826f622ba634225d7))
+
+ -  update parent pom relative path ([431d87e46548494](https://github.com/bsorrentino/langgraph4j/commit/431d87e46548494d9f44a5f92296e535ea0fb08a))
+
+ -  **studio**  update parent pom path ([20bf3e315e82c7a](https://github.com/bsorrentino/langgraph4j/commit/20bf3e315e82c7a41ce28cd6c94a52b1a250a0d7))
+
+
+### Documentation
+
+ -  build: bump to version 1.6-beta4 ([0fac72c980045e4](https://github.com/bsorrentino/langgraph4j/commit/0fac72c980045e43c3259242491473d4f64d7811))
+
+ -  **postgres**  add readme ([15a323e208458cd](https://github.com/bsorrentino/langgraph4j/commit/15a323e208458cd7b9926378c929351e3ca05ef0))
+     > work on #133
+
+ -  refine parallel node documentation ([5d5babc1864d1d1](https://github.com/bsorrentino/langgraph4j/commit/5d5babc1864d1d104275a155317d946626a05f3c))
+
+ -  refine parallel node documentation ([e8f12334c332ab4](https://github.com/bsorrentino/langgraph4j/commit/e8f12334c332ab4dfb165bc9a9e0f8e0395a6b9f))
+
+ -  **pom**  update project url ([276402be6de96a3](https://github.com/bsorrentino/langgraph4j/commit/276402be6de96a32e23cc6798f75366c43201dda))
+
+ -  fix link references in site ([c517965326eb4da](https://github.com/bsorrentino/langgraph4j/commit/c517965326eb4da58ca31823872174084bb6a151))
+
+ -  update changelog ([fe8d3337d614f7d](https://github.com/bsorrentino/langgraph4j/commit/fe8d3337d614f7d1d3abd7749f8a0062d2cb9e2d))
+
+
+### Refactor
+
+ -  **how-to**  code refinement ([8dcd0159a1c5ca1](https://github.com/bsorrentino/langgraph4j/commit/8dcd0159a1c5ca121f9a28294a23e6eb4bb63c44))
+    > evaluate tool call during streaming for springai
+ > work on #169
+
+ -  **how-to**  code refinement ([edaab7cddb51d83](https://github.com/bsorrentino/langgraph4j/commit/edaab7cddb51d831898d60b38e749851bf6a6fbc))
+    > evaluate tool call during streaming for springai
+ > work on #169
+
+ -  **how-to**  code refinement ([f7bfe2c14ba6612](https://github.com/bsorrentino/langgraph4j/commit/f7bfe2c14ba66125f92c7862c69661c98607d904))
+    > evaluate tool call during streaming
+ > work on #169
+
+ -  **how-to**  code refinement ([cdb911c4a474333](https://github.com/bsorrentino/langgraph4j/commit/cdb911c4a4743335395bbb6e899f81a283743cee))
+    > evaluate tool call during streaming
+ > work on #169
+
+ -  **serialization**  apply serialization changes ([d51faaef437b23c](https://github.com/bsorrentino/langgraph4j/commit/d51faaef437b23cc2ec796f21f9a52ac0fc87272))
+   
+ -  **StateSerializer**  abstract read/write methods for state data serialization ([3d4507094827ff7](https://github.com/bsorrentino/langgraph4j/commit/3d4507094827ff72859f4a2f61be1116f69335f5))
+    > - Renamed &#x27;write&#x27; and &#x27;read&#x27; methods to abstract methods &#x27;writeData&#x27; and &#x27;readData&#x27; respectively.
+ > - Added &#x27;dataToBytes&#x27; and &#x27;dataFromBytes&#x27; as final methods for serializing/deserializing Map&lt;String, Object&gt; instances.
+
+ -  **Serializer**  update method names and documentation ([caef4159282526f](https://github.com/bsorrentino/langgraph4j/commit/caef4159282526f31df73c9d259bc2d9d27e47ea))
+    > - Renamed &#x60;mimeType&#x60; to &#x60;contentType&#x60; for clarification.
+ > - Deprecated old methods (&#x60;writeObject&#x60;, &#x60;readObject&#x60;) in favor of new ones (&#x60;objectToBytes&#x60;, &#x60;bytesToObject&#x60;).
+
+ -  **core**  enhance MemorySaver to become a base cache implementation for further CheckpointSaver extensions ([611bbe490d64fdf](https://github.com/bsorrentino/langgraph4j/commit/611bbe490d64fdf6081fd3dc999a9577850bc112))
+   
+ -  **CompiledGraph**  add public access to lastStateOf method ([8819776a0f5519a](https://github.com/bsorrentino/langgraph4j/commit/8819776a0f5519a3c59cb443b542773f227023fa))
+   
+
+### ALM 
+
+ -  bump to version 1.6-beta4 ([878166fe608cdd8](https://github.com/bsorrentino/langgraph4j/commit/878166fe608cdd8cd9414dfe3386e13173629c2b))
+   
+ -  **PostgresSaver**  skip integration test on build ([5034c1f81f12485](https://github.com/bsorrentino/langgraph4j/commit/5034c1f81f12485a07317f43d9c3d16b8e7d1b96))
+    > work on #133
+
+ -  **postgres**  add new module for saving checkpoint to postgres ([4b61aa3dba9a14d](https://github.com/bsorrentino/langgraph4j/commit/4b61aa3dba9a14d67cdc011d0017bc77fc415ce5))
+    > work on #133
+
+ -  bump to 1.6-SNAPSHOT ([7530493939954ee](https://github.com/bsorrentino/langgraph4j/commit/7530493939954ee74bfcd231f4584c3b0607a25c))
+   
+
+### Test 
+
+ -  **postgres**  verify dropTable and createTable built-in commands ([d35fea32c9fa06d](https://github.com/bsorrentino/langgraph4j/commit/d35fea32c9fa06dd0dcdb61ace1f0a52f9c04ec4))
+    > work on #133
+
+
+
+
+
+
+<!-- "name: v1.6.0-beta3" is a release tag -->
+
+## [v1.6.0-beta3](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-beta3) (2025-06-09)
 
 
 
 ### Documentation
 
+ -  update changelog ([32611374228849b](https://github.com/bsorrentino/langgraph4j/commit/32611374228849b18d606d8747089bd1c609b50d))
+
+ -  bump to version 1.6.0-beta3 ([76198eaf8428a6a](https://github.com/bsorrentino/langgraph4j/commit/76198eaf8428a6acad339a9e860531dd66dee360))
+
+ -  fix link references in site ([986d1c85d871a41](https://github.com/bsorrentino/langgraph4j/commit/986d1c85d871a416189fff5fb356a098f8c2e0c6))
+
+ -  update javadoc ([034e0915c1adc3f](https://github.com/bsorrentino/langgraph4j/commit/034e0915c1adc3f027bebfb7af6b6639f64b0755))
+
+ -  fix javadoc links ([69e6d9b6de4ff83](https://github.com/bsorrentino/langgraph4j/commit/69e6d9b6de4ff83b20113660c9045df98e8399d2))
+
+ -  fix javadoc links ([41afd10131b2659](https://github.com/bsorrentino/langgraph4j/commit/41afd10131b2659d06ff8233b0da9efd240d6fd9))
+
+ -  update javadoc ([73c9c638d7232c5](https://github.com/bsorrentino/langgraph4j/commit/73c9c638d7232c5fb6c38c159e89f6b3aaf3b15a))
+
+ -  update javadoc ([5a68979fe931b62](https://github.com/bsorrentino/langgraph4j/commit/5a68979fe931b622256352770f499bcb068cbba0))
+
+ -  fix typo in reference link ([88c0002134ce029](https://github.com/bsorrentino/langgraph4j/commit/88c0002134ce02948cbfc8b92b7e81545930e334))
+     > merge PR #160
+
+ -  fix link references in site ([d0f9567fccafe65](https://github.com/bsorrentino/langgraph4j/commit/d0f9567fccafe6545996b4a49d00cd07cec076a9))
+
+ -  fix bom reference ([022aa5ac1420695](https://github.com/bsorrentino/langgraph4j/commit/022aa5ac1420695a3c1b5f8a448f8bb544cc630e))
+     > resolve #155
+
+ -  update changelog ([26cd7fc76dc4b6c](https://github.com/bsorrentino/langgraph4j/commit/26cd7fc76dc4b6c0cfaf7e0ad9d20777012dd01a))
+
+
+
+### ALM 
+
+ -  bump to version 1.6.0-beta3 ([3db174a8e60c93b](https://github.com/bsorrentino/langgraph4j/commit/3db174a8e60c93b6abbe738401c78695a99403a9))
+   
+ -  bump to version 1.6-SNAPSHOT ([3eab3b2d1ae7ff8](https://github.com/bsorrentino/langgraph4j/commit/3eab3b2d1ae7ff81b85c78f4811262710b51da3e))
+   
+
+
+
+
+
+
+<!-- "name: v1.6.0-beta2" is a release tag -->
+
+## [v1.6.0-beta2](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-beta2) (2025-06-05)
+
+
+
+### Documentation
+
+ -  bump to version 1.6.0-beta2 ([82d0ddae4f567b5](https://github.com/bsorrentino/langgraph4j/commit/82d0ddae4f567b53d9b9076f78238a749d58322b))
+
+ -  update getting started ([c0e6ec4521c7484](https://github.com/bsorrentino/langgraph4j/commit/c0e6ec4521c7484082bd8b62de269f283c5680da))
+
+ -  update getting started ([234aa25959e319a](https://github.com/bsorrentino/langgraph4j/commit/234aa25959e319a4a4fb748ed3f1936e170e0217))
+
+ -  update getting started ([98c064f69fc5f45](https://github.com/bsorrentino/langgraph4j/commit/98c064f69fc5f4509819765ab167bd0a68baecc7))
+
+ -  update site and readme ([4661d121c6885db](https://github.com/bsorrentino/langgraph4j/commit/4661d121c6885dbf0ad71fac4ef34a7e262d0429))
+
+ -  update site and readme ([965561f2f75c3ba](https://github.com/bsorrentino/langgraph4j/commit/965561f2f75c3badef22a2c2ec860ad257c7e41c))
+
+ -  update site ([6dcd3ee3d28a1a5](https://github.com/bsorrentino/langgraph4j/commit/6dcd3ee3d28a1a58aa3b0e0ed74f41c5dd2a33fd))
+
+ -  update site ([062594f1e8866f1](https://github.com/bsorrentino/langgraph4j/commit/062594f1e8866f14a6394bf243e2f634ea50d107))
+
+ -  update site ([6b20cabba77b8c1](https://github.com/bsorrentino/langgraph4j/commit/6b20cabba77b8c17c28b4b0bb58b2f3692abd55d))
+
+ -  fix builder link ([d792a33a4e0f4aa](https://github.com/bsorrentino/langgraph4j/commit/d792a33a4e0f4aaeece3aa632a130a3ff1d0122e))
+
+ -  update site ([6a2927293c627eb](https://github.com/bsorrentino/langgraph4j/commit/6a2927293c627ebca1f52d486c4731a3a7a4af08))
+
+ -  update site ([8782b6e17bbda04](https://github.com/bsorrentino/langgraph4j/commit/8782b6e17bbda04d81556c850c827555fae4f7e0))
+
+ -  update changelog ([47271c68e9d36fd](https://github.com/bsorrentino/langgraph4j/commit/47271c68e9d36fda97520904c62cca2f823613e7))
+
+
+### Refactor
+
+ -  **how-to**  remove useless output ([7832cfb377cd25f](https://github.com/bsorrentino/langgraph4j/commit/7832cfb377cd25f83b2f52b79214586487a355d0))
+   
+ -  **spring-ai-agent**  feat(AgentExecutor): add a ReACT agent that make in evidence make in evidence the tools execution using and action dispatcher node ([a8a6946473ae855](https://github.com/bsorrentino/langgraph4j/commit/a8a6946473ae855d7d6edf565fcff5a40a8f92e0))
+    > - good to see in action with Studio
+ > BREAKING CHANGE: ChatService is now private
+
+
+### ALM 
+
+ -  bump to version 1.6.0-beta2 ([893f4d41efbccd7](https://github.com/bsorrentino/langgraph4j/commit/893f4d41efbccd7d52fe91b9884b9e23e3e8ada3))
+   
+ -  bump to version 1.6-SNAPSHOT ([e96be89c71f153d](https://github.com/bsorrentino/langgraph4j/commit/e96be89c71f153d570064e2967e671f89e524f72))
+   
+
+
+
+
+
+
+<!-- "name: v1.6.0-beta1" is a release tag -->
+
+## [v1.6.0-beta1](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-beta1) (2025-06-02)
+
+### Features
+
+ *  finalize usage of CommandAction as Conditional Edges action ([8d25600e6bb5ff1](https://github.com/bsorrentino/langgraph4j/commit/8d25600e6bb5ff119c205977cf70a94da91979d6))
+     > resolve #109
+   
+ *  **StateGraph**  add node and conditional edges accepting command action ([6c4bf8b4ef272c4](https://github.com/bsorrentino/langgraph4j/commit/6c4bf8b4ef272c42a3f4c4f514593e38215a080f))
+     > work on #109
+   
+ *  **compiledgraph**  add support command in Edge evaluation ([8db59a12f613cb0](https://github.com/bsorrentino/langgraph4j/commit/8db59a12f613cb027d609d32cd55f7433efe1997))
+     > - From now conditional edge can contribute to state management
+     > work on #109
+   
+ *  **core**  handle the gotoNode command when evaluating the next node to go to ([41de390505796d1](https://github.com/bsorrentino/langgraph4j/commit/41de390505796d11926caea4e90791c2ac56017b))
+     > move enum RunnableErrors from StateGraph to CompiledGraph
+     > work on #109
+   
+ *  **core**  enforce optional semantic to gotoNode field to Command record ([09bb03c777ee70c](https://github.com/bsorrentino/langgraph4j/commit/09bb03c777ee70c22e0479fe53c5755d7a637f90))
+     > work on #109
+   
+ *  **core**  enforce optional semantic to gotoNode field to Command record ([0a65e51f5b66b6b](https://github.com/bsorrentino/langgraph4j/commit/0a65e51f5b66b6b002e1e7edb7301ec4acef8286))
+     > work on #109
+   
+ *  **core**  add metadata support to RunnableConfig ([84ef52315e2278c](https://github.com/bsorrentino/langgraph4j/commit/84ef52315e2278ca655fccffc771a7bfee089c9c))
+     > - Introduced &#x60;HasMetadata&#x60;
+     > - Refactored &#x60;RunnableConfig&#x60; to include metadata management using builder.
+     > - Added unit tests for metadata handling in &#x60;StateGraphTest&#x60;.
+     > resolve #137
+   
+ *  **core**  add  command action support ([ccb31d7be762526](https://github.com/bsorrentino/langgraph4j/commit/ccb31d7be7625266b3ce57841445248a4098c148))
+     > - Added new &#x60;Command&#x60; class  to represent a navigational command for nodes and updating properties.
+     > - Implemented &#x60;AsyncCommandAction&#x60; and &#x60;CommandAction&#x60; functional interface for agent state management.
+     > work on #109
+   
+
+
+### Documentation
+
+ -  bump to version 1.6-SNAPSHOT ([d746aab981c719d](https://github.com/bsorrentino/langgraph4j/commit/d746aab981c719de106297feb24b5f97bede4211))
+
+ -  bump to version 1.6.0-beta1 ([e3341adc522e574](https://github.com/bsorrentino/langgraph4j/commit/e3341adc522e574193139f49a68eab1a29e890c4))
+
+ -  update site menu ([d82edb39006116e](https://github.com/bsorrentino/langgraph4j/commit/d82edb39006116e7b597aa8c681dd0fdd6f2c5fa))
+
+ -  refine decumentation ([acdc0a8a6a86199](https://github.com/bsorrentino/langgraph4j/commit/acdc0a8a6a86199672218fe5da3c94802a5c6c3f))
+
+ -  update projects links ([c4c3cba0600b274](https://github.com/bsorrentino/langgraph4j/commit/c4c3cba0600b274d3e86d767f0b1615d59e7b6df))
+
+ -  update projects links ([808699ec3edffa7](https://github.com/bsorrentino/langgraph4j/commit/808699ec3edffa7408b5914c9eec7ac9b725514b))
+
+ -  update projects links ([600183b762ed028](https://github.com/bsorrentino/langgraph4j/commit/600183b762ed0288246a534ee46daaeaf473ffa3))
+
+ -  update badges ([63fc1e8ab196bcb](https://github.com/bsorrentino/langgraph4j/commit/63fc1e8ab196bcbc9db472edf688867d262aa932))
+
+
+### Refactor
+
+ -  **spring-ai-agent**  remove deprecated chatService method ([8590cc4da73cabc](https://github.com/bsorrentino/langgraph4j/commit/8590cc4da73cabc1067d48bbc49df948610fdf19))
+    > BREAKING CHANGE:
+
+ -  **agent-executor**  remove deprecated methods for chat model selection ([1e6e4a6995ff120](https://github.com/bsorrentino/langgraph4j/commit/1e6e4a6995ff1206b5b01393650948de49581083))
+    > - Removed &#x60;chatLanguageModel&#x60;
+ > BREAKING CHANGE:
+
+ -  **langchain4j**  Remove deprecated ToolNode class ([1318e32652c34c9](https://github.com/bsorrentino/langgraph4j/commit/1318e32652c34c991b136c696ac1d5c0091d2d74))
+    > BREAKING CHANGE:
+
+ -  **core**  remove deprecation marked for removal ([697135a4a4f130e](https://github.com/bsorrentino/langgraph4j/commit/697135a4a4f130ec365b94946cc93ffa3fc1e234))
+    > - NodeOutput removed  &#x27;getState&#x27;.
+ > - Removed deprecated method of creating AppenderChannel and Channel replacing it with Channels.appender.
+ > BREAKING CHANGE:
+
+ -  **how-to**  refine implementation ([ad703b88f0afb7a](https://github.com/bsorrentino/langgraph4j/commit/ad703b88f0afb7a68cc3ff9205a9a29c5dc867aa))
+    > - use EdgeMappings in multi agent notebook
+ > - add workflow in plantuml notebook
+
+ -  **how-to**  bump to version 1.6-SNAPSHOT ([8d5b297bd7c22a7](https://github.com/bsorrentino/langgraph4j/commit/8d5b297bd7c22a7f3cb92344f2f6a6596c4e657c))
+   
+ -  **core**  remove support for returning command from node action ([f317936a999aea0](https://github.com/bsorrentino/langgraph4j/commit/f317936a999aea0935ea82753596207528ef7194))
+    > work on #109
+
+ -  **edgeCondition**  update action type to AsyncCommandAction ([74e4d5af40aac25](https://github.com/bsorrentino/langgraph4j/commit/74e4d5af40aac25ebfc95d9d253b490af9910a2c))
+    > work on #109
+
+ -  **StateGraph**  update edge construction with AsyncCommandAction ([529c3654ec81fc2](https://github.com/bsorrentino/langgraph4j/commit/529c3654ec81fc292853cea0b7f901679e78dc70))
+    > work on #109
+
+ -  **core**  refactor to use new  `AsyncCommandAction` ([6e73884974f5fa3](https://github.com/bsorrentino/langgraph4j/commit/6e73884974f5fa3e004a8fad05e863e0776f2dfe))
+    > work on #109
+
+
+### ALM 
+
+ -  bump to version 1.6.0-beta1 ([3eb0c45cf378901](https://github.com/bsorrentino/langgraph4j/commit/3eb0c45cf3789018e178ffecffc97780406cb620))
+   
+ -  **deploy-sitel**  fix site path ([9713fcccdd7533b](https://github.com/bsorrentino/langgraph4j/commit/9713fcccdd7533b8e30b834c2a5461e2ba0224d1))
+   
+ -  **deploy-sitel**  add python dependencies ([29d6f090bfe3fdd](https://github.com/bsorrentino/langgraph4j/commit/29d6f090bfe3fddac424d88c5cb0f3b3764c5074))
+   
+ -  bump to 1.6-SNAPSHOT ([1b65454d97e1ca1](https://github.com/bsorrentino/langgraph4j/commit/1b65454d97e1ca138cc8d7871563dff8d0d756c6))
+   
+
+
+
+
+
+
+<!-- "name: v1.6-20250601-1" is a release tag -->
+
+## [v1.6-20250601-1](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6-20250601-1) (2025-06-01)
+
+### Features
+
+ *  **AgentExecutor**  add a ReACT agent that make in evidence make in evidence the tools execution using and action dispatcher node ([ce5a7aefb0b1bc6](https://github.com/bsorrentino/langgraph4j/commit/ce5a7aefb0b1bc6807bdad49cdb34875f5ee355d))
+     > - good to see in action with Studio
+   
+ *  **core**  handle newValue as null in AppenderChannel ([25a760489ebbd84](https://github.com/bsorrentino/langgraph4j/commit/25a760489ebbd848685bd4a4f7ed5e744345a76b))
+     > - When newValue is null the channel is reset to default value
+     > BREAKING CHANGE: this change previous behaviour where the null value was ignored
+   
+ *  **AgentExecutor**  add a ReACT agent that make in evidence make in evidence the tools execution using and action dispatcher node ([8e9df91996cf5b6](https://github.com/bsorrentino/langgraph4j/commit/8e9df91996cf5b677d9e0f990a4b519ca44c18b1))
+     > - good to see in action with Studio
+   
+
+
+### Documentation
+
+ -  update changelog ([878bb035aa01f1b](https://github.com/bsorrentino/langgraph4j/commit/878bb035aa01f1b7ef73573a07a9f44ac727db48))
+
+ -  Added documentation created with Mkdocs framework able to generate the whole langgraph4j site ([0b78ce212aca56e](https://github.com/bsorrentino/langgraph4j/commit/0b78ce212aca56e77fb4d49492a173d85e6dbbff))
+
+
+### Refactor
+
+ -  **AgentExecutor**  clean code and review readme ([1f246146ccf27b0](https://github.com/bsorrentino/langgraph4j/commit/1f246146ccf27b09500f140fe97000ad28fe90fe))
+   
+ -  **core/AppenderChannel**  handle newValue  equals NULL ([369ba8d2c46df95](https://github.com/bsorrentino/langgraph4j/commit/369ba8d2c46df957fd90bf33695d7f93c7d579e2))
+    > -Reset to default value when newValue is null
+ > BREAKING CHANGE: this change previous behaviour where the null value was ignored
+
+ -  update project site using mkdocs ([ca73d5be1d692bd](https://github.com/bsorrentino/langgraph4j/commit/ca73d5be1d692bd2f8d13d713558e31464d72732))
+    > - add build script :
+ > - start maven site
+ > - copy javadoc before build
+ > - copy notebbok before site build
+ > merge PR #150
+
+ -  update project site using mkdocs ([98393d69abea40f](https://github.com/bsorrentino/langgraph4j/commit/98393d69abea40f42f86d0cf1e63f54985e1dbdc))
+    > - add build script :
+ > - start maven site
+ > - copy javadoc before build
+ > - copy notebbok before site build
+ > merge PR #150
+
+
+### ALM 
+
+ -  add deploy site action (alpha version) ([1afac3bb2475d38](https://github.com/bsorrentino/langgraph4j/commit/1afac3bb2475d382f755038d9d22611ff7649810))
+   
+ -  bump to SNAPSHOT 1.5-SNAPSHOT ([b54c78f62b9cac2](https://github.com/bsorrentino/langgraph4j/commit/b54c78f62b9cac25edbcf5ebef7d5e3c7cbfc096))
+   
+
+
+
+
+
+
+<!-- "name: v1.5.14" is a release tag -->
+
+## [v1.5.14](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.14) (2025-05-28)
+
+### Features
+
+ *  **lc4j**  add tools from MCP client ([fdf9f66272b851b](https://github.com/bsorrentino/langgraph4j/commit/fdf9f66272b851bafaeb0ac751ead1be8720398c))
+   
+ *  **core**  add method to retrieve last StateSnapshot for RunnableConfig ([e425f0d41a7b3b8](https://github.com/bsorrentino/langgraph4j/commit/e425f0d41a7b3b8dd1f4289df981f50fe69c58c0))
+     > - Added a new method &#x60;lastStateOf&#x60; in &#x60;CompiledGraph.java&#x60; to fetch the latest &#x60;StateSnapshot&#x60; associated with a given &#x60;RunnableConfig&#x60;.
+   
+ *  Add comprehensive Getting Started guide ([658877ce1cd56be](https://github.com/bsorrentino/langgraph4j/commit/658877ce1cd56be6f29d605d6d198555c37433e0))
+     > This commit introduces a new comprehensive &quot;Getting Started&quot; document (&#x60;GETTING_STARTED.md&#x60;) to help new users understand and use LangGraph4j.
+     > The new guide covers:
+     > - Introduction to LangGraph4j
+     > - Core features and benefits
+     > - Detailed explanation of core concepts (StateGraph, AgentState, Nodes, Edges, Compilation, Checkpoints)
+     > - Installation instructions
+     > - A simple, step-by-step &quot;Your First Graph&quot; example
+     > - Overview of key capabilities (Async, Streaming, Persistence, Visualization, etc.)
+     > - Pointers for next steps (how-tos, samples, Javadocs)
+     > The main &#x60;index.md&#x60; file has been updated to:
+     > - Prominently link to the new &#x60;GETTING_STARTED.md&#x60;.
+     > - Reframe the existing &quot;Quick Start&quot; section as a &quot;Quick Overview&quot; for users who need a fast recap of core snippets, directing new users to the full guide.
+   
+
+### Bug Fixes
+
+ -  **core**  update addMetadata visibility to public ([3a36c44166b36ce](https://github.com/bsorrentino/langgraph4j/commit/3a36c44166b36ce3889debf144e0ce2e22ea0163))
+     > resolve issue #137
+
+
+### Documentation
+
+ -  bump to version 1.5.14 ([fcea5ebff9be3f9](https://github.com/bsorrentino/langgraph4j/commit/fcea5ebff9be3f9b72b7fa662814e981500300bb))
+
+ -  update documentation ([81dbbd4d935eb22](https://github.com/bsorrentino/langgraph4j/commit/81dbbd4d935eb22df07da2a5865f2e607e9a37bb))
+
+ -  update documentation ([37be59061863aa1](https://github.com/bsorrentino/langgraph4j/commit/37be59061863aa1b08839103dd238913266f5cdd))
+
+ -  update documentation ([2f849edafabee82](https://github.com/bsorrentino/langgraph4j/commit/2f849edafabee829ee3b76fa7583e82b1d619cd9))
+
+ -  update changelog ([b0d496e1b33f750](https://github.com/bsorrentino/langgraph4j/commit/b0d496e1b33f7507c1289388e86f84a9a387dc27))
+
+
+### Refactor
+
+ -  **AgentExecutor**  Reorganize class and methods ([aebb4693675068c](https://github.com/bsorrentino/langgraph4j/commit/aebb4693675068c5133ecff467c488b52e23db01))
+    > - move Agent execution logic to CallModel.
+
+
+### ALM 
+
+ -  bump to version 1.5.14 ([be8f317b0ddca63](https://github.com/bsorrentino/langgraph4j/commit/be8f317b0ddca639e0264540aad348c60b1fa7ad))
+   
+ -  bump to 1.5-SNAPSHOT ([9ef3bff75482928](https://github.com/bsorrentino/langgraph4j/commit/9ef3bff754829288d160911757f1e46bd3a5cf45))
+   
+
+
+
+
+
+
+<!-- "name: v1.5.13" is a release tag -->
+
+## [v1.5.13](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.13) (2025-05-21)
+
+### Features
+
+ *  add support for BOM ([3ae1e6951c312b8](https://github.com/bsorrentino/langgraph4j/commit/3ae1e6951c312b8c0237ca2a2c27e6b388680fd2))
+     > merge  PR #146
+   
+ *  **core**  add metadata support to RunnableConfig ([3f98f574e5e6104](https://github.com/bsorrentino/langgraph4j/commit/3f98f574e5e6104730fd339e79108683ba2b8cd6))
+     > - Introduced &#x60;HasMetadata&#x60;
+     > - Refactored &#x60;RunnableConfig&#x60; to include metadata management using builder.
+     > - Added unit tests for metadata handling in &#x60;StateGraphTest&#x60;.
+     > resolve #137
+   
+
+### Bug Fixes
+
+ -  **bom**  update scm connection URLs ([7c1b4b5a822e514](https://github.com/bsorrentino/langgraph4j/commit/7c1b4b5a822e514f6b9ee0dc1a449ce6077d1b3f))
+     > - changed &#x60;GIT_SCM_CONNECTION_URL&#x60; from SSH to HTTPS adding scm: prefix
+
+
+### Documentation
+
+ -  bump to release 1.5.13 ([aa5ac6cd779a169](https://github.com/bsorrentino/langgraph4j/commit/aa5ac6cd779a169edc14b19414b68dcac926b532))
+
+ -  update link to relocated project langgraph4j-builder ([f5251fec321beb0](https://github.com/bsorrentino/langgraph4j/commit/f5251fec321beb03bdd0236642004636ac7c636f))
+     > work on #139
+
+ -  update link to relocated project langgraph4j-builder ([cf8414a154d8b51](https://github.com/bsorrentino/langgraph4j/commit/cf8414a154d8b512d8c10890cf9d1c0786e7f898))
+     > work on #139
+
+ -  **spring-ai-agent**  add site ([964fee3656fee1b](https://github.com/bsorrentino/langgraph4j/commit/964fee3656fee1b81dd02a0406346d31e4ad9418))
+
+ -  adds message to inform about relocation of sample projects ([2916696edeeb9ec](https://github.com/bsorrentino/langgraph4j/commit/2916696edeeb9ec2ae09677eb3cb28920a8ebbc3))
+     > - update links
+     > work on #139
+
+ -  adds message to inform about relocation of sample projects ([5f48629cabc7048](https://github.com/bsorrentino/langgraph4j/commit/5f48629cabc70483f01d999416f0da7405398071))
+     > work on #139
+
+ -  adds message to inform about relocation of sample projects ([edbcd1fecbb1a35](https://github.com/bsorrentino/langgraph4j/commit/edbcd1fecbb1a358a849c77417b603ca2cc43e92))
+     > work on #139
+
+ -  update changelog ([62818f344b5f4e3](https://github.com/bsorrentino/langgraph4j/commit/62818f344b5f4e31268b48b19239f9799e670c60))
+
+ -  update changelog ([ae18f63ee946f33](https://github.com/bsorrentino/langgraph4j/commit/ae18f63ee946f331e5ef3054f0ea82e342d140aa))
+
+
+### Refactor
+
+ -  **studio/jetty**  relocate test to langgraph4j-examples project ([428193ad49e143a](https://github.com/bsorrentino/langgraph4j/commit/428193ad49e143a5423b49430502f42a65c35909))
+    > - remove dependencies
+ > work on #139
+
+ -  **studio/jetty**  relocate test to langgraph4j-examples project ([8706ad4a7c669d9](https://github.com/bsorrentino/langgraph4j/commit/8706ad4a7c669d98cc76375ad00e97ad8c1a2e1c))
+    > work on #139
+
+
+### ALM 
+
+ -  **how-to**  bump langchain4j version to v1.0.1 ([4e93c14754e14ad](https://github.com/bsorrentino/langgraph4j/commit/4e93c14754e14ad545dc8d079393e08fbc3457a4))
+    > Bump dependencies:
+ > - Increase langchain4j version from 1.0.0 to 1.0.1
+ > - Update beta version from 1.0.0-beta5 to 1.0.1-beta6
+
+ -  bump to version 1.5.13 ([2476b94b8a16d6d](https://github.com/bsorrentino/langgraph4j/commit/2476b94b8a16d6d9b9c0dd41a726dd87ed89f7b6))
+   
+ -  bump langchain4j version to v1.0.1 ([6c04795e0c8cbaa](https://github.com/bsorrentino/langgraph4j/commit/6c04795e0c8cbaab9b172384a7e686d9213a4600))
+    > Bump dependencies:
+ > - Increase langchain4j version from 1.0.0 to 1.0.1
+ > - Update beta version from 1.0.0-beta5 to 1.0.1-beta6
+
+ -  update to developer version 1.5-SNAPSHOT ([cf8e6ad98c72df2](https://github.com/bsorrentino/langgraph4j/commit/cf8e6ad98c72df2762d0852109d8ad81d127c7a1))
+   
+ -  **generator**  remove relocated implementation ([b84f498be42ee24](https://github.com/bsorrentino/langgraph4j/commit/b84f498be42ee241d29c721d6891eaf3d5a19f1d))
+    > work on #139
+
+ -  remove relocated generator module from build ([0250f7a8d3231e2](https://github.com/bsorrentino/langgraph4j/commit/0250f7a8d3231e203171cf159a4e8095f9c025ef))
+    > work on #139
+
+ -  **samples**  remove relocated implementation ([bc110bb83ce06d3](https://github.com/bsorrentino/langgraph4j/commit/bc110bb83ce06d367a6412e93185e9f82bcefd0e))
+    > work on #139
+
+ -  remove samples modules from build ([8bd3858913cada3](https://github.com/bsorrentino/langgraph4j/commit/8bd3858913cada3070d1b72589e536be0b8ebce7))
+    > work on #139
+
+
+
+
+
+
+
+<!-- "name: v1.5.12" is a release tag -->
+
+## [v1.5.12](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.12) (2025-05-15)
+
+
+### Bug Fixes
+
+ -  **spring-ai-agent**  to use `defaultToolCallbacks` instead of `defaultTools` ([561039f7401ea29](https://github.com/bsorrentino/langgraph4j/commit/561039f7401ea29b6002e52416fbdc174f4f7316))
+
+
+### Documentation
+
+ -  bump to version 1.5.12 ([83d49280f1f9a75](https://github.com/bsorrentino/langgraph4j/commit/83d49280f1f9a75dd00b472472e6c6bc64d4252a))
+
+ -  add ai generated documentation ([ac04593e9ec081b](https://github.com/bsorrentino/langgraph4j/commit/ac04593e9ec081be5c8214f716ea98e540558b2e))
+
+ -  update site documentation ([8747d7fc3dd547c](https://github.com/bsorrentino/langgraph4j/commit/8747d7fc3dd547ce3b1959fb0b6ecde2205d873c))
+
+ -  update readme ([acc8e7d74411f41](https://github.com/bsorrentino/langgraph4j/commit/acc8e7d74411f41b9df301fa9e0786851352d850))
+
+ -  update readme ([a2854663b16d590](https://github.com/bsorrentino/langgraph4j/commit/a2854663b16d59075212261a0acac095cd337737))
+
+ -  update changelog ([7cd740e0d9836eb](https://github.com/bsorrentino/langgraph4j/commit/7cd740e0d9836eb5e582a6c6bfb4007d5d131ca8))
+
+
+### Refactor
+
+ -  **llm-streaming-springai**  use OllamaApi  builder ([36f13ff69dc998a](https://github.com/bsorrentino/langgraph4j/commit/36f13ff69dc998a23d10e5cd236cc438d2d839e7))
+   
+ -  **deploy-snapshot**  update branch ref from main to develop ([5d359d50471cd76](https://github.com/bsorrentino/langgraph4j/commit/5d359d50471cd76d2012b869b01e980b17230347))
+   
+ -  **deploy-pages**  apply concurrency flag to build process ([35c4dd7d55b8f3f](https://github.com/bsorrentino/langgraph4j/commit/35c4dd7d55b8f3f2dd86694b10a45f38a1528b81))
+   
+ -  **deploy-snapshot**  update branch trigger from main to develop ([13771c5fd0a25ce](https://github.com/bsorrentino/langgraph4j/commit/13771c5fd0a25ceb637f2671726bd6c017528fdf))
+   
+
+### ALM 
+
+ -  bump to version 1.5.12 ([2e51063fb67628b](https://github.com/bsorrentino/langgraph4j/commit/2e51063fb67628beb1985d3da1bedf9fed796023))
+   
+ -  **how-to**  build: bump langchain4j version to 1.0.0 / 1.0.0-beta5 ([88aac32f9475bf2](https://github.com/bsorrentino/langgraph4j/commit/88aac32f9475bf2e20d897fd786a181e86b3575b))
+   
+ -  bump langchain4j version to 1.0.0 / 1.0.0-beta5 ([3c75e0c9b723258](https://github.com/bsorrentino/langgraph4j/commit/3c75e0c9b7232585eae8035c3fb8bc1314579c7c))
+   
+ -  **deploy-snapshot**  add  source jar generation ([d3f942fd1c591e2](https://github.com/bsorrentino/langgraph4j/commit/d3f942fd1c591e2f3197a7b8c4eb7635dee1e333))
+   
+ -  **site-run**  apply concurrency flag to build process ([50990ecab017753](https://github.com/bsorrentino/langgraph4j/commit/50990ecab0177534d5fd01c3bb0b8398aeea2f23))
+   
+ -  bump to new SNAPSHOT ([c050dc6868c9fd3](https://github.com/bsorrentino/langgraph4j/commit/c050dc6868c9fd33f35d0b490ccd93299c3f607c))
+   
+
+
+
+
+
+
+<!-- "name: v1.5.11" is a release tag -->
+
+## [v1.5.11](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.11) (2025-05-13)
+
+### Features
+
+ *  **spring-ai-agent**  allows empty tool chain ([8d1e9298f2fb066](https://github.com/bsorrentino/langgraph4j/commit/8d1e9298f2fb0667c394dfa80ab6ad362211e48c))
+     > merge #132
+   
+ *  **langchain4j**  allows empty tool chain ([a7cb6623972c2de](https://github.com/bsorrentino/langgraph4j/commit/a7cb6623972c2dee27291d517c0f97d2b8d62fd6))
+   
+
+### Bug Fixes
+
+ -  **agent-executor**  update prompt ordering to feed model ([25fa3aabec6ee7f](https://github.com/bsorrentino/langgraph4j/commit/25fa3aabec6ee7f59aa54a102f861151fc71eb56))
+     > resolve #128
+
+ -  SpringAI DefaultChatService support not tools ([331a2f43a71ff94](https://github.com/bsorrentino/langgraph4j/commit/331a2f43a71ff94d62ae93c38793ba93746eb319))
+     > Signed-off-by: lambochen &lt;lambochen@yeah.net&gt;
+
+
+### Documentation
+
+ -  bump to release 1.5.11 ([7b2fe23a0ad9460](https://github.com/bsorrentino/langgraph4j/commit/7b2fe23a0ad9460b6e260dc76495a09666d47fb9))
+
+ -  update  multi-agent handoff samples links ([ea4485fcfc4ab67](https://github.com/bsorrentino/langgraph4j/commit/ea4485fcfc4ab671037c7ebb0c579217f6781c37))
+
+ -  add multi-agent handoff samples ([ecaa645e9bd197a](https://github.com/bsorrentino/langgraph4j/commit/ecaa645e9bd197a06abcc13539b03bd3ef764b55))
+
+ -  update changelog ([93da456742479c2](https://github.com/bsorrentino/langgraph4j/commit/93da456742479c2b9519ba70c029d72989fa26f5))
+
+
+
+### ALM 
+
+ -  update git ignore ([15be2a511ffcff1](https://github.com/bsorrentino/langgraph4j/commit/15be2a511ffcff1940937d420cf2730acd4658bf))
+   
+ -  update git ignore ([7e04d31ce9665b1](https://github.com/bsorrentino/langgraph4j/commit/7e04d31ce9665b1ba2f9298efe5319183bcfb692))
+   
+ -  merge PR #121 ([4a4ad5435143fb4](https://github.com/bsorrentino/langgraph4j/commit/4a4ad5435143fb4fbc24c70e5b38a7ffe7665353))
+   
+ -  bump to new SNAPSHOT ([3ca6104f0346574](https://github.com/bsorrentino/langgraph4j/commit/3ca6104f034657454187bc9bec8ae9e27650913d))
+   
+
+
+
+
+
+
+<!-- "name: v1.5.10" is a release tag -->
+
+## [v1.5.10](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.10) (2025-05-12)
+
+### Features
+
+ *  **how-to**  add 'How to integrate Spring AI LLM streaming in Langgraph4j' notebook ([9772013ce53efbc](https://github.com/bsorrentino/langgraph4j/commit/9772013ce53efbc91ed61be3a7fe53e5795b29b5))
+     > work on #125
+   
+ *  **spring-ai-agent**  add streaming chat model support ([3300c3d3dd218b3](https://github.com/bsorrentino/langgraph4j/commit/3300c3d3dd218b35412f88b4f1d1c09e7142ac59))
+     > work on #125
+   
+ *  **spring-ai**  adds streaming chat generator ([453978e47b96754](https://github.com/bsorrentino/langgraph4j/commit/453978e47b96754669a734b4ee51345103b21013))
+     > work on #125
+   
+
+### Bug Fixes
+
+ -  **spring-ai-agent**  use `defaultToolCallbacks` instead of `defaultTools`. ([62187aa71f76d13](https://github.com/bsorrentino/langgraph4j/commit/62187aa71f76d13928c16860e7caf97f26f02b5c))
+
+
+### Documentation
+
+ -  **how-to**  update site documentation ([2463697aa257b06](https://github.com/bsorrentino/langgraph4j/commit/2463697aa257b06e0643d7be93086be9fc6afb70))
+
+ -  bump to 1.5.10 version ([8b944f6178a9d5a](https://github.com/bsorrentino/langgraph4j/commit/8b944f6178a9d5a9736afa386b14871df8be8add))
+
+ -  **agent-handoff**  update readme ([575b622d63f2c16](https://github.com/bsorrentino/langgraph4j/commit/575b622d63f2c161b7586fa251f5e5667a80bc09))
+
+ -  update changelog ([4136ed144356349](https://github.com/bsorrentino/langgraph4j/commit/4136ed14435634902316b2aa7423ed2bd71d4aff))
+
+
+### Refactor
+
+ -  **spring-ai**  reorder conditional checks to improve readability and performance in `StreamingChatGenerator` ([4edd9272b0ba966](https://github.com/bsorrentino/langgraph4j/commit/4edd9272b0ba966e95ef3415ecd8501475dcb721))
+    > work on #125
+
+ -  **how-to**  update notebook title 'How to integrate Langchain4j LLM streaming in Langgraph4j' ([6dafde10e290d37](https://github.com/bsorrentino/langgraph4j/commit/6dafde10e290d37812e427bf4c4369f3a0f5e3f8))
+   
+ -  **NodeOutput**  remove 'isInterrupted' method and simplify JSON output in JacksonSerializerTest ([60c52c16b148d9c](https://github.com/bsorrentino/langgraph4j/commit/60c52c16b148d9c64c500eb165ef6605669b8dd7))
+   
+ -  **core/NodeOutput**  Add helper methods to check for graph interruption and END state ([faf574f3a3f2634](https://github.com/bsorrentino/langgraph4j/commit/faf574f3a3f2634a6835cbe4f3fd083d2fce1b9d))
+    > - Introduced &#x60;isInterrupted()&#x60; method to determine if the output refers to a graph interruption by checking against non-END states.
+ > - Added &#x60;isEND()&#x60; method to verify if the current node represents the end of the graph using a direct string comparison with &quot;END&quot;.
+ > - Updated Javadoc comments for clarity and to reflect changes in functionality.
+
+ -  **howto**  code refinements ([a0aadb493c1e49a](https://github.com/bsorrentino/langgraph4j/commit/a0aadb493c1e49aeef74c53ffa7d0797df93d088))
+   
+ -  **springai-agent**  rename project ([ae76a1b339d3cf1](https://github.com/bsorrentino/langgraph4j/commit/ae76a1b339d3cf1387be674b7af8cf1b4468cd2c))
+   
+ -  **sample/handoff**  change projects layout ([92960eaa56076a6](https://github.com/bsorrentino/langgraph4j/commit/92960eaa56076a635c1e6a2feb02f43d66c48081))
+   
+
+### ALM 
+
+ -  bump to 1.5.10 version ([dc93fc9de86c8a2](https://github.com/bsorrentino/langgraph4j/commit/dc93fc9de86c8a2834807ba66f92edef760723c9))
+   
+ -  **core**  bump to  async-generator 3.2.0 version ([450747a01b91efd](https://github.com/bsorrentino/langgraph4j/commit/450747a01b91efd50291809fcb2f1324979c08ec))
+    > work on #125
+
+ -  **README.md**  update integrated projects to reflect Spring AI integration ([d996b67b62c30fa](https://github.com/bsorrentino/langgraph4j/commit/d996b67b62c30fa9e63016b0f53de3d13da31ae2))
+   
+ -  merge PR #121 ([4bb7e1082a17adf](https://github.com/bsorrentino/langgraph4j/commit/4bb7e1082a17adf77cc75740c24d439020e73df2))
+   
+ -  bump to new SNAPSHOT ([7518a3c9976e74d](https://github.com/bsorrentino/langgraph4j/commit/7518a3c9976e74d20b9ef2e1bad4b89ac82314a1))
+   
+
+### Test 
+
+ -  **spring-ai-agent**  refine agent executor test implementation ([53512a825890b0d](https://github.com/bsorrentino/langgraph4j/commit/53512a825890b0d6a1d403aca91226655fcd1e4f))
+   
+ -  **spring-ai**  test streaming chat generator ([3827f8753825e76](https://github.com/bsorrentino/langgraph4j/commit/3827f8753825e761c9a60a80f4516d17eb92d02d))
+    > work on #125
+
+ -  **core**  alphabetically sort JSON properties for consistency ([bebca7f7dee4a05](https://github.com/bsorrentino/langgraph4j/commit/bebca7f7dee4a0589474035fde4127722e52062f))
+   
+ -  **core**  add optional fields to JSON output ([5b1ed3167223a70](https://github.com/bsorrentino/langgraph4j/commit/5b1ed3167223a70db6606047b781e0ad5215a187))
+   
+
+
+
+
+
+<!-- "name: v1.5.9" is a release tag -->
+
+## [v1.5.9](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.9) (2025-05-06)
+
+### Features
+
+ *  **sample/handoff**  second candidate version for spring-ai implementation ([54c371a43543c5b](https://github.com/bsorrentino/langgraph4j/commit/54c371a43543c5b79bf1ffed15d745ac44ce218d))
+     > work on #94
+   
+ *  **sample/handoff**  first candidate version for spring-ai implementation ([db42be92eaa0098](https://github.com/bsorrentino/langgraph4j/commit/db42be92eaa0098798b6554e16b3d67b70f83758))
+     > work on #94
+   
+ *  **sample/handoff**  setup for springai support ([29d50a12d34fd2c](https://github.com/bsorrentino/langgraph4j/commit/29d50a12d34fd2c8014d77539f7489a2bb96c526))
+   
+ *  **sample/handoff**  refine handoff sample ([64f07d3ac76a52f](https://github.com/bsorrentino/langgraph4j/commit/64f07d3ac76a52fff851f1f5dcd19276bd23015e))
+     > work on #94
+   
+ *  **sample/handoff**  finalize handoff sample using using agent-executor and langchain4j ([fed3d87702df5e2](https://github.com/bsorrentino/langgraph4j/commit/fed3d87702df5e2fe62ee22b2a20c288eb0324d7))
+     > resolve #94
+   
+ *  **langchain4j**  introduce new class LC4jToolMapBuilder to build a map of ToolSpecifications and ToolExecutors ([5e74f918db03ad2](https://github.com/bsorrentino/langgraph4j/commit/5e74f918db03ad20d7e806291392187e1fcf08f4))
+     > - Refactor LC4jToolService
+     > - Refactor ToolNode
+     > - Deprecate the older &#x60;Specification&#x60; record in favor of the more versatile and flexible map-based approach.
+   
+ *  **sample/handoff**  implementation based on handoff agents as functions ([ea1549410e319b9](https://github.com/bsorrentino/langgraph4j/commit/ea1549410e319b922f002bfc967616b26c06f9a5))
+     > work on #94
+   
+ *  **sample/handoff**  start experimentation with  multi agent handoff  workflow ([a65f5c6a1e8019e](https://github.com/bsorrentino/langgraph4j/commit/a65f5c6a1e8019e916cfb48b0a78174dddd31847))
+     > work on #94
+   
+
+
+### Documentation
+
+ -  **springai-agent**  update readme ([723ae83ef451082](https://github.com/bsorrentino/langgraph4j/commit/723ae83ef451082333c2be80e5c73f83827e31fa))
+
+ -  bump to release 1.5.9 ([fc28dea3e90d784](https://github.com/bsorrentino/langgraph4j/commit/fc28dea3e90d784344b74145f9dd72c65fff8d32))
+
+ -  **sample/handoff**  update readme ([02fc3f3455408f1](https://github.com/bsorrentino/langgraph4j/commit/02fc3f3455408f1096f89aaf0f8fb11a2ef177f5))
+     > work on #94
+
+ -  **sample/handoff**  update readme ([a986f829190f209](https://github.com/bsorrentino/langgraph4j/commit/a986f829190f2096b51f1f5d223e1b409f393c78))
+
+ -  **sample/handoff**  update readme ([e2c68a25c49029a](https://github.com/bsorrentino/langgraph4j/commit/e2c68a25c49029a9059d851c4ae8b0bf41bfc954))
+
+ -  **sample/handoff**  update readme ([89a37d070fca964](https://github.com/bsorrentino/langgraph4j/commit/89a37d070fca9646047ca8757ee7507a93d40a4d))
+
+ -  **sample/handoff**  update readme ([720f1cf0fc09c3a](https://github.com/bsorrentino/langgraph4j/commit/720f1cf0fc09c3a6215bfeaafe494dee5e7764b4))
+
+ -  **samples/handoff**  update readme ([be111d5225c23dc](https://github.com/bsorrentino/langgraph4j/commit/be111d5225c23dc4c4db07f1f53e0b02b4a32590))
+
+ -  **samples/handoff**  update readme ([89d062a44657edb](https://github.com/bsorrentino/langgraph4j/commit/89d062a44657edb23389d9ba786ed170d7380bbb))
+
+ -  **samples/handoff**  update readme ([1501f381478b4ff](https://github.com/bsorrentino/langgraph4j/commit/1501f381478b4ffb6ddf7a5256d4dc11999725de))
+
+ -  update home page ([55095c9f1cd36b8](https://github.com/bsorrentino/langgraph4j/commit/55095c9f1cd36b8fa8fbd9daa0e486b0c7750548))
+
+ -  update README ([036fb4e9b2963a4](https://github.com/bsorrentino/langgraph4j/commit/036fb4e9b2963a45d308603d5afd947573397107))
+
+ -  update README ([0f6292dedbc9303](https://github.com/bsorrentino/langgraph4j/commit/0f6292dedbc9303e02c7bf69b69611b68083e211))
+
+ -  fix link for spring-ai-agent ([60bb6f22b5acda2](https://github.com/bsorrentino/langgraph4j/commit/60bb6f22b5acda2f9bad027c857effece952864a))
+
+ -  fix link for spring-ai-agent ([f3e622eda636d8c](https://github.com/bsorrentino/langgraph4j/commit/f3e622eda636d8c0bcee479efc5f216ad5f6fca0))
+
+ -  update changelog ([64637f0ac4b11d0](https://github.com/bsorrentino/langgraph4j/commit/64637f0ac4b11d00de427318b03ee7a38bfec79a))
+
+
+### Refactor
+
+ -  **springai-agent**  support chat models and tools improvements ([9caa4c170614af5](https://github.com/bsorrentino/langgraph4j/commit/9caa4c170614af525b8351c97706c73e9f5a8835))
+    > - Deprecate ChatService interface
+ > - Refactored DemoConsoleController to use ChatModel and ToolCallback list
+ > - Refactored LangGraphStudioConfiguration to accept ChatModel and ToolCallback list
+
+ -  bump to langchain4j 1.0.0-rc1 ([762e3e4656755a8](https://github.com/bsorrentino/langgraph4j/commit/762e3e4656755a84ff2f228a8e4ae4d2f3b6caa8))
+    > - rename ChatLanguageModel to ChatModel
+
+ -  **studio/jetty**  refactored agent instantation   by replacing direct `specification` calls with more specific methods like `toolsFromObject` ([5916e5bb3023a82](https://github.com/bsorrentino/langgraph4j/commit/5916e5bb3023a82661da4e261dce3382d08b6a13))
+   
+ -  **lc4jtoolservice**  update tool configuration ([d4b3c3056a0d9c1](https://github.com/bsorrentino/langgraph4j/commit/d4b3c3056a0d9c1e969955c74f0e1de4a66cc990))
+    > Refactored tool service by replacing direct &#x60;specification&#x60; calls with more specific methods like &#x60;toolsFromObject&#x60;, &#x60;tool&#x60;
+
+ -  **how-to**  bump to langgraph4j 1.0.0-beta3 ([71077fd75d5570e](https://github.com/bsorrentino/langgraph4j/commit/71077fd75d5570e5fc5fdc14a6462d37182fa7d6))
+    > - remove usage of deprecated lm.checkAccess() method
+
+ -  **agent-executor**  simplify objects hierarchy ([96126dbe3e72fa8](https://github.com/bsorrentino/langgraph4j/commit/96126dbe3e72fa864463d83f8bd3b8f6e9afb341))
+   
+ -  **agent-executor**  simplify objects hierarchy ([2f1d462664b7948](https://github.com/bsorrentino/langgraph4j/commit/2f1d462664b7948da54c87bd755120a7287ce18b))
+   
+ -  **core/CollectionsUtils**  allow null values in collection factory methods ([a678136a1cdee03](https://github.com/bsorrentino/langgraph4j/commit/a678136a1cdee0369be24f9a642553b69bb9c549))
+    > - Updated methods to handle null values gracefully.
+ > - Removed deprecated annotations.
+
+
+### ALM 
+
+ -  **spring-ai**  add pring-ai-client-chat deps ([f254baf15261032](https://github.com/bsorrentino/langgraph4j/commit/f254baf15261032dbaf35b39ad3a4e668ca7c93b))
+   
+ -  add maven wrapper support ([08ddc80315c510e](https://github.com/bsorrentino/langgraph4j/commit/08ddc80315c510e99e62762bd839c4926644f5b3))
+   
+ -  **pom.xml**  bump langchain4j version to 1.0.0-beta3 ([2b3e632212e20bc](https://github.com/bsorrentino/langgraph4j/commit/2b3e632212e20bc9656d4c1266b841266de9e793))
+   
+ -  bump to new SNAPSHOT ([624990b697d8dc0](https://github.com/bsorrentino/langgraph4j/commit/624990b697d8dc0c76a7cfe347f4bf7c8fb33785))
+   
+
+### Test 
+
+ -  verify issue #118 ([6ac2adcd47b7313](https://github.com/bsorrentino/langgraph4j/commit/6ac2adcd47b73131ba781db7afe5da68a7f7ed98))
+   
+ -  **samples/agents-handoff**  try to create the complete context  for passing over handoff ([f5528a0a8316cb2](https://github.com/bsorrentino/langgraph4j/commit/f5528a0a8316cb2acbb6030d84b60f1f2a178377))
+    > work on #94
+
+
+
+
+
+
+<!-- "name: v1.5.8" is a release tag -->
+
+## [v1.5.8](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.8) (2025-04-26)
+
+### Features
+
+ *  **studio/webui**  enhance UI adding the execution history ([757ecc46cd69546](https://github.com/bsorrentino/langgraph4j/commit/757ecc46cd69546dc1fd22a5804ce263f30e918c))
+   
+ *  **studio/webui**  add debug utility ([04628e2ce4851ef](https://github.com/bsorrentino/langgraph4j/commit/04628e2ce4851efbc965c3c5fa4a8cd40b14e6ad))
+   
+ *  **studio/webui**  add LIFO stack implementation ([e4e1c4e243eb098](https://github.com/bsorrentino/langgraph4j/commit/e4e1c4e243eb098c447372eb8feb10c50e1aa6de))
+   
+ *  **DiagramGenerator**  add conditional to ensure title is optional ([1e3b90dac728906](https://github.com/bsorrentino/langgraph4j/commit/1e3b90dac728906b6532ec219c11e6960c17c9e1))
+     > - Added default title &#x27;unnamed&#x27; if none provided.
+   
+ *  add studio support to langchain4j agent executor ([3cbfc36fb3dacfb](https://github.com/bsorrentino/langgraph4j/commit/3cbfc36fb3dacfbaa1eda53b318508d37ea875ec))
+   
+ *  promote spring.ai agent executor as first class module ([b6ad73bb8b9c5ba](https://github.com/bsorrentino/langgraph4j/commit/b6ad73bb8b9c5ba134f401341fb6a2662f4e57e6))
+   
+ *  **core**  Add a versioned memory saver ([aa6dc841b65145f](https://github.com/bsorrentino/langgraph4j/commit/aa6dc841b65145f511843cbaa40f54570568f5cf))
+     > - add &#x60;VersionedMemorySaver&#x60;, which extends the functionality of an existing memory saver to include versioning.
+     > work on #111
+   
+ *  **core**  add HasVersions interface ([7d959110c60589f](https://github.com/bsorrentino/langgraph4j/commit/7d959110c60589fd8cde7b4aee4288ed8c7999b1))
+     > - new interface &#x60;HasVersions&#x60; that provides methods to retrieve versions associated with a thread ID and the last version for a given thread.
+     > work on #111
+   
+
+
+### Documentation
+
+ -  update doc link ([a84fc805bab0fb2](https://github.com/bsorrentino/langgraph4j/commit/a84fc805bab0fb20b2784a558630c2a589f157c2))
+
+ -  add javadoc ([9a9642dcb7069cb](https://github.com/bsorrentino/langgraph4j/commit/9a9642dcb7069cb6af3e0fb2e9a2095269bdd2e6))
+
+ -  update changelog ([7179aa413f680d9](https://github.com/bsorrentino/langgraph4j/commit/7179aa413f680d91da1b478b0a89e8ef5dc41755))
+
+ -  update changeme ([8f33b9c2fd9b59d](https://github.com/bsorrentino/langgraph4j/commit/8f33b9c2fd9b59d39ec1741536c90172c54b1b43))
+
+ -  update changeme ([198f9f7c9a09d95](https://github.com/bsorrentino/langgraph4j/commit/198f9f7c9a09d95aecf2938cf1e81c9e7b378444))
+
+
+### Refactor
+
+ -  **studio/webui**  integrate debug utility ([130bf19942ed2e3](https://github.com/bsorrentino/langgraph4j/commit/130bf19942ed2e3c18ab67b96613dfb6a70387de))
+   
+ -  **studio/webui**  integrate debug utility ([9364fd22fefda85](https://github.com/bsorrentino/langgraph4j/commit/9364fd22fefda85af32638200fd0c122f3e4b16b))
+   
+ -  **studio/webui**  integrate debug utility ([bd2c91a8261f9cf](https://github.com/bsorrentino/langgraph4j/commit/bd2c91a8261f9cf5f82cbe828c5f1aabc2595e0a))
+   
+ -  **studio**  remove redundant graph title ([b30f10b136081df](https://github.com/bsorrentino/langgraph4j/commit/b30f10b136081dfacebf5736c24366626d06e547))
+   
+ -  **spring-ai-agen**  update parent group ID and version ([f5d3b70634dc5a7](https://github.com/bsorrentino/langgraph4j/commit/f5d3b70634dc5a71aaf5a436de2d55fe93ebfab1))
+   
+ -  moved dependencies to their correct sections. ([070c9a0982f2330](https://github.com/bsorrentino/langgraph4j/commit/070c9a0982f2330c4c542b543d427b51c63cbcb9))
+   
+ -  **hotfix-changelog.sh**  update script for changelog hotfix ([da8938a2ab91ce5](https://github.com/bsorrentino/langgraph4j/commit/da8938a2ab91ce545a57b1b19fe1bfd82ce17b76))
+    > - Renamed branch name from &quot;changenme&quot; to &quot;changelog&quot;
+
+ -  **Issue105Test**  remove threadVersion parameter from RunnableConfig builder ([7ce61dfd69c84ba](https://github.com/bsorrentino/langgraph4j/commit/7ce61dfd69c84ba754f8ab18e5461fa4aa63d2a1))
+   
+
+### ALM 
+
+ -  **studio/webui**  update Jetty webui dist ([c639f905c4e858a](https://github.com/bsorrentino/langgraph4j/commit/c639f905c4e858aa51287a77ca15acb230071ec3))
+    > - Update tests to verify webui enhancement
+
+ -  **studio/webui**  update webui dist ([3389d3b18a546e0](https://github.com/bsorrentino/langgraph4j/commit/3389d3b18a546e02f95cfd2610728f4794ed4e1f))
+   
+ -  **studio/webui**  update webui dist ([77491f08c555561](https://github.com/bsorrentino/langgraph4j/commit/77491f08c5555617436b5bd6031452bc4a342031))
+   
+ -  bump to new SNAPSHOT ([9ff905f296f03c8](https://github.com/bsorrentino/langgraph4j/commit/9ff905f296f03c8c02f9cd06c773d3ae5249c5a5))
+   
+ -  update git ignore ([fe234a0b79cb8e7](https://github.com/bsorrentino/langgraph4j/commit/fe234a0b79cb8e7fefb70a7d34e83363e733a1f3))
+   
+
+### Test 
+
+ -  add  a js playground ([dd58f3d0702e50e](https://github.com/bsorrentino/langgraph4j/commit/dd58f3d0702e50edf591b254d563251831afd389))
+   
+ -  **core**  add versioned memory saver  tests ([29f244224492b36](https://github.com/bsorrentino/langgraph4j/commit/29f244224492b36805d1ad845da780ca8afb3dbd))
+    > work on #111
+
+ -  **how-to**  refine integration test ([9ea510de9c1a6ca](https://github.com/bsorrentino/langgraph4j/commit/9ea510de9c1a6ca3668a19016f52d1e8b8001f7a))
+    > - rename AgentWebTest to AgentWebITest
+
+ -  **core**  refine multi thread scenario concerns Issue105 ([339fefa8efb2719](https://github.com/bsorrentino/langgraph4j/commit/339fefa8efb27194dc0b610e96e136bb6f110684))
+   
+
+
+
+
+
+<!-- "name: v1.5.7" is a release tag -->
+
+## [v1.5.7](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.7) (2025-04-22)
+
+### Features
+
+ *  **core/CompiledGraph**  implement auto release thread ([c106f4454246b3c](https://github.com/bsorrentino/langgraph4j/commit/c106f4454246b3cb34db5287a88cd21eb7fe0ba9))
+     > work on #115
+   
+ *  **core/CompileConfig**  add thread release flag ([73f8d7174475740](https://github.com/bsorrentino/langgraph4j/commit/73f8d71744757403212a485ca2564c57341bb42e))
+     > - adding a new boolean field &#x60;releaseThread&#x60; to track whether the thread should be automatically released.
+     > work on #115
+   
+ *  **core/FileSystemSaver**  implements release method ([5241f254b549579](https://github.com/bsorrentino/langgraph4j/commit/5241f254b549579dd0bd2fa57477bbef83b53046))
+     > - introduce versioned backup of checkpoints
+     > work on #115
+   
+ *  **core/MemorySaver**  implements release method ([b02fc6dc75f9882](https://github.com/bsorrentino/langgraph4j/commit/b02fc6dc75f98821f9f2085d2bab52885b418cb1))
+     > replace ReentrantReadWriteLock with ReentrantLock for simplicity
+     > work on #115
+   
+ *  **BaseCheckpointSaver.java**  add release method ([088785ad18b9050](https://github.com/bsorrentino/langgraph4j/commit/088785ad18b9050c1f960a2600d7fc75697831b7))
+     > - Introduce &#x60;THREAD_ID_DEFAULT&#x60; to provide a default thread ID.
+     > - Add a record type &#x60;Tag&#x60; to group checkpoints by thread ID.
+     > work on #115
+   
+ *  **how-to**  add web search sample ([66c77b5f4a403d1](https://github.com/bsorrentino/langgraph4j/commit/66c77b5f4a403d195ad54d0eba58ecc72c2eaca9))
+   
+ *  **how-to**  add Agent Executor with MCP sample ([de5b967823d836f](https://github.com/bsorrentino/langgraph4j/commit/de5b967823d836ff1f2f1661c339f4375e977d15))
+     > resolve #108
+   
+
+
+### Documentation
+
+ -  bump to version 1.5.7 ([1a27fa3694bb9f1](https://github.com/bsorrentino/langgraph4j/commit/1a27fa3694bb9f1992a618efa46a2fa673b8fc7e))
+
+ -  add new article reference ([3331f433dbeeadf](https://github.com/bsorrentino/langgraph4j/commit/3331f433dbeeadfe8d3e5b94da19071c5cee548a))
+
+ -  **how-tos/agentexecutor-mcp**  update docker command to use 'docker compose' ([2d85a1940d36444](https://github.com/bsorrentino/langgraph4j/commit/2d85a1940d364445d25d7a9c849ab02a4a64be15))
+
+ -  add new reference ([5be8b7f96d10b08](https://github.com/bsorrentino/langgraph4j/commit/5be8b7f96d10b08a5c68a884618c529969f5be6d))
+
+ -  update changeme ([65b28e610bc7096](https://github.com/bsorrentino/langgraph4j/commit/65b28e610bc70961034524dd5bf9dd3af5701b35))
+
+ -  update changeme ([97e085eff75a021](https://github.com/bsorrentino/langgraph4j/commit/97e085eff75a0212dfe313eadd5f16fc28bdaa23))
+
+ -  update changeme ([110ca8805f650cd](https://github.com/bsorrentino/langgraph4j/commit/110ca8805f650cd01b98880f52016628216e4d8d))
+
+ -  update changeme ([9ac2ec6fb5cf551](https://github.com/bsorrentino/langgraph4j/commit/9ac2ec6fb5cf55114ca9c7b9c2baccff58f5b8f7))
+
+ -  update changeme ([6ed0a0b0bee4920](https://github.com/bsorrentino/langgraph4j/commit/6ed0a0b0bee4920b18ce35676d55440bf4f17288))
+
+
+### Refactor
+
+ -  **core/checkpoint**  handle null checkpoints parameter ([de7e45c63c3c0d8](https://github.com/bsorrentino/langgraph4j/commit/de7e45c63c3c0d80aa35f2ee3efa9cfdeaac7161))
+    > work on #115
+
+ -  **core/FileSystemSaver**  Removed redundant `targetFolder` variable ([4692dc0a927e977](https://github.com/bsorrentino/langgraph4j/commit/4692dc0a927e97769fb3b2461890f0e2d677d475))
+    > work on #115
+
+ -  **langchain4j**  reduce log level for null ID warning ([58953f39aad4659](https://github.com/bsorrentino/langgraph4j/commit/58953f39aad465934e06c39fc2036a74efd4cc98))
+    > - ToolExecutionResultMessageSerializer
+ > - ToolExecutionRequest
+
+ -  **agent-executor**  handle STOP finish reason ([2b9bb1f3cd1812d](https://github.com/bsorrentino/langgraph4j/commit/2b9bb1f3cd1812dc32b4d31ca2a0a47e1baa6093))
+    > - Add default response for empty tool execution requests
+
+ -  **core/parallelnode**  change HashMap to ConcurrentHashMap for thread safety ([f678778c8fb836f](https://github.com/bsorrentino/langgraph4j/commit/f678778c8fb836fe84f8b1e86c7b0a901c61d159))
+    > resolve #106
+
+
+### ALM 
+
+ -  bump to version 1.5.7 ([92f347f3b0553a1](https://github.com/bsorrentino/langgraph4j/commit/92f347f3b0553a158017d4d708eece1c6194ad23))
+   
+ -  update git ignore ([316c219399291ef](https://github.com/bsorrentino/langgraph4j/commit/316c219399291ef7a4418d1f3f43b5114b01103e))
+   
+ -  bump to SNAPSHOT ([5d0f228d669f6bf](https://github.com/bsorrentino/langgraph4j/commit/5d0f228d669f6bfb4c8fbfe7674e36fb40a64301))
+   
+
+### Test 
+
+ -  **core**  Added tests for checkpoint saving with manual and auto release ([78b6840ff04135f](https://github.com/bsorrentino/langgraph4j/commit/78b6840ff04135f4b2837af8d22886436e14640b))
+    > work on #115
+
+ -  **core**  refine multi thread scenario concerns Issue105 ([5fa489a88715ce1](https://github.com/bsorrentino/langgraph4j/commit/5fa489a88715ce1d87a07d75637b4d594119706b))
+   
+ -  **how-to**  refine integration test ([0a563a81e54bb9e](https://github.com/bsorrentino/langgraph4j/commit/0a563a81e54bb9e329586ca76a340f288754cd07))
+    > - rename AgentWebTest to AgentWebITest
+
+
+
+
+
+
+<!-- "name: v1.5.6" is a release tag -->
+
+## [v1.5.6](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.6) (2025-04-16)
+
+### Features
+
+ *  **creator**  add save and load graph from builder UI ([75d8725d25b2da9](https://github.com/bsorrentino/langgraph4j/commit/75d8725d25b2da9f0f0bd6006910ee4f7878c4bb))
+   
+
+
+### Documentation
+
+ -  update changeme ([6e74eccf24c7ebc](https://github.com/bsorrentino/langgraph4j/commit/6e74eccf24c7ebcbdc184f1e539e3e6d3dabf369))
+
+ -  update changeme ([40fc569e4808a51](https://github.com/bsorrentino/langgraph4j/commit/40fc569e4808a51c26e8a826b893d25c5c7553fd))
+
+ -  update changeme ([8018c3410f5827d](https://github.com/bsorrentino/langgraph4j/commit/8018c3410f5827d64588d8488c9d9502f3470e21))
+
+ -  update changeme ([853fbaceaa1b4a6](https://github.com/bsorrentino/langgraph4j/commit/853fbaceaa1b4a6ff2cc0c2ee6d48c7ecb7da1bb))
+
+ -  update changeme ([d423c2b253ffbf6](https://github.com/bsorrentino/langgraph4j/commit/d423c2b253ffbf68a22928e74a895037156006ce))
+
+ -  update changeme ([c77d8715f4ca05a](https://github.com/bsorrentino/langgraph4j/commit/c77d8715f4ca05a8acaac6bcb93275b59067e4c1))
+
+ -  bump to release 1.5.6 ([936d8beebdae320](https://github.com/bsorrentino/langgraph4j/commit/936d8beebdae32055a98258f36eaef0216040e64))
+
+ -  update changeme ([8f29e83248b087c](https://github.com/bsorrentino/langgraph4j/commit/8f29e83248b087c364175bb8cec92a7bcc7ab6bf))
+
+
+### Refactor
+
+ -  **core/ParallelNode.java**  change HashMap to ConcurrentHashMap for thread safety ([1a1ecf2a8a24048](https://github.com/bsorrentino/langgraph4j/commit/1a1ecf2a8a24048aad051aa903922587e838de2e))
+    > resolve #106
+
+
+### ALM 
+
+ -  bump to release 1.5.6 ([ff3bfd529ff6c32](https://github.com/bsorrentino/langgraph4j/commit/ff3bfd529ff6c32b83b8a0075b6ad4e9fb2c242e))
+   
+ -  **core**  update async-generator dependency version to 3.1.0 ([fe0d9157d624888](https://github.com/bsorrentino/langgraph4j/commit/fe0d9157d624888baf777aeb9df01d5a9818b68c))
+   
+ -  **creator**  bump version of doker image to SNAPSHOT ([80e50ca56bc7fa6](https://github.com/bsorrentino/langgraph4j/commit/80e50ca56bc7fa6abdb17302450315bd801fcc13))
+   
+ -  bump to new SNAPSHOT ([8f314dedb108fa1](https://github.com/bsorrentino/langgraph4j/commit/8f314dedb108fa1ec30c4b099e8609c292eee875))
+   
+
+### Test 
+
+ -  **core**  add test method for AsyncGenerator result retrieval ([830a1e12301ae15](https://github.com/bsorrentino/langgraph4j/commit/830a1e12301ae15b0e2643f5103ba0d682424a8c))
+   
+
+
+
+
+
+<!-- "name: v1.5.5" is a release tag -->
+
+## [v1.5.5](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.5) (2025-04-09)
+
+### Features
+
+ *  **studio**  Add support for argument conversion. ([75ba3e8615d0b69](https://github.com/bsorrentino/langgraph4j/commit/75ba3e8615d0b6941ff99f00bc57906c21fc5770))
+     > - Extend ArgumentMetadata to include a converter function
+     > - Modify request processing logic to apply converters during data deserialization
+   
+ *  **core**  Added util method for creating immutable entries ([26e36d73f15abbd](https://github.com/bsorrentino/langgraph4j/commit/26e36d73f15abbd2590bcc3aef771bb6ad16937d))
+     > - Added entryOf method to CollectionsUtils class
+   
+
+### Bug Fixes
+
+ -  **langchain4j**  add ToolExecutionResultMessage support ([c16a75d942b76c3](https://github.com/bsorrentino/langgraph4j/commit/c16a75d942b76c35c64a688cdbc6f0e98fb87c96))
+     > - Handle toolExecutionRequests in AiMessageDeserializer
+     > - Added ToolExecutionResultMessage serialization/deserialization in LC4jJacksonStateSerializer.
+     > - Added serialization tests for AiMessage
+
+
+### Documentation
+
+ -  bump to version 1.5.5 ([ed5dd12e55e7053](https://github.com/bsorrentino/langgraph4j/commit/ed5dd12e55e705379b19e955f598ec66675554d8))
+
+ -  update changeme ([b9eaa38be2e977d](https://github.com/bsorrentino/langgraph4j/commit/b9eaa38be2e977d3651d2c4ce40097825845e9c0))
+
+
+### Refactor
+
+ -  **CallAgent class**  fix finish reason check ([f641de02f123b15](https://github.com/bsorrentino/langgraph4j/commit/f641de02f123b1596ddb2aae87b27bdac12811c8))
+    > add langchain4j-ollama dependency for Ollama support
+
+ -  **AppenderChannel.java**  add validation method for new values ([359bfff596ce0ce](https://github.com/bsorrentino/langgraph4j/commit/359bfff596ce0cefc39269b84b5fc052d2152086))
+    > Added overridable method &#x60;validateNewValues&#x60; to ensure that the incoming list is compatible with the channel&#x27;s type parameter.
+
+ -  **AppenderChannel**  expose nested class ReducerDisallowDuplicate and ReducerAllowDuplicate ([f127da2e2e9cc92](https://github.com/bsorrentino/langgraph4j/commit/f127da2e2e9cc9260bcd583fc935d9d3da4f80e2))
+   
+ -  **sprinhai-agentexecutor**  remove unused dependency on AgentExecutor from DemoConsoleController ([bc77b918e2637cc](https://github.com/bsorrentino/langgraph4j/commit/bc77b918e2637cc1bf3e7de793d2f9b6915ca72b))
+    > Refactored AgentExecutor to an interface and static methods to improve modularity and decoupling.
+
+
+### ALM 
+
+ -  bump to version 1.5.5 ([4fcfd3ff1d3fc87](https://github.com/bsorrentino/langgraph4j/commit/4fcfd3ff1d3fc8755f0f43f004f8089e2e45a654))
+   
+ -  update `spring-ai` version to `1.0.0-M6` ([1284a997bca17a5](https://github.com/bsorrentino/langgraph4j/commit/1284a997bca17a5c11aa3ece3894ad3efd612330))
+   
+ -  update `spring-ai` version to `1.0.0-M6` ([f0ed8133b03cadd](https://github.com/bsorrentino/langgraph4j/commit/f0ed8133b03cadd4206cb60a702867853ce22cd7))
+   
+ -  bump to new SNAPSHOT ([f3973e48746f939](https://github.com/bsorrentino/langgraph4j/commit/f3973e48746f939e826228906aa7cb153f5aad18))
+   
+
+
+
+
+
+
+<!-- "name: v1.5.4" is a release tag -->
+
+## [v1.5.4](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.4) (2025-04-06)
+
+### Features
+
+ *  **springai-agentexecutor**  add ChatService interface to improve configurability ([5a84f4d1035bae4](https://github.com/bsorrentino/langgraph4j/commit/5a84f4d1035bae4ff833ab236bc83046bc2a06ef))
+   
+ *  **spring-ai**  add module with Spring AI  utilities ([345e3058568820e](https://github.com/bsorrentino/langgraph4j/commit/345e3058568820e218d2ff8c119fcd2b45f2fba9))
+   
+ *  **spring-ai**  add module with Spring AI  utilities ([0d2c49f23440b9c](https://github.com/bsorrentino/langgraph4j/commit/0d2c49f23440b9c1522f9f03007f5f82a9d882b3))
+     > - add serializers
+     > - ToolService (to manage tools and their executor)
+   
+
+
+### Documentation
+
+ -  bump to version 1.5.4 ([a6b6a511f637ce1](https://github.com/bsorrentino/langgraph4j/commit/a6b6a511f637ce1af7cf2b7ff1ab7684ab39ce94))
+
+ -  **agent-executor**  improve code snippet ([dfaf18b52727f09](https://github.com/bsorrentino/langgraph4j/commit/dfaf18b52727f09746232f1796722ea10f9a5ed5))
+
+ -  added README for LangGraph4j utilities integration with Spring AI ([a3b59ddb57c0cfc](https://github.com/bsorrentino/langgraph4j/commit/a3b59ddb57c0cfc4c6c9499f35023eac82eaff59))
+     > Documentation was added to outline the integration of LangGraph4j utilities with Spring AI, including details on serializers, tools, and Maven dependency information.
+
+ -  fix relase date ([36622302338c968](https://github.com/bsorrentino/langgraph4j/commit/36622302338c968ec2926f0e71d6f4f6009ab7e3))
+
+ -  update changeme ([9c3f211924b2d30](https://github.com/bsorrentino/langgraph4j/commit/9c3f211924b2d3075429036f38c8cd0defdb67ea))
+
+
+### Refactor
+
+ -  **langchain4j**  deprecated classes in favor of meaningful ones ([02bd938c9ed8161](https://github.com/bsorrentino/langgraph4j/commit/02bd938c9ed81619ac1248048886effadb6e5d8f))
+    > - JacksonMessagesStateSerializer -&gt; LC4jJacksonStateSerializer
+ > - STDStateSerializer -&gt; LC4jStateSerialize
+ > - ToolNode -&gt; LC4jToolService
+
+ -  **springai-agent**  explicit create LLM Chat models ([9588b0d1f3bda28](https://github.com/bsorrentino/langgraph4j/commit/9588b0d1f3bda28dbf2379515c06f5e5654fcfd9))
+   
+ -  **spring-ai**  Rename ToolService to SpringAIToolService. ([e12381cbf4233cf](https://github.com/bsorrentino/langgraph4j/commit/e12381cbf4233cf19c5f40fa458eb60a4e021c0c))
+   
+ -  **agent-executor**  Deprecate ToolNode to LC4jToolService. ([20fa00807c4f3f8](https://github.com/bsorrentino/langgraph4j/commit/20fa00807c4f3f81910910641a394bd61df797ec))
+   
+ -  **springai-agentexecutor**  upgrade spring ai dependency and update code accordly ([a7131cba769e34d](https://github.com/bsorrentino/langgraph4j/commit/a7131cba769e34d2e45b83a0742d30e9459466d0))
+   
+
+### ALM 
+
+ -  bump to version 1.5.4 ([447a11291bcdb5e](https://github.com/bsorrentino/langgraph4j/commit/447a11291bcdb5e477f64fe2e4c8463bd931f515))
+   
+ -  bump to new SNAPSHOT ([f81153f0c74d44b](https://github.com/bsorrentino/langgraph4j/commit/f81153f0c74d44bebb0bef7fe885b0ce9eef5ad0))
+   
+
+
+
+
+
+
+<!-- "name: v1.5.3" is a release tag -->
+
+## [v1.5.3](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.3) (2025-04-03)
+
+### Features
+
+ *  **how-to**  update parallel-branch notebook ([1e740ef5cafa022](https://github.com/bsorrentino/langgraph4j/commit/1e740ef5cafa0226cbc6401c071decf30e842f46))
+     > work on #104
+   
+ *  add support for compiled graph in parallel branch ([a05fa5479296373](https://github.com/bsorrentino/langgraph4j/commit/a05fa54792963730986072ef7989e7b3bdf1ed55))
+     > - Refactored &#x60;getEmbedGenerator&#x60; to correcly merge result states
+     > - Removed generator entry before updating currentState.
+     > - Simplified state updating logic in &#x60;ParallelNode&#x60;.
+     > - Added unique identifier for subgraph in state
+     > - Updated tests for parallel branches in MessagesStateGraph workflow with multiple compiled subgraphs.
+     > resolve #104
+   
+ *  **core/CollectionsUtils.java**  add methods for merging maps with conflict resolution ([e8acd24e7235717](https://github.com/bsorrentino/langgraph4j/commit/e8acd24e7235717bf6d6d95ac4d724824bffb5ac))
+   
+ *  add new example ([ad944f7658663f1](https://github.com/bsorrentino/langgraph4j/commit/ad944f7658663f16e4e41f63be2faed7a4c9494d))
+     > work on #104
+   
+
+### Bug Fixes
+
+ -  **checkpoints**  replace HashMap with ConcurrentHashMap for thread safety ([70dcb2397f56a44](https://github.com/bsorrentino/langgraph4j/commit/70dcb2397f56a4413b722965992281a1b316d6c0))
+     > - Updated &#x60;_checkpointsByThread&#x60; from &#x60;HashMap&#x60; to &#x60;ConcurrentHashMap&#x60; to ensure thread safety during concurrent execution.
+     > - Added test &#x60;Issue105Test&#x60; to verify that all threads are accounted for in &#x60;_checkpointsByThread&#x60;.
+     > resolve #105
+
+
+### Documentation
+
+ -  bump to next release 1.5.3 ([66d5d54e4ea4f2a](https://github.com/bsorrentino/langgraph4j/commit/66d5d54e4ea4f2a1df7dd30224961c42f2924472))
+
+ -  **how-to**  update notebook markdown documents ([5062d370939c0e1](https://github.com/bsorrentino/langgraph4j/commit/5062d370939c0e1f095126950cf07e86a5fe0d65))
+
+ -  **README.md**  add project links to README ([0a90a39da400627](https://github.com/bsorrentino/langgraph4j/commit/0a90a39da40062788c4cf542584e850383117c3e))
+
+ -  update changeme ([7dc20416d3245f1](https://github.com/bsorrentino/langgraph4j/commit/7dc20416d3245f1424ba044738d75ebe1b07aaa2))
+
+
+### Refactor
+
+ -  **core/MessagesState.java**  remove unused import ([e3e19cd4a0b230e](https://github.com/bsorrentino/langgraph4j/commit/e3e19cd4a0b230e66bbbbba2e01da25cf2bb6ddb))
+   
+
+### ALM 
+
+ -  bump to next release 1.5.3 ([083263c7ad390b7](https://github.com/bsorrentino/langgraph4j/commit/083263c7ad390b71054dccbf2e8d5e114830c524))
+   
+ -  bump to new SNAPSHOT ([fbd1424e3eec36d](https://github.com/bsorrentino/langgraph4j/commit/fbd1424e3eec36d4fa9e74bd847978ba2e342611))
+   
+
+
+
+
+
+
+<!-- "name: v1.5.2" is a release tag -->
+
+## [v1.5.2](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.2) (2025-04-01)
+
+
+### Bug Fixes
+
+ -  Properly handle state updates when return from a nested generator (eg. subgraph, llm-streaming) ([86ad6f88f42416e](https://github.com/bsorrentino/langgraph4j/commit/86ad6f88f42416e8a5b733e15b3feb6231c59bae))
+     > - Makes Appender channel duplicate safe. !! WARNING THIS BREAK IN COMPATIBILITY !! may have undesirable effects
+     > - deprecated .of() methods on AppenderChannel and Channel adding Channels interface with appender and base channel implementations
+     > - Added tests for nested generator with stream, subgraph, and subgraph with appender
+     > resolve #102
+
+ -  **AgentExecutorAzureOpenAITest.java**  add required environment variables for Azure OpenAI configuration ([a86c922c98247ca](https://github.com/bsorrentino/langgraph4j/commit/a86c922c98247cad046cc04762bc5dd22873d343))
+     > - Updated endpoint and deployment configuration in &#x60;AgentExecutorAzureOpenAITest&#x60; class to use environment variables: &#x60;AZURE_OPENAI_ENDPOINT&#x60;, &#x60;AZURE_OPENAI_DEPLOYMENT_NAME&#x60;.
+
+
+### Documentation
+
+ -  bump to version 1.5.2 ([0ce12b521078c9f](https://github.com/bsorrentino/langgraph4j/commit/0ce12b521078c9f2d228ad3de759f8de76c0426b))
+
+ -  remove unused imports and update documentation ([411338a3ba9a2ef](https://github.com/bsorrentino/langgraph4j/commit/411338a3ba9a2ef4f274b899d67414a48bbaba65))
+     > - Removed the AppenderChannel import from persistence.md
+     > - Refactored Channel instantiation in MessagesState to use Channels.appender()
+     > - Added link to Generator (Visual Builder) for LangGraph
+
+ -  update changeme ([c4a69aa42f15532](https://github.com/bsorrentino/langgraph4j/commit/c4a69aa42f15532b9a44404cf6cc81dd56ad7ec2))
+
+
+### Refactor
+
+ -  remove lombok usage ([9bc154c5fd38681](https://github.com/bsorrentino/langgraph4j/commit/9bc154c5fd38681f7cf5bc3a4b7ada179a5982bd))
+    > resolve #103
+
+ -  **how-tos**  remove unused imports ([226505cd2a34f6f](https://github.com/bsorrentino/langgraph4j/commit/226505cd2a34f6f98d329028f9040aec1601f8de))
+   
+ -  replace deprecated methods with right ones ([8c31f359f9f85a6](https://github.com/bsorrentino/langgraph4j/commit/8c31f359f9f85a6a6d41358ef33ea21f20b8e221))
+   
+
+### ALM 
+
+ -  bump to version 1.5.2 ([56a01f125ca360f](https://github.com/bsorrentino/langgraph4j/commit/56a01f125ca360fd25020aad714038ab4cdca5eb))
+   
+
+
+
+
+
+
+<!-- "name: v1.5.1" is a release tag -->
+
+## [v1.5.1](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.1) (2025-03-28)
+
+### Features
+
+ *  **how-tos**  add new notebook for verify issue 99 ([4f8d6bded777cb5](https://github.com/bsorrentino/langgraph4j/commit/4f8d6bded777cb5cb9950f9100977140540f7434))
+     > work on #99
+   
+
+### Bug Fixes
+
+ -  **CompiledGraph.java**  fix interruption before node after start ([813938d6802eedc](https://github.com/bsorrentino/langgraph4j/commit/813938d6802eedc6c3f3e863f000b5229544f0b7))
+     > Ensure that the compiled graph checks if the current node ID is the same as the previous node ID before interrupting.
+     > work on #100
+
+ -  **CompiledGraph.java**  update edge retrieval logic for subgraph processing ([9cf33ccfb892bf9](https://github.com/bsorrentino/langgraph4j/commit/9cf33ccfb892bf9ac4db02b09ad3ef3ad0c01d8a))
+     > - Replaced &#x60;stateGraph.edges.edgesByTargetId(subgraphNode.id())&#x60; with &#x60;edges.edgesByTargetId(subgraphNode.id())&#x60;
+     > - Replaced &#x60;stateGraph.edges.edgeBySourceId(subgraphNode.id()).orElseThrow()&#x60; with &#x60;edges.edgeBySourceId(subgraphNode.id()).orElseThrow()&#x60;
+     > These changes fix problem when process multiple subgraph.
+     > work on #99
+
+ -  **generator**  update gif url ([fcdc75a871962bb](https://github.com/bsorrentino/langgraph4j/commit/fcdc75a871962bb73ad1e94080a666bcbc515fb9))
+
+ -  **generator**  readme typo ([cc1761f50dfa9ef](https://github.com/bsorrentino/langgraph4j/commit/cc1761f50dfa9ef13c30d43b2e96ceeb069554f5))
+
+
+### Documentation
+
+ -  bump to next release 1.5.1 ([114e36023e9a6c4](https://github.com/bsorrentino/langgraph4j/commit/114e36023e9a6c4cee3909b2f7987bcd95d99f1d))
+
+ -  bump to new SNAPSHOT in badge ([c0f05b2b4b92981](https://github.com/bsorrentino/langgraph4j/commit/c0f05b2b4b92981489ec493844effff191dea33c))
+
+ -  update changeme ([0dc31cdf85e2bb2](https://github.com/bsorrentino/langgraph4j/commit/0dc31cdf85e2bb204703a73cb451e1b2778095fb))
+
+
+### Refactor
+
+ -  **AgentExecutor**  rename builder ([0a7907bdc802404](https://github.com/bsorrentino/langgraph4j/commit/0a7907bdc802404647e70ecac85cb3bcefad4235))
+    > - Renamed &#x60;GraphBuilder&#x60; to &#x60;Builder&#x60;.
+ > - Introduced static factory methods &#x60;builder()&#x60; and &#x60;graphBuilder()&#x60;, deprecating the old names.
+ > - Refactored AgentExecutorTest to use updated builder method.
+
+
+### ALM 
+
+ -  bump to next release 1.5.1 ([cfe285e77864c77](https://github.com/bsorrentino/langgraph4j/commit/cfe285e77864c775fec41c01c233acfca0d4fbc5))
+   
+ -  bump to new SNAPSHOT ([f43c753c569f344](https://github.com/bsorrentino/langgraph4j/commit/f43c753c569f344502e011521b3ffad9e099c8d5))
+   
+ -  **how-tos**  bump to new SNAPSHOT ([36211f6549faa2a](https://github.com/bsorrentino/langgraph4j/commit/36211f6549faa2a2e7e039a744810ec04a374f44))
+   
+
+### Test 
+
+ -  include test for check intrruptions ssenarios also on subgraph ([65d6c1a0889eb0f](https://github.com/bsorrentino/langgraph4j/commit/65d6c1a0889eb0fd7c74d1ca99cbc34dae7bb4e8))
+    > work on #100
+
+ -  add unit tests for check edge processing in multiple graphs scenario ([ea3263158137585](https://github.com/bsorrentino/langgraph4j/commit/ea3263158137585e8792ae0413de674000d231c7))
+    > work on #99
+
+
+
+
+
+
+<!-- "name: v1.5.0" is a release tag -->
+
+## [v1.5.0](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.5.0) (2025-03-25)
+
+### Features
+
+ *  **generator**  package builder and generator in docker ([ae8f57fb029d60e](https://github.com/bsorrentino/langgraph4j/commit/ae8f57fb029d60ea8037807ce0b3565f9fab3a42))
+     > work on #97
+   
+ *  **builder-webui**  add builder UI for visually design the graph. ([97f615f0f8563fa](https://github.com/bsorrentino/langgraph4j/commit/97f615f0f8563fa08b20f41e555438733f97d0e2))
+     > thi project is based on a fork of  https://github.com/langchain-ai/langgraph-builder
+     > work on #97
+   
+ *  **Generator**  Add generator implementation ([b42db819c334dc8](https://github.com/bsorrentino/langgraph4j/commit/b42db819c334dc802e6f07afcbf0c977cf6c2a98))
+     > - add the Generator class that enables the creation of custom agent builder stub and sample implementation using mustache templates
+     > - add The GraphDefinition class that represent the graph model
+     > - add related  unit test
+     > work on #97
+   
+ *  **studio/webui/**  refactor execution logic ([434a7e58507661d](https://github.com/bsorrentino/langgraph4j/commit/434a7e58507661d3501038b6afdb2900b22f653c))
+     > - Extracted start and stop execution logic into separate methods
+     > - Added custom events to notify the state changes (start, interrupted, stop) during execution.
+     > work on #74
+   
+ *  **studio/webui**  add message display and state management for graph interaction ([9a805c27425f55c](https://github.com/bsorrentino/langgraph4j/commit/9a805c27425f55cde466281e4c95573e24af188f))
+     > - Added methods &#x60;#writeMessage&#x60; to update a message element in the UI.
+     > - Created handlers &#x60;#onGraphActive&#x60; and &#x60;#onStateUpdated&#x60; to manage &#x27;graph-active&#x27; and &#x27;state-updated&#x27; events.
+     > - Updated event listeners to use these new handler methods.
+     > - Modified the navbar in lg4j-workbench.js to include elements for displaying messages (&#x60;#message&#x60;) and state indicators (&#x60;#spinner&#x60;).
+     > - Ensured proper cleanup of event listeners on disconnection.
+     > work on #74
+   
+ *  **studio/base**  add support for JacksonStateSerializer ([b65dc92e383dad1](https://github.com/bsorrentino/langgraph4j/commit/b65dc92e383dad1aeacbbaa4ed00796f5c254ff3))
+     > - Introduced &#x60;JacksonStateSerializer&#x60; to handle JSON serialization.
+     > - Updated the &#x60;LangGraphStreamingServer&#x60; to recognize and utilize the &#x60;JacksonStateSerializer&#x60; if present.
+     > - Adjusted logic to correctly configure the &#x60;objectMapper&#x60; based on the state serializer type.
+     > - Modified the state update and resumption logic to accommodate the new serializer.
+     > work on #74
+   
+ *  Jackson based serialization refinements ([b7eb009e9a65002](https://github.com/bsorrentino/langgraph4j/commit/b7eb009e9a650025866656b1f8cd835ff9c40b18))
+     > - Add TypeMapper to map class  type with type name
+     > - Provide implementation for GenericListDeserializer and GenericMapDeserializer
+     > - Unit test for Jackson based serialization
+   
+ *  **CollectionsUtils.java**  add method to merge two maps ([395f5cd481e471f](https://github.com/bsorrentino/langgraph4j/commit/395f5cd481e471f04fa0be29664c611bcbdfe011))
+   
+ *  add support for JSON serialization using Jackson for langchain4j Chat Messages ([44eb32cb5c953f6](https://github.com/bsorrentino/langgraph4j/commit/44eb32cb5c953f6db6b39db8d59f4c364c16a41b))
+   
+ *  update jetty,springboot,quarkus implementation ([9d75b9faff8afcd](https://github.com/bsorrentino/langgraph4j/commit/9d75b9faff8afcdec40fd2a6b23d57ad340439dd))
+     > - provide CompileConfig
+     > - update webui
+     > work on #74
+   
+ *  **LangGraphStreamingServer.java**  add support to provide CompileConfig to streaming servlet ([3cce4301bba314e](https://github.com/bsorrentino/langgraph4j/commit/3cce4301bba314e838c9bf4725410040ee93281c))
+     > - Removed unused import &#x60;BaseCheckpointSaver&#x60;
+     > - Updated constructor parameters to be more descriptive (&#x60;stateGraph&#x60;, &#x60;compileConfig&#x60;)
+     > - Removed redundant checkpoint saving logic in &#x60;compileConfig&#x60; method
+     > work on 74
+   
+ *  **studio/webui**  detect interruption ([d77a841c2dba2a6](https://github.com/bsorrentino/langgraph4j/commit/d77a841c2dba2a6a912a5c7a7729cc3c19128c51))
+     > update script for deployment to jetty,springboot,quarkus
+     > work on #74
+   
+
+### Bug Fixes
+
+ -  **studio/webui**  highlight the next node instead of current one ([da251d4cd6bd55b](https://github.com/bsorrentino/langgraph4j/commit/da251d4cd6bd55b16a0948bf62c5d294e8c2e4bc))
+     > work on #74
+
+
+### Documentation
+
+ -  bump to new SNAPSHOT ([38d4f4b8766ea9d](https://github.com/bsorrentino/langgraph4j/commit/38d4f4b8766ea9dc7dc6a4167ca412554c1589dc))
+
+ -  (generator) add README and Maven Site ([79321559738a800](https://github.com/bsorrentino/langgraph4j/commit/79321559738a800d87fcd6891b5fc931d0f7ebd5))
+     > work on #97
+
+ -  update changeme ([a286678d3d1818c](https://github.com/bsorrentino/langgraph4j/commit/a286678d3d1818c1134898d358f03975ec2eba20))
+
+
+### Refactor
+
+ -  **core**  remove deprecated marked for removal ([55a880b5009ab10](https://github.com/bsorrentino/langgraph4j/commit/55a880b5009ab1020a3bb83693ce25d2f4f4ed5c))
+    > Removed:
+ > - StateGraph.getEntryPoint()
+ > - StateGraph.getFinishPoint()
+ > - StateGraph.setEntryPoint()
+ > - StateGraph.setFinishPoint()
+ > - StateGraph.setConditionalEntryPoint()
+ > - AgentState.AppendableValue()
+ > - class  AppendableValue {}
+ > - class  AppendableValueRW {}
+ > work on #96
+
+ -  **CompiledGraph.java**  refine node output construction ([83e713246fd7a9a](https://github.com/bsorrentino/langgraph4j/commit/83e713246fd7a9aaac470577c18359935117c5cc))
+    > Refactors the &#x60;streamSnapshots&#x60; to return the __START__ completion as StateSnaphot instead of NodeOutput
+ > work on #74
+
+ -  **studio/webui**  handle JSON streaming responses efficiently ([ba48bf83cabdaf6](https://github.com/bsorrentino/langgraph4j/commit/ba48bf83cabdaf6d437907156dacdd3f1ddcc892))
+    > - Updated &#x60;streamingResponse&#x60; to decode chunks into a buffer and then parse JSON, ensuring only complete messages are emitted.
+ > - Removed unused variable &#x60;interrupted&#x60; as logic has been updated.
+ > - Adjusted dispatch event&#x27;s detail property to use the parsed JSON directly.
+ > work on #74
+
+ -  **AppenderChannel.java**  change constructor access level to protected ([27beeea5a45808a](https://github.com/bsorrentino/langgraph4j/commit/27beeea5a45808a72aa688f88afd34d4f1c089a3))
+    > - allow AppenderChannel specialization
+
+
+### ALM 
+
+ -  **how-tos**  bump to new SNAPSHOT ([0dc54f9857be40d](https://github.com/bsorrentino/langgraph4j/commit/0dc54f9857be40deb009a70ad9d9f0060c2327e1))
+   
+ -  bump to version 1.5.0 ([259ccf45771a802](https://github.com/bsorrentino/langgraph4j/commit/259ccf45771a80294271b80afffe2ab081c2549f))
+   
+ -  **generator**  add new maven  module project ([0bedceea3064be1](https://github.com/bsorrentino/langgraph4j/commit/0bedceea3064be18d9476f3e3a6282b2a958ef63))
+    > work on #97
+
+ -  **pom.xml**  Add new module `generator` to project ([7d380e4f80300fc](https://github.com/bsorrentino/langgraph4j/commit/7d380e4f80300fc0074bf11cf958a3f23118f193))
+    > work on #97
+
+ -  **studio/webui**  update distribution ([3852737e640f965](https://github.com/bsorrentino/langgraph4j/commit/3852737e640f9657410d9246cde824672719d09e))
+   
+ -  **studio**  update webui distribution ([34d02f3a7d5ac60](https://github.com/bsorrentino/langgraph4j/commit/34d02f3a7d5ac603e1a5b2354e46916053df7150))
+    > work on #74
+
+ -  **studio/webui**  update studio distribution ([5b3cb334379734c](https://github.com/bsorrentino/langgraph4j/commit/5b3cb334379734c000635e7adbb50d5f3ce4f264))
+    > work on #74
+
+ -  bump to 1.5-SNAPSHOT ([0c28535c4582f93](https://github.com/bsorrentino/langgraph4j/commit/0c28535c4582f93d7d885e12b7b8442fcbe7817c))
+   
+
+### Test 
+
+ -  **studio/webui/**  refactor execution logic ([fe9203bc5efe6c4](https://github.com/bsorrentino/langgraph4j/commit/fe9203bc5efe6c40f4fc7eef14f6291e83461f36))
+    > - Extracted start and stop execution logic into separate methods
+ > - Added custom events to notify the state changes (start, interrupted, stop) during execution.
+ > work on #74
+
+ -  add support for JSON serialization using Jackson for langchain4j Chat Messages ([3e4b183a397c57b](https://github.com/bsorrentino/langgraph4j/commit/3e4b183a397c57ba3de9db64b55fdd2c9b468bda))
+   
+
+
+
+
+
+<!-- "name: v1.4.4-patch1" is a release tag -->
+
+## [v1.4.4-patch1](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.4.4-patch1) (2025-03-21)
+
+
+
+### Documentation
+
+ -  update changeme ([c9f59de263e7bdc](https://github.com/bsorrentino/langgraph4j/commit/c9f59de263e7bdc521a6dba7e12874cb2c642855))
+
+
+
+
+
+
+
+
+
+<!-- "name: v1.4.4" is a release tag -->
+
+## [v1.4.4](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.4.4) (2025-03-21)
+
+### Features
+
+ *  add support for JSON serialization using Jackson for langchain4j Chat Messages ([cf8943d42dca955](https://github.com/bsorrentino/langgraph4j/commit/cf8943d42dca95593bac32860035d88465258f94))
+   
+ *  Jackson based serialization refinements ([8f06f76e9f643f0](https://github.com/bsorrentino/langgraph4j/commit/8f06f76e9f643f00e27a4d132329db26ddab874d))
+     > - Add TypeMapper to map class  type with type name
+     > - Provide implementation for GenericListDeserializer and GenericMapDeserializer
+     > - Unit test for Jackson based serialization
+   
+ *  Jackson based serialization refinements ([946588148e58297](https://github.com/bsorrentino/langgraph4j/commit/946588148e582978835afbc7d28fc7a2856e009b))
+     > - Add TypeMapper to map class  type with type name
+     > - Provide implementation for GenericListDeserializer and GenericMapDeserializer
+     > - Unit test for Jackson based serialization
+   
+ *  **langchain4j**  Adds a new class for integration of chat memory  within graph state ([8174df0586d5616](https://github.com/bsorrentino/langgraph4j/commit/8174df0586d5616e18723d86f193f7481c09d9aa))
+     > - Introduce &#x60;GraphChatMemory&#x60; class to manage conversation histories using graph state. This allows a seamless experience in using langchain4j chat memory implementation in langgraph4j.
+   
+
+
+### Documentation
+
+ -  bump to 1.4.4 release ([73841494cd75a86](https://github.com/bsorrentino/langgraph4j/commit/73841494cd75a86b63d7b27db5cbf49eadfad033))
+
+ -  update changeme ([e81907b5c6482e4](https://github.com/bsorrentino/langgraph4j/commit/e81907b5c6482e4bcb049e7d336a5b2e34d88cf3))
+
+
+### Refactor
+
+ -  **AppenderChannel.java**  change constructor access level to protected ([7245120f3bfdb1d](https://github.com/bsorrentino/langgraph4j/commit/7245120f3bfdb1df811ffc05a26e7c068c2564cb))
+    > - allow AppenderChannel specialization
+
+
+### ALM 
+
+ -  bump to 1.4.4 release ([56835ab018ab7bd](https://github.com/bsorrentino/langgraph4j/commit/56835ab018ab7bdbbdc34537ec83a57226394436))
+   
+ -  bump to SNAPSHOT ([167ace3002c162b](https://github.com/bsorrentino/langgraph4j/commit/167ace3002c162b25f07f5f0d4ee7becb4045c22))
+   
+
+
+
+
+
+
+<!-- "name: v1.4.3" is a release tag -->
+
+## [v1.4.3](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.4.3) (2025-03-15)
+
+### Features
+
+ *  **core**  Add utility class for edge mappings in state graph ([68012fb87133a46](https://github.com/bsorrentino/langgraph4j/commit/68012fb87133a463bc8e20d95acec056a1db8669))
+     > EdgeMappings class provides a fluent API to create immutable maps representing edges between states in a state graph. This utility makes it easier to define and configure state transitions, ensuring consistency and reducing errors.
+   
+ *  **AgentState.java**  Add functionality to handle null values in state operations for their removal ([3e591a2bf41da0e](https://github.com/bsorrentino/langgraph4j/commit/3e591a2bf41da0e9942dcaa881eea8115c77a29c))
+     > Introducing in &#x60;AgentState&#x60; class two new utility methods: &#x60;toMapAllowingNulls&#x60; and &#x60;toMapRemovingNulls&#x60;.
+   
+
+### Bug Fixes
+
+ -  remove usage of deprecated listOf() ([14c28801eeb137e](https://github.com/bsorrentino/langgraph4j/commit/14c28801eeb137e37bd2378e21ae3245d9c6f333))
+
+ -  remove usage of deprecated mapOf() ([45064fbfedd709b](https://github.com/bsorrentino/langgraph4j/commit/45064fbfedd709b78365ca3d273d1bd3af1b4814))
+
+ -  remove usage of deprecated addSubgraph() ([70226bdc2a792c4](https://github.com/bsorrentino/langgraph4j/commit/70226bdc2a792c40f076d91780e3d667d0ed78e9))
+
+ -  remove usage of deprecated addSubgraph() ([3762b23e4e98e0b](https://github.com/bsorrentino/langgraph4j/commit/3762b23e4e98e0b69dab065fc5b4bfe1fb5a7de1))
+
+
+### Documentation
+
+ -  bump to version 1.4.3 ([3649144307807c8](https://github.com/bsorrentino/langgraph4j/commit/3649144307807c8ead740429a5fe10e5731529e4))
+
+ -  update changeme ([e9899681299a948](https://github.com/bsorrentino/langgraph4j/commit/e9899681299a94852012293eb6a5edfba4732358))
+
+
+### Refactor
+
+ -  upgrade langchain4j version to 1.0.0-beta2 and update affected code accordingly ([858bc8318acde90](https://github.com/bsorrentino/langgraph4j/commit/858bc8318acde90f73626814027be21ab511dc85))
+   
+ -  **StateGraph**  add new methods to add subgraphs as nodes ([1ee7bdf6086816c](https://github.com/bsorrentino/langgraph4j/commit/1ee7bdf6086816c8a0639a4a4d50daa92ece3c62))
+    > - Introduced a new method &#x60;addNode&#x60; that allows adding a subgraph to the state graph by creating a node with the specified identifier. This method replaces and deprecates the existing &#x60;addSubgraph&#x60; method.
+
+
+### ALM 
+
+ -  bump to version 1.4.3 ([bf31cd481591313](https://github.com/bsorrentino/langgraph4j/commit/bf31cd48159131338f9556601738b723cdd9078a))
+   
+ -  bump to SNAPSHOT ([0538288b35db864](https://github.com/bsorrentino/langgraph4j/commit/0538288b35db864affa12095ff5f1a6dafe987ee))
+   
+
+### Test 
+
+ -  refine graph representation generation using EdgeMappings ([d865a766d591163](https://github.com/bsorrentino/langgraph4j/commit/d865a766d5911635ed8efa9b363e9b6750f46c7f))
+   
+ -  **AgentState**  test the state's value removal using nul ([f506a9b8e1df0e0](https://github.com/bsorrentino/langgraph4j/commit/f506a9b8e1df0e083e82df226f39e1002dbab40a))
+   
+
+
+
+
+
+<!-- "name: v1.4.2" is a release tag -->
+
+## [v1.4.2](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.4.2) (2025-03-11)
+
+
+### Bug Fixes
+
+ -  **langchain4j/serializer**  handle nullable values in ToolExecutionRequest and ToolExecutionResultMessage serializers ([9b686e6281f9753](https://github.com/bsorrentino/langgraph4j/commit/9b686e6281f975330df84cf7c62ebb84b2461aae))
+     > This commit introduces a new interface &#x60;NullableObjectSerializer&#x60; that extends &#x60;Serializer&#x60; to handle nullable objects during serialization, adding logic to manage null id values
+     > resolve #93
+
+ -  **pom.xml**  update langgraph4j-parent version to 1.4.1 ([5687f029a816daf](https://github.com/bsorrentino/langgraph4j/commit/5687f029a816daf6436c2cb85bc40684aff65ae9))
+
+
+### Documentation
+
+ -  bump to 1.4.2 ([160d7fce9a93170](https://github.com/bsorrentino/langgraph4j/commit/160d7fce9a9317075147ed7428652e32085b8b32))
+
+ -  **notebook**  update head description ([38567a32037be34](https://github.com/bsorrentino/langgraph4j/commit/38567a32037be346282d21a7c486e64134dae755))
+
+ -  **how-tos**  update site documentation ([bbe80306994e7b1](https://github.com/bsorrentino/langgraph4j/commit/bbe80306994e7b1f59952db4a6470b264b276777))
+     > - update &#x27;multi-agent supervisor&#x27;
+
+ -  **how-tos**  update site documentation ([5c2d9ea0fb7a549](https://github.com/bsorrentino/langgraph4j/commit/5c2d9ea0fb7a549c73c4c473a560d6adab152457))
+     > - add &#x27;multi-agent supervisor&#x27;
+
+ -  **agent-executor**  update site ([262db50327700ec](https://github.com/bsorrentino/langgraph4j/commit/262db50327700ec0f33851897d222fa62b4f0ce0))
+     > - fix code sample
+
+ -  update readme.md ([1412671d5a78553](https://github.com/bsorrentino/langgraph4j/commit/1412671d5a78553bf9d8303df5d14f241a299ccd))
+     > fix snapshots link
+
+ -  List Quarkus under Studio & fix minor typo. ([f9de69a1b0193f6](https://github.com/bsorrentino/langgraph4j/commit/f9de69a1b0193f64b6f7f75d8d1fd9b07e5c0a87))
+     > merge PR #83
+
+ -  update changeme ([94b899d5abe2270](https://github.com/bsorrentino/langgraph4j/commit/94b899d5abe2270243401f11df8fd1f9d112764d))
+
+
+### Refactor
+
+ -  **tool/toolnode**  update implementation with record syntax ([279e38e3876edff](https://github.com/bsorrentino/langgraph4j/commit/279e38e3876edffd24451ce039ce747f86a09690))
+   
+ -  **serializer**  add logging for null ids in ToolExecutionRequestSerializer and ToolExecutionResultMessageSerializer ([27aa1d7cee4159e](https://github.com/bsorrentino/langgraph4j/commit/27aa1d7cee4159ec257939e492fe9b9af5086354))
+    > This refactoring adds logging to serialize methods in &#x60;ToolExecutionRequestSerializer&#x60; and &#x60;ToolExecutionResultMessageSerializer&#x60;. The logs will warn if the id is null, aiding in debugging potential issues where null ids are not handled gracefully.
+ > work on #93
+
+ -  **how-tos**  wait-user-input refinemnts ([3eb7b1544b9f880](https://github.com/bsorrentino/langgraph4j/commit/3eb7b1544b9f8804b035237ef0134a6b336cb692))
+    > - add conditional edges to handle user input
+ > resolve discussion #84
+
+ -  **notebook**  refine 'Multi-agent supervisor' implementation ([c9d9994548c47fd](https://github.com/bsorrentino/langgraph4j/commit/c9d9994548c47fd31dd1a3e0dd398c1aa41ca1c0))
+    > - use NodeAction rather than AsyncNodeAction
+
+
+### ALM 
+
+ -  bump to 1.4.2 ([34a94c6714ca996](https://github.com/bsorrentino/langgraph4j/commit/34a94c6714ca99667e91d7277c183d12890c216e))
+   
+ -  **langchain4jl**  upgrade Java compiler version to 17 ([a71ca59e9755e0a](https://github.com/bsorrentino/langgraph4j/commit/a71ca59e9755e0a1755bfeab4a2e84859d46c849))
+   
+ -  bump to SNAPSHOT ([7a6d489d230829b](https://github.com/bsorrentino/langgraph4j/commit/7a6d489d230829b926fc590628d91bb99ba3d1dd))
+   
+
+### Test 
+
+ -  add notebook for replicating the issue #93 ([2d0867fd5fc2e08](https://github.com/bsorrentino/langgraph4j/commit/2d0867fd5fc2e08c38eb5dc819657282f46fd45c))
+   
+
+
+
+
+
+<!-- "name: v1.4.1" is a release tag -->
+
+## [v1.4.1](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.4.1) (2025-02-24)
+
+### Features
+
+ *  add new class for LLM streaming support ([4d8977fbf779471](https://github.com/bsorrentino/langgraph4j/commit/4d8977fbf7794718bd5283ee398e317bf589d21c))
+     > - add StreamingChatGeneraror
+     > - deprecate LLMStreaminGenerator
+     > - update notebook
+     > resolve #82
+   
+ *  **studio**  add support for Quarkus in Studio ([5321eb1f716299a](https://github.com/bsorrentino/langgraph4j/commit/5321eb1f716299aff9c235e1aa155781fcbc5425))
+     > resolve #81
+   
+
+### Bug Fixes
+
+ -  **site.xml**  update Studio menu item to correct base path ([16eb0bdf07e7ae1](https://github.com/bsorrentino/langgraph4j/commit/16eb0bdf07e7ae1a37c3e1264332569468c1d4a4))
+
+ -  **changelog**  add 'test' support in changelog generation template ([74be5d31e6019e9](https://github.com/bsorrentino/langgraph4j/commit/74be5d31e6019e95b3df57c523407a04720a6572))
+
+
+### Documentation
+
+ -  bump to next release ([ee36919d3a25c4a](https://github.com/bsorrentino/langgraph4j/commit/ee36919d3a25c4a1ebbb53e112da521496db086c))
+
+ -  update documentation ([87170d9dec82a3b](https://github.com/bsorrentino/langgraph4j/commit/87170d9dec82a3b8111eb07ec6d5516905fe21dd))
+     > add more &#x27;how to&#x27;
+
  -  update changeme ([a8938bab782f499](https://github.com/bsorrentino/langgraph4j/commit/a8938bab782f4998dd2275750e218318671de9ed))
 
 
+### Refactor
 
+ -  **agent-executor**  update  agent-executor  implementation ([f8d11303458190b](https://github.com/bsorrentino/langgraph4j/commit/f8d11303458190bce1ffc9981b6d09df8bf7fd92))
+    > - remove deprecated usage
+ > - Simplify implementation using MessagesState
+
+ -  **agent-executor**  update  agent-executor  implementation ([bb880109b2e5d58](https://github.com/bsorrentino/langgraph4j/commit/bb880109b2e5d580eb705be4ba5550cafea68991))
+    > - remove deprecated usage
+ > - Simplify implementation using MessagesState
+
+ -  **studio/quarkus**  quarkus impl refinements ([317bf09a5958cc3](https://github.com/bsorrentino/langgraph4j/commit/317bf09a5958cc381e0d48635802edb25664cffb))
+    > using of @Produces to inject flow
+ > work on #81
+
+
+### ALM 
+
+ -  bump to next release ([20b62ce590197bc](https://github.com/bsorrentino/langgraph4j/commit/20b62ce590197bc6afcf72409ce4ba7196b7ea0d))
+   
+ -  move to next SNAPSHOT ([4250364d58d0ff9](https://github.com/bsorrentino/langgraph4j/commit/4250364d58d0ff9b95a19a922c06d78e0912b93f))
+   
 
 
 
