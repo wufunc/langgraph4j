@@ -123,6 +123,16 @@ public class PostgresSaverITest {
         assertEquals( "agent_1", lastSnapshot.get().node() );
         assertEquals( END, lastSnapshot.get().next() );
 
+        // UPDATE STATE
+        var updatedConfig = workflow.updateState( lastSnapshot.get().config(), Map.of( "update", "update test") );
+
+        var updatedSnapshot = workflow.stateOf( updatedConfig );
+        assertTrue( updatedSnapshot.isPresent() );
+        assertEquals( "agent_1", updatedSnapshot.get().node() );
+        assertTrue( updatedSnapshot.get().state().value("update").isPresent() );
+        assertEquals( "update test", updatedSnapshot.get().state().value("update").get() );
+        assertEquals( END, lastSnapshot.get().next() );
+
         // test checkpoints reloading from database
         saver = buildPostgresSaver().build(); // create a new saver (reset cache)
 
@@ -144,6 +154,10 @@ public class PostgresSaverITest {
         assertTrue( lastSnapshot.isPresent() );
         assertEquals( "agent_1", lastSnapshot.get().node() );
         assertEquals( END, lastSnapshot.get().next() );
+        assertTrue( lastSnapshot.get().state().value("update").isPresent() );
+        assertEquals( "update test", lastSnapshot.get().state().value("update").get() );
+        assertEquals( END, lastSnapshot.get().next() );
+
 
         saver.release( runnableConfig );
 

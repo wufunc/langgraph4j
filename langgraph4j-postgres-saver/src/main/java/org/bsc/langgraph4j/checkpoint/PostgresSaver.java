@@ -284,7 +284,7 @@ public class PostgresSaver extends MemorySaver {
                 SET
                     node_id = ?,
                     next_node_id = ?,
-                    state_data = ?,
+                    state_data = ?::jsonb
                 WHERE checkpoint_id = ?;
                 """;
 
