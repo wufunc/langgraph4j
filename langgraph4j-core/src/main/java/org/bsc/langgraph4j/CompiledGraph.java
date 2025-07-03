@@ -691,7 +691,7 @@ public class CompiledGraph<State extends AgentState> {
                 }
 
                 if( shouldInterruptBefore( nextNodeId, currentNodeId ) ) {
-                    return Data.done(currentNodeId);
+                    return Data.done(nextNodeId);
                 }
 
                 currentNodeId = nextNodeId;
