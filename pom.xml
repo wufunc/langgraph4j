@@ -50,9 +50,10 @@
     <flatten-maven-plugin.version>1.5.0</flatten-maven-plugin.version>
   </properties>
 
-<!--
+
   <distributionManagement>
-    <repository>
+<!-- 
+   <repository>
       <id>${release.repo.id}</id>
       <name>central</name>
       <url>${release.repo.url}</url>
@@ -62,12 +63,13 @@
       <name>snapshots</name>
       <url>${snapshot.repo.url}</url>
     </snapshotRepository>
+ -->
     <site>
       <id>${project.artifactId}-site</id>
       <url>${project.baseUri}</url>
     </site>
   </distributionManagement>
--->
+
 
   <dependencyManagement>
     <dependencies>
