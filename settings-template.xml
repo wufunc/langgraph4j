@@ -6,7 +6,7 @@
 
         <server>
             <id>sonatype-central</id>
-            <username>yEKudvqX</username>
+            <username>R4ncrpkA</username>
             <password>${env.OSS_SONATYPE_TOKEN}</password>
         </server>
 
