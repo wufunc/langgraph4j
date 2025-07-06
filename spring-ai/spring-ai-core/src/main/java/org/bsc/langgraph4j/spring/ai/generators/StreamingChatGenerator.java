@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 public interface StreamingChatGenerator {
@@ -68,8 +69,8 @@ public interface StreamingChatGenerator {
          * @return a new instance of LLMStreamingGenerator
          */
         public AsyncGenerator<? extends NodeOutput<State>> build( Flux<ChatResponse> flux ) {
-            Objects.requireNonNull( flux, "flux cannot be null" );
-            Objects.requireNonNull( mapResult, "mapResult cannot be null" );
+            requireNonNull( flux, "flux cannot be null" );
+            requireNonNull( mapResult, "mapResult cannot be null" );
 
             var result = new AtomicReference<ChatResponse>(null) ;
 
@@ -86,12 +87,14 @@ public interface StreamingChatGenerator {
                         return response;
                     }
 
-                    var lastMessage = lastResponse.getResult().getOutput();
+                    final var lastMessageText = requireNonNull(lastResponse.getResult().getOutput().getText(),
+                            "lastResponse text cannot be null" );
+                    final var currentMessageText = currentMessage.getText();
 
                     var newMessage =  new AssistantMessage(
-                            ofNullable(currentMessage.getText())
-                                    .map( text -> lastMessage.getText().concat( text ))
-                                    .orElse(lastMessage.getText()),
+                            currentMessageText != null ?
+                                    lastMessageText.concat( currentMessageText ) :
+                                    lastMessageText,
                             currentMessage.getMetadata(),
                             currentMessage.getToolCalls(),
                             currentMessage.getMedia()
@@ -104,7 +107,7 @@ public interface StreamingChatGenerator {
             };
 
             var processedFlux = flux
-                    .doOnNext( next -> mergeMessage.accept( next ) )
+                    .doOnNext(mergeMessage)
                     .map(next ->
                             new StreamingOutput<>( next.getResult().getOutput().getText(),
                                     startingNode,

@@ -60,12 +60,12 @@ public abstract class JacksonStateSerializer <State extends AgentState> extends 
     @Override
     public final void writeData(Map<String, Object> data, ObjectOutput out) throws IOException {
         String json = objectMapper.writeValueAsString(data);
-        out.writeUTF(json);
+        out.writeObject(json);
     }
 
     @Override
     public final Map<String, Object> readData(ObjectInput in) throws IOException, ClassNotFoundException {
-        String json = in.readUTF();
+        String json = Objects.toString(in.readObject());
         return objectMapper.readValue(json, new TypeReference<Map<String,Object>>() {});
     }
 

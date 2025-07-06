@@ -17,12 +17,24 @@ public final class CollectionsUtils {
      * Returns the last value in the list, if present.
      *
      * @return an Optional containing the last value if present, otherwise an empty Optional
+     * @deprecated use {@link #lastOf(List)} instead
      */
+    @Deprecated(forRemoval = true)
     public static <T> Optional<T> last( List<T> values ) {
+        return lastOf( values );
+    }
+
+    /**
+     * Returns the last value in the list, if present.
+     *
+     * @return an Optional containing the last value if present, otherwise an empty Optional
+     */
+    public static <T> Optional<T> lastOf( List<T> values ) {
         return (values == null || values.isEmpty()) ?
                 Optional.empty() :
                 Optional.of(values.get(values.size() - 1));
     }
+
 
     /**
      * Returns the value at the specified position from the end of the list, if present.
