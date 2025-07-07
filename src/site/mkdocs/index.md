@@ -71,7 +71,7 @@ For more details please see [Features](features.md)
 [Mermaid]: https://mermaid.js.org
 
 [releases]: https://central.sonatype.com/search?q=a%3Alanggraph4j-parent
-[snapshots]: https://oss.sonatype.org/content/repositories/snapshots/org/bsc/langgraph4j/
+[snapshots]: https://central.sonatype.com/repository/maven-snapshots/org/bsc/langgraph4j/
 
 [LangGraph4j Builder]: https://github.com/langgraph4j/langgraph4j-builder
 [generator]: https://github.com/bsorrentino/langgraph4j/tree/main/generator
