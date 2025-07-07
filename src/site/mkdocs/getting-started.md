@@ -122,7 +122,7 @@ You might need to configure your `settings.xml` or `pom.xml` to include the Sona
 <repositories>
     <repository>
         <id>sonatype-oss-snapshots</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <url>https://central.sonatype.com/repository/maven-snapshots</url>
         <snapshots>
             <enabled>true</enabled>
         </snapshots>
