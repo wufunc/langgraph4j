@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -94,7 +95,7 @@ public final class RunnableConfig implements HasMetadata<RunnableConfig.Builder>
      * @return metadata value for key if any
      */
     @Override
-    public Optional<Object> getMetadata(String key) {
+    public Optional<Object> metadata(String key) {
         if( key == null ) {
             return Optional.empty();
         }
@@ -139,12 +140,11 @@ public final class RunnableConfig implements HasMetadata<RunnableConfig.Builder>
          * @param config The configuration to be used for initialization.
          */
         Builder( RunnableConfig config ) {
-            Objects.requireNonNull(config, "config cannot be null!");
+            super( requireNonNull(config, "config cannot be null!").metadata );
             this.threadId       = config.threadId;
             this.checkPointId   = config.checkPointId;
             this.nextNode       = config.nextNode;
             this.streamMode     = config.streamMode;
-            this.metadata       = config.metadata;
         }
         /**
          * Sets the ID of the thread.
@@ -198,14 +198,14 @@ public final class RunnableConfig implements HasMetadata<RunnableConfig.Builder>
     /**
      * Creates a new instance of {@code RunnableConfig} as a copy of the provided {@code config}.
      *
-     * @param Builder The configuration builder.
+     * @param builder The configuration builder.
      */
     private RunnableConfig( Builder builder ) {
         this.threadId       = builder.threadId;
         this.checkPointId   = builder.checkPointId;
         this.nextNode       = builder.nextNode;
         this.streamMode     = builder.streamMode;
-        this.metadata       = ofNullable(builder.metadata)
+        this.metadata       = ofNullable(builder.metadata())
                                 .map( Map::copyOf )
                                 .orElse(null);
     }
