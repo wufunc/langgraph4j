@@ -17,7 +17,7 @@ LangGraph for Java. A library for building stateful, multi-agents applications w
 
 | Date         | Release        | info
 |--------------|----------------| ---
-| Jun 19, 2025 | `1.6.0-beta4` | official release
+| Jul 06, 2025 | `1.6.0-beta6` | official release
 
 ----
 
@@ -103,7 +103,7 @@ Make sure you are using Java 17 or later.
 **Latest Stable Version (Recommended):**
 ```xml
 <properties>
-    <langgraph4j.version>1.6.0-beta4</langgraph4j.version> <!-- Check for the actual latest version -->
+    <langgraph4j.version>1.6.0-beta6</langgraph4j.version> <!-- Check for the actual latest version -->
 </properties>
 
 <!-- Optional: Add the Bill of Materials (BOM) to manage langgraph4j module versions -->
@@ -143,7 +143,7 @@ You might need to configure your `settings.xml` or `pom.xml` to include the Sona
 <repositories>
     <repository>
         <id>sonatype-oss-snapshots</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        <url>https://central.sonatype.com/repository/maven-snapshots</url>
         <snapshots>
             <enabled>true</enabled>
         </snapshots>
@@ -383,7 +383,7 @@ We hope this guide helps you get started with LangGraph4j. Happy building!
 [langgraph]: https://github.com/langchain-ai/langgraph
 [documentation]: https://bsorrentino.github.io/langgraph4j/
 [releases]: https://central.sonatype.com/search?q=a%3Alanggraph4j-parent
-[snapshots]: https://oss.sonatype.org/content/repositories/snapshots/org/bsc/langgraph4j/
+[snapshots]: https://central.sonatype.com/repository/maven-snapshots/org/bsc/langgraph4j/
 [PlantUML]: https://plantuml.com
 [Mermaid]: https://mermaid.js.org
 

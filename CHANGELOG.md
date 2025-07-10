@@ -2,9 +2,112 @@
 
 
 
-<!-- "name: v1.6-beta4" is a release tag -->
+<!-- "name: v1.6.0-beta6" is a release tag -->
 
-## [v1.6-beta4](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6-beta4) (2025-06-19)
+## [v1.6.0-beta6](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-beta6) (2025-07-06)
+
+### Features
+
+ *  **langchain4j-core**  introduce ChatMessageUtil to provide type-safe message checks and conversions ([6f9920264efbf27](https://github.com/bsorrentino/langgraph4j/commit/6f9920264efbf27b816c3dca1d251020aabcb30c))
+   
+ *  **spring-ai-core**  introduce MessageUtil to provide type-safe message checks and conversions ([834d7e0e355b0e8](https://github.com/bsorrentino/langgraph4j/commit/834d7e0e355b0e82a4ec2ca97ee7e23c34db5dcf))
+   
+
+### Bug Fixes
+
+ -  **JacksonStateSerializer**  switch from `writeUTF` to `writeObject` for JSON serialization ([c9d0ff268f55f68](https://github.com/bsorrentino/langgraph4j/commit/c9d0ff268f55f688f062df54e8803ffe1aa53716))
+     > this is overhelm size limit of 65535 chars
+     > resolve #181
+
+ -  **core**  update return value in shouldInterruptBefore ([05bce20916940a8](https://github.com/bsorrentino/langgraph4j/commit/05bce20916940a8d83a3bad9e5e869cfa804fd23))
+
+
+### Documentation
+
+ -  bump to version 1.6.0-beta6 ([8419cd7374ca9dc](https://github.com/bsorrentino/langgraph4j/commit/8419cd7374ca9dc19648e81164f718f2016d733a))
+
+ -  update changelog ([62076723c1aa0e9](https://github.com/bsorrentino/langgraph4j/commit/62076723c1aa0e9257716b235865f8af2da9c600))
+
+
+### Refactor
+
+ -  update deployment process to support  new sonatype central server ([4308ae76bd09a3f](https://github.com/bsorrentino/langgraph4j/commit/4308ae76bd09a3f71af9fe95ed9c379f2e3bd0ff))
+   
+
+### ALM 
+
+ -  bump to version 1.6.0-beta6 ([20e148e6406703f](https://github.com/bsorrentino/langgraph4j/commit/20e148e6406703ff5245e36844abf76d5e742832))
+   
+ -  bump to 1.6-SNAPSHOT ([e0227bfcbbab490](https://github.com/bsorrentino/langgraph4j/commit/e0227bfcbbab490beaab6469d35d76f124984055))
+   
+
+### Test 
+
+ -  **JacksonStateSerializer**  switch from `writeUTF` to `writeObject` for JSON serialization ([4c4710f546a8dee](https://github.com/bsorrentino/langgraph4j/commit/4c4710f546a8dee60a8e506ed948f1d306ac9595))
+    > this is overhelm size limit of 65535 chars
+ > work on #181
+
+
+
+
+
+
+<!-- "name: v1.6.0-beta5" is a release tag -->
+
+## [v1.6.0-beta5](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-beta5) (2025-06-27)
+
+### Features
+
+ *  **core**  add method to check if current output node refers to the start of graph processing ([85e2e026866d2f6](https://github.com/bsorrentino/langgraph4j/commit/85e2e026866d2f6ce9e0c6208b0859f610c332c4))
+     > - Refactored JacksonSerializerTest methods to use &#x27;objectToBytes&#x27; and &#x27;bytesToObject&#x27;.
+   
+
+### Bug Fixes
+
+ -  **Checkpoint**  Introduced a copyOf() static factory method that creates an immutable copy of a Checkpoint with a new id ([097c568083b982a](https://github.com/bsorrentino/langgraph4j/commit/097c568083b982ac40d3da8562ea98359d6acc5b))
+     > - Refactored state update logic to create a new Checkpoint instance
+     > resolve #175
+
+ -  **PostgresSaver**  fix SQL syntax  and Update the SQL query to explicitly cast the `state_data` column to type `jsonb`, ([7b911449898e85a](https://github.com/bsorrentino/langgraph4j/commit/7b911449898e85a033bc5199fede123951d48966))
+     > resolve #174
+
+
+### Documentation
+
+ -  bump to version 1.6.0-beta5 ([da77704f1ec3e7d](https://github.com/bsorrentino/langgraph4j/commit/da77704f1ec3e7df0fc4a9238ac1841896272a7a))
+
+ -  update site documentation ([71cd3edb0cb093b](https://github.com/bsorrentino/langgraph4j/commit/71cd3edb0cb093b0f7ec6569262962e935f18abf))
+
+ -  update changelog ([45bd939882a1001](https://github.com/bsorrentino/langgraph4j/commit/45bd939882a1001e4fbd2c0ac6134815e3236687))
+
+
+### Refactor
+
+ -  **howto**  update wait-fo-user-input notebook to verify postgres saver usage ([1ba4160dcb5a929](https://github.com/bsorrentino/langgraph4j/commit/1ba4160dcb5a9294e4c39bc28abecf449a2e56bc))
+    > work on #175
+
+ -  **CompiledGraph**  update checkpoint handling ([8fb5d914771338e](https://github.com/bsorrentino/langgraph4j/commit/8fb5d914771338ebcc054b52323ead854c9870a2))
+    > - Replaced &#x60;Checkpoint::new&#x60; with &#x60;Checkpoint::copyOf&#x60; for creating immutable checkpoints.
+ > work on #175
+
+
+### ALM 
+
+ -  bump to version 1.6.0-beta5 ([614e76883d99a1b](https://github.com/bsorrentino/langgraph4j/commit/614e76883d99a1bd34e0a2aea17acf480054df53))
+   
+ -  **core**  bump async-generator to 3.2.1 ([1c5d857ca9f16b7](https://github.com/bsorrentino/langgraph4j/commit/1c5d857ca9f16b79a78b1d4c64179b9af39cc4a0))
+   
+ -  bump to 1.6-SNAPSHOT ([991a8892f96c71c](https://github.com/bsorrentino/langgraph4j/commit/991a8892f96c71cb4a95f9f4624cd8911af5392d))
+   
+
+
+
+
+
+
+<!-- "name: v1.6.0-beta4" is a release tag -->
+
+## [v1.6.0-beta4](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-beta4) (2025-06-19)
 
 ### Features
 
