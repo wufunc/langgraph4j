@@ -4,6 +4,7 @@ import org.bsc.async.AsyncGenerator;
 import org.bsc.langgraph4j.action.AsyncNodeAction;
 import org.bsc.langgraph4j.action.AsyncNodeActionWithConfig;
 import org.bsc.langgraph4j.action.Command;
+import org.bsc.langgraph4j.action.InterruptableAction;
 import org.bsc.langgraph4j.checkpoint.BaseCheckpointSaver;
 import org.bsc.langgraph4j.checkpoint.Checkpoint;
 import org.bsc.langgraph4j.internal.edge.Edge;
@@ -11,6 +12,7 @@ import org.bsc.langgraph4j.internal.edge.EdgeValue;
 import org.bsc.langgraph4j.internal.node.ParallelNode;
 import org.bsc.langgraph4j.state.AgentState;
 import org.bsc.langgraph4j.state.StateSnapshot;
+import org.bsc.langgraph4j.utils.TryFunction;
 
 import java.io.IOException;
 import java.util.*;
@@ -573,8 +575,8 @@ public class CompiledGraph<State extends AgentState> {
 
         private CompletableFuture<Data<Output>> evaluateAction(AsyncNodeActionWithConfig<State> action, State withState ) {
 
-                return action.apply( withState, config ).thenApply( updateState -> {
-                    try {
+                return action.apply( withState, config )
+                    .thenApply(TryFunction.Try(updateState -> {
 
                         Optional<Data<Output>> embed = getEmbedGenerator( updateState );
                         if( embed.isPresent() ) {
@@ -588,12 +590,8 @@ public class CompiledGraph<State extends AgentState> {
                         currentState = nextNodeCommand.update();
 
                         return Data.of( getNodeOutput() );
-                    }
-                    catch (Exception e) {
-                        throw new CompletionException(e);
-                    }
 
-                });
+                    }));
         }
 
         /**
@@ -701,7 +699,18 @@ public class CompiledGraph<State extends AgentState> {
                 if (action == null)
                     throw RunnableErrors.missingNode.exception(currentNodeId);
 
-                return evaluateAction(action, cloneState(currentState) ).get();
+                final var clonedState = cloneState(currentState);
+
+                if( action instanceof InterruptableAction<?>) {
+                    @SuppressWarnings("unchecked")
+                    final var interruption = (InterruptableAction<State>) action;
+                    final var interruptMetadata = interruption.interrupt(currentNodeId, clonedState);
+                    if( interruptMetadata.isPresent() ) {
+                        return Data.done( interruptMetadata.get() );
+                    }
+                }
+
+                return evaluateAction(action, clonedState ).get();
             }
             catch( Exception e ) {
                 log.error( e.getMessage(), e );
