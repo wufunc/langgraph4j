@@ -4,6 +4,7 @@ import org.bsc.langgraph4j.prebuilt.MessagesState;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,33 @@ public class AgentStateTest {
         state = sf.apply( newStateData );
 
         assertTrue( state.messages().isEmpty() );
+
+    }
+
+    @Test
+    public void removeDataFromStateTest() {
+
+        AgentStateFactory<AgentState> sf = AgentState::new;
+
+        var state = new AgentState( new HashMap<>() );
+
+        var data = AgentState.updateState( state, Map.of( "attr1", "test"), Map.of());
+
+        assertEquals( 1, data.size() );
+        assertEquals( "test", data.get("attr1") );
+
+        data = AgentState.updateState( data, mapOf( "attr1", null), Map.of());
+
+        assertEquals( 0, data.size() );
+
+        data = AgentState.updateState( state, Map.of( "attr1", "test"), Map.of());
+
+        assertEquals( 1, data.size() );
+        assertEquals( "test", data.get("attr1") );
+
+        data = AgentState.updateState( data, Map.of( "attr1", AgentState.MARK_FOR_RESET), Map.of());
+
+        assertEquals( 0, data.size() );
 
     }
 

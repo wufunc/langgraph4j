@@ -14,6 +14,7 @@ import static org.bsc.langgraph4j.StateGraph.END;
 import static org.bsc.langgraph4j.StateGraph.START;
 import static org.bsc.langgraph4j.action.AsyncEdgeAction.edge_async;
 import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
+import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_REMOVAL;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -116,7 +117,7 @@ public class StateGraphTest {
 
         var agent = AsyncNodeActionWithConfig.node_async((state, config) -> {
 
-            assertTrue( config.getMetadata("configData").isPresent() );
+            assertTrue( config.metadata("configData").isPresent() );
 
             log.info("agent_1\n{}", state);
             return Map.of("prop1", "test");
@@ -152,9 +153,7 @@ public class StateGraphTest {
                 .addNode("agent_1", node_async(state -> {
                     log.info("agent_1\n{}", state);
 
-                    return new HashMap<>() {{
-                        put( "prop1", null );
-                    }};
+                    return Map.of("prop1", MARK_FOR_REMOVAL);
 
                 }))
                 .addEdge("agent_1", END);
