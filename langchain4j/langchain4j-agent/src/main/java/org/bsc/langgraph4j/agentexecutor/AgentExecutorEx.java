@@ -1,37 +1,29 @@
 package org.bsc.langgraph4j.agentexecutor;
 
+import dev.langchain4j.agent.tool.ToolExecutionRequest;
+import dev.langchain4j.agent.tool.ToolSpecification;
 import dev.langchain4j.data.message.*;
-import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.chat.StreamingChatModel;
-import dev.langchain4j.model.chat.request.ChatRequest;
-import dev.langchain4j.model.chat.request.ChatRequestParameters;
-import dev.langchain4j.model.chat.request.ResponseFormat;
-import dev.langchain4j.model.chat.response.ChatResponse;
-import dev.langchain4j.model.output.FinishReason;
 import org.bsc.langgraph4j.GraphStateException;
 import org.bsc.langgraph4j.RunnableConfig;
 import org.bsc.langgraph4j.StateGraph;
-import org.bsc.langgraph4j.action.AsyncNodeActionWithConfig;
-import org.bsc.langgraph4j.action.EdgeAction;
-import org.bsc.langgraph4j.action.NodeAction;
-import org.bsc.langgraph4j.action.NodeActionWithConfig;
-import org.bsc.langgraph4j.langchain4j.generators.StreamingChatGenerator;
+import org.bsc.langgraph4j.action.*;
+import org.bsc.langgraph4j.agent.Agent;
+import org.bsc.langgraph4j.agent.AgentEx;
 import org.bsc.langgraph4j.langchain4j.serializer.jackson.LC4jJacksonStateSerializer;
 import org.bsc.langgraph4j.langchain4j.serializer.std.LC4jStateSerializer;
-import org.bsc.langgraph4j.langchain4j.tool.LC4jToolMapBuilder;
 import org.bsc.langgraph4j.langchain4j.tool.LC4jToolService;
 import org.bsc.langgraph4j.prebuilt.MessagesState;
 import org.bsc.langgraph4j.serializer.StateSerializer;
 import org.bsc.langgraph4j.state.Channel;
 import org.bsc.langgraph4j.state.Channels;
-import org.bsc.langgraph4j.utils.EdgeMappings;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 
-import static java.util.Optional.ofNullable;
-import static org.bsc.langgraph4j.StateGraph.START;
-import static org.bsc.langgraph4j.action.AsyncEdgeAction.edge_async;
-import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
+import static java.lang.String.format;
+import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_REMOVAL;
+import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_RESET;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.mapOf;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.mergeMap;
 
@@ -96,6 +88,17 @@ public interface AgentExecutorEx {
             return value(FINAL_RESPONSE);
         }
 
+        private  List<ToolExecutionRequest> toolExecutionRequestsByName(String actionName ) {
+            return lastMessage()
+                    .filter(m -> ChatMessageType.AI == m.type())
+                    .map(AiMessage.class::cast)
+                    .filter(AiMessage::hasToolExecutionRequests)
+                    .map(AiMessage::toolExecutionRequests)
+                    .map(requests -> requests.stream()
+                            .filter(req -> Objects.equals(req.name(), actionName)).toList())
+                    .orElseGet(List::of)
+                    ;
+        }
 
     }
 
@@ -128,24 +131,36 @@ public interface AgentExecutorEx {
         }
     }
 
+    static AsyncNodeActionWithConfig<State> executeTooL( LC4jToolService toolService, String actionName  ) {
 
-    /**
-     * The ExecuteTools class implements the NodeAction interface for handling
-     * actions related to executing tools within an agent's context.
-     */
-    class DispatchTools implements NodeAction<State> {
+        return AsyncNodeActionWithConfig.node_async(( state, config ) -> {
+            log.trace( "ExecuteTool" );
+            var toolExecutionRequests = state.lastMessage()
+                    .filter( m -> ChatMessageType.AI==m.type() )
+                    .map( m -> (AiMessage)m )
+                    .filter(AiMessage::hasToolExecutionRequests)
+                    .map(AiMessage::toolExecutionRequests)
+                    .map( requests -> requests.stream()
+                            .filter( req -> Objects.equals(req.name(), actionName)).toList())
+                    .orElseThrow(() -> new IllegalArgumentException("no tool execution request found!"))
+                    ;
 
-        /**
-         * Applies the tool execution logic based on the provided agent state.
-         *
-         * @param state the current state of the agent executor
-         * @return a map containing the intermediate steps of the execution
-         * @throws IllegalArgumentException if no agent outcome is provided
-         * @throws IllegalStateException if no action or tool is found for execution
-         */
-        @Override
-        public Map<String,Object> apply(AgentExecutorEx.State state )  {
-            log.trace( "DispatchTools" );
+            var results = toolExecutionRequests.stream()
+                    .map(toolService::execute)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .toList()
+                    ;
+
+            return Map.of("tool_execution_results", results );
+
+        });
+    }
+
+    private static AsyncNodeActionWithConfig<State> dispatchTools(Set<String> approvals ) {
+        return AsyncNodeActionWithConfig.node_async(( state, config ) -> {
+
+            log.trace("DispatchTools");
 
             var toolExecutionRequests = state.lastMessage()
                     .filter( m -> ChatMessageType.AI==m.type() )
@@ -163,208 +178,86 @@ public interface AgentExecutorEx {
                     .filter( request -> state.toolExecutionResults().stream()
                             .noneMatch( r -> Objects.equals(r.toolName(), request.name())))
                     .findFirst()
-                    .map( result -> Map.<String,Object>of( "next_action", result.name() ))
+                    .map( result -> ( approvals.contains(result.name()) ?
+                            format( "approval_%s", result.name() ) :
+                            result.name()))
+                    .map( actionId -> Map.<String,Object>of( "next_action", actionId ))
                     .orElseGet( () ->  mapOf("messages",  state.toolExecutionResults(),
-                                            "tool_execution_results", null, /* reset results */
-                                            "next_action", null  /* remove element */ ));
-        }
-
+                            "tool_execution_results", MARK_FOR_RESET, /* reset results */
+                            "next_action", MARK_FOR_REMOVAL  /* remove element */ ));
+        });
     }
 
+    private static AsyncCommandAction<State> approvalAction() {
+        return (state, config) -> {
+            var result = new CompletableFuture<Command>();
 
-    class ExecuteTool implements NodeActionWithConfig<State> {
-
-        public static AsyncNodeActionWithConfig<State> of( LC4jToolService toolService, String actionName ) {
-            return AsyncNodeActionWithConfig.node_async(new ExecuteTool(toolService, actionName));
-        }
-
-        final LC4jToolService toolService;
-        final String actionName;
-
-        public ExecuteTool(LC4jToolService toolService, String actionName) {
-            this.toolService = toolService;
-            this.actionName = actionName;
-        }
-
-        @Override
-        public Map<String, Object> apply(State state, RunnableConfig config) throws Exception {
-            log.trace( "ExecuteTool" );
-            var toolExecutionRequests = state.lastMessage()
-                    .filter( m -> ChatMessageType.AI==m.type() )
-                    .map( m -> (AiMessage)m )
-                    .filter(AiMessage::hasToolExecutionRequests)
-                    .map(AiMessage::toolExecutionRequests)
-                    .map( requests -> requests.stream()
-                            .filter( req -> Objects.equals(req.name(), actionName)).toList())
-                    .orElseThrow(() -> new IllegalArgumentException("no tool execution request found!"))
-                    ;
-
-            var results = toolExecutionRequests.stream()
-                    .map(toolService::execute)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .toList()
-            ;
-
-            return Map.of("tool_execution_results", results );
-        }
-
-    }
-
-    /**
-     * The CallAgent class implements the NodeAction interface for handling
-     * actions related to an AgentExecutor's state.
-     */
-    class CallModel implements NodeAction<State> {
-
-        private final ChatModel chatModel;
-        private final StreamingChatModel streamingChatModel;
-        private final SystemMessage systemMessage;
-
-        final ChatRequestParameters parameters;
-
-        public boolean isStreaming() {
-            return streamingChatModel != null;
-        }
-
-        /**
-         * Constructs a CallAgent with the specified agent.
-         *
-         * @param builder the builder used to construct the Agent
-         */
-        CallModel(Builder builder ) {
-            this.chatModel = builder.chatModel;
-            this.streamingChatModel = builder.streamingChatModel;
-            this.systemMessage = ofNullable( builder.systemMessage ).orElseGet( () -> SystemMessage.from("You are a helpful assistant") );
-
-            var parametersBuilder = ChatRequestParameters.builder()
-                    .toolSpecifications( builder.toolMap().keySet().stream().toList() );
-
-            if( builder.responseFormat != null ) {
-                parametersBuilder.responseFormat(builder.responseFormat);
+            if( state.value( AgentEx.APPROVAL_RESULT_PROPERTY ).isEmpty() ) {
+                result.completeExceptionally( new IllegalStateException(format("resume property '%s' not found!", AgentEx.APPROVAL_RESULT_PROPERTY) ));
+                return result;
             }
 
-            this.parameters =  parametersBuilder.build();        }
+            var resumeState = state.<String>value( AgentEx.APPROVAL_RESULT_PROPERTY )
+                    .orElseThrow( () -> new IllegalStateException(format("resume property '%s' not found!", AgentEx.APPROVAL_RESULT_PROPERTY) ));
 
-        /**
-         * Maps the result of the response from an AI message to a structured format.
-         *
-         * @param response the response containing the AI message
-         * @return a map containing the agent's outcome
-         * @throws IllegalStateException if the finish reason of the response is unsupported
-         */
-        private Map<String,Object> mapResult( ChatResponse response )  {
-
-            var content = response.aiMessage();
-
-            if (response.finishReason() == FinishReason.TOOL_EXECUTION || content.hasToolExecutionRequests() ) {
-                return Map.of("messages", content);
-            }
-            if( response.finishReason() == FinishReason.STOP || response.finishReason() == null  ) {
-                return Map.of(State.FINAL_RESPONSE, content.text());
-            }
-
-            throw new IllegalStateException("Unsupported finish reason: " + response.finishReason() );
-        }
-
-        private ChatRequest prepareRequest(List<ChatMessage> messages ) {
-
-            var reqMessages = new ArrayList<ChatMessage>() {{
-                add(systemMessage);
-                addAll(messages);
-            }};
-
-            return ChatRequest.builder()
-                    .messages( reqMessages )
-                    .parameters(parameters)
-                    .build();
-        }
-
-        /**
-         * Applies the action to the given state and returns the result.
-         *
-         * @param state the state to which the action is applied
-         * @return a map containing the agent's outcome
-         * @throws IllegalArgumentException if no input is provided in the state
-         */
-        @Override
-        public Map<String,Object> apply( State state )  {
-            log.trace( "callAgent" );
-            var messages = state.messages();
-
-            if( messages.isEmpty() ) {
-                throw new IllegalArgumentException("no input provided!");
-            }
-
-            if( isStreaming()) {
-
-                var generator = StreamingChatGenerator.<State>builder()
-                        .mapResult( this::mapResult )
-                        .startingNode("agent")
-                        .startingState( state )
-                        .build();
-                streamingChatModel.chat(prepareRequest(messages),  generator.handler());
-
-                return Map.of( "_generator", generator);
-
+            if( Objects.equals( resumeState, AgentEx.ApprovalState.APPROVED.name() )) {
+                result.complete( new Command( resumeState,
+                        Map.of(AgentEx.APPROVAL_RESULT_PROPERTY, MARK_FOR_REMOVAL)));
 
             }
             else {
-                var response = chatModel.chat(prepareRequest(messages));
+                var actionName = state.nextAction()
+                        .map( v -> v.replace("approval_", "") )
+                        .orElseThrow( () -> new IllegalStateException("no next action found!"));
 
-                return mapResult(response);
+                var tools = state.toolExecutionRequestsByName( actionName );
+
+                if(tools.isEmpty())  {
+                    throw new IllegalStateException("no tool execution request found!");
+                }
+
+                var toolResponses = tools.stream().map( toolRequest ->
+                        ToolExecutionResultMessage.from( toolRequest, "execution has been DENIED!")
+                ).toList();
+
+                result.complete( new Command( resumeState,
+                        Map.of( "messages", toolResponses ,
+                                "tool_execution_results", "execution has been DENIED!",
+                                AgentEx.APPROVAL_RESULT_PROPERTY, MARK_FOR_REMOVAL)));
+
             }
-
-        }
-
+            return result;
+        };
     }
 
+    private static AsyncCommandAction<AgentExecutorEx.State> shouldContinue() {
+        return AsyncCommandAction.command_async( (state, config ) ->
+                state.finalResponse()
+                        .map(res -> new Command(Agent.END_LABEL))
+                        .orElse(new Command(Agent.CONTINUE_LABEL) ));
+    }
+
+    private static AsyncCommandAction<State> dispatchAction() {
+        return AsyncCommandAction.command_async( (state, config ) ->
+                state.nextAction()
+                        .map( Command::new )
+                        .orElseGet( () -> new Command("model" ) ));
+
+    }
 
     /**
      * Builder class for constructing a graph of agent execution.
      */
-    class Builder extends LC4jToolMapBuilder<Builder> {
+    class Builder extends AgentExecutorBuilder<State,Builder>  {
 
-        private StateSerializer<State> stateSerializer;
-        ChatModel chatModel;
-        StreamingChatModel streamingChatModel;
-        SystemMessage systemMessage;
-        ResponseFormat responseFormat;
+        private final Map<String,AgentEx.ApprovalNodeAction<ChatMessage,State>> approvals = new LinkedHashMap<>();
 
-        public Builder chatModel( ChatModel chatModel ) {
-            if( this.chatModel == null ) {
-                this.chatModel = chatModel;
-            }
-            return this;
-        }
+        public Builder approvalOn( String actionId, BiFunction<String, State, InterruptionMetadata<State>> interruptionMetadataProvider  ) {
+            var action = AgentEx.ApprovalNodeAction.<ChatMessage,AgentExecutorEx.State>builder()
+                    .interruptionMetadataProvider( interruptionMetadataProvider )
+                    .build();
 
-        public Builder chatModel( StreamingChatModel streamingChatModel ) {
-            if( this.streamingChatModel == null ) {
-                this.streamingChatModel = streamingChatModel;
-            }
-            return this;
-        }
-
-        public Builder systemMessage( SystemMessage systemMessage ) {
-            if( this.systemMessage == null ) {
-                this.systemMessage = systemMessage;
-            }
-            return this;
-        }
-
-        public Builder responseFormat( ResponseFormat responseFormat ) {
-            this.responseFormat = responseFormat;
-            return this;
-        }
-
-        /**
-         * Sets the state serializer for the graph builder.
-         *
-         * @param stateSerializer the state serializer
-         * @return the updated GraphBuilder instance
-         */
-        public Builder stateSerializer(StateSerializer<State> stateSerializer) {
-            this.stateSerializer = stateSerializer;
+            approvals.put( actionId, action  );
             return this;
         }
 
@@ -391,48 +284,18 @@ public interface AgentExecutorEx {
 
             final LC4jToolService toolService = new LC4jToolService(tools);
 
-            final var callModel = new CallModel(this);
-            final var executeTools = new DispatchTools( );
-
-            final EdgeAction<State> shouldContinue = (state) ->
-                    state.finalResponse()
-                            .map(res -> "end")
-                            .orElse("continue");
-
-            final EdgeAction<State> dispatchAction = (state) ->
-                    state.nextAction().orElse("model");
-
-            var graph = new StateGraph<>(State.SCHEMA, stateSerializer)
-                    .addNode("model", node_async(callModel))
-                    .addNode("action_dispatcher", node_async(executeTools))
-                    .addEdge(START, "model")
-                    .addConditionalEdges("model",
-                            edge_async(shouldContinue),
-                            EdgeMappings.builder()
-                                    .to("action_dispatcher", "continue")
-                                    .toEND("end" )
-                                    .build()) ;
-
-            var actionMappingBuilder  =  EdgeMappings.builder()
-                    .to( "model")
-                    .toEND();
-
-            for (var tool : tools.entrySet()) {
-
-                var tool_name = tool.getKey().name();
-
-                actionMappingBuilder.to(tool_name );
-
-                graph.addNode(tool_name,
-                        ExecuteTool.of(toolService, tool_name));
-                graph.addEdge(tool_name, "action_dispatcher");
-
-            }
-
-            return   graph.addConditionalEdges( "action_dispatcher",
-                            edge_async(dispatchAction),
-                            actionMappingBuilder.build())
-                   ;
+            return AgentEx.<ChatMessage, State, ToolSpecification>builder()
+                    .stateSerializer( stateSerializer )
+                    .schema( State.SCHEMA )
+                    .toolName(ToolSpecification::name)
+                    .callModelAction( new CallModel<>(this) )
+                    .dispatchToolsAction( dispatchTools( approvals.keySet() ) )
+                    .executeToolFactory( ( toolName ) -> executeTooL( toolService, toolName ) )
+                    .shouldContinueEdge( shouldContinue() )
+                    .approvalActionEdge( approvalAction() )
+                    .dispatchActionEdge( dispatchAction() )
+                    .build( tools.keySet(), approvals )
+                    ;
         }
     }
 

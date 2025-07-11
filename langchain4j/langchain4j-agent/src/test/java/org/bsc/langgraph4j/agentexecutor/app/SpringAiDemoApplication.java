@@ -1,10 +1,10 @@
-package org.bsc.langgraph4j.agentexecutor.studio;
+package org.bsc.langgraph4j.agentexecutor.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringAiStudioApplication {
+public class SpringAiDemoApplication  {
 
 	/**
   * The entry point of the application. This method is executed when the application starts.
@@ -12,7 +12,7 @@ public class SpringAiStudioApplication {
   * @param args An array of strings that are arguments passed to the application.
   */
  public static void main(String[] args) {
-		SpringApplication.run(SpringAiStudioApplication.class, args);
+		SpringApplication.run(SpringAiDemoApplication.class, args);
 	}
 
 }

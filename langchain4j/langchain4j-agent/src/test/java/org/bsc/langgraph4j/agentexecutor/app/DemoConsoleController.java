@@ -1,17 +1,19 @@
-package org.bsc.langgraph4j.spring.ai.agentexecutor;
+package org.bsc.langgraph4j.agentexecutor.app;
 
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.model.chat.ChatModel;
 import org.bsc.async.AsyncGenerator;
 import org.bsc.langgraph4j.CompileConfig;
 import org.bsc.langgraph4j.GraphRepresentation;
 import org.bsc.langgraph4j.RunnableConfig;
 import org.bsc.langgraph4j.action.InterruptionMetadata;
 import org.bsc.langgraph4j.agent.AgentEx;
+import org.bsc.langgraph4j.agentexecutor.AgentExecutor;
+import org.bsc.langgraph4j.agentexecutor.AgentExecutorEx;
+import org.bsc.langgraph4j.agentexecutor.TestTool;
 import org.bsc.langgraph4j.checkpoint.MemorySaver;
 import org.bsc.langgraph4j.streaming.StreamingOutput;
-import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Controller;
 
@@ -54,12 +56,12 @@ public class DemoConsoleController implements CommandLineRunner {
 
         var streaming = true;
 
-        runAgent( userMessage, streaming, console  );
+        runAgent( userMessage, console  );
 
-        // runAgentWithApproval( userMessage, streaming, console  );
+        runAgentWithApproval( userMessage, console  );
     }
 
-    public void runAgentWithApproval( String userMessage, boolean streaming, java.io.Console console ) throws Exception {
+    public void runAgentWithApproval( String userMessage, java.io.Console console ) throws Exception {
 
         var saver = new MemorySaver();
 
@@ -68,18 +70,19 @@ public class DemoConsoleController implements CommandLineRunner {
                 .build();
 
         var agent = AgentExecutorEx.builder()
-                .chatModel(chatModel, streaming)
+                .chatModel(chatModel)
                 .toolsFromObject( new TestTool()) // Support without providing tools
                 .approvalOn( "execTest", ( nodeId, state ) ->
                         InterruptionMetadata.builder( nodeId, state )
                                 .addMetadata( "label", "confirm execution of test?")
                                 .build())
+
                 .build()
                 .compile(compileConfig);
 
         log.info( "{}", agent.getGraph( GraphRepresentation.Type.MERMAID, "ReAct Agent", false));
 
-        Map<String,Object> input = Map.of("messages", new UserMessage(userMessage) );
+        Map<String,Object> input = Map.of("messages", UserMessage.from(userMessage) );
 
         var runnableConfig = RunnableConfig.builder().build();
 
@@ -99,10 +102,7 @@ public class DemoConsoleController implements CommandLineRunner {
 
             if (output.isEND()) {
                 console.format( "result: %s\n",
-                        output.state().lastMessage()
-                                .map(AssistantMessage.class::cast)
-                                .map(AssistantMessage::getText)
-                                .orElseThrow());
+                        output.state().finalResponse().orElseThrow());
                 break;
 
             } else {
@@ -131,7 +131,7 @@ public class DemoConsoleController implements CommandLineRunner {
         }
     }
 
-    public void runAgent( String userMessage, boolean streaming, java.io.Console console ) throws Exception {
+    public void runAgent( String userMessage, java.io.Console console ) throws Exception {
 
         var saver = new MemorySaver();
 
@@ -140,7 +140,7 @@ public class DemoConsoleController implements CommandLineRunner {
                 .build();
 
         var agent = AgentExecutor.builder()
-                .chatModel(chatModel, streaming)
+                .chatModel(chatModel)
                 .toolsFromObject( new TestTool())
                 .build()
                 .compile(compileConfig);
@@ -164,10 +164,7 @@ public class DemoConsoleController implements CommandLineRunner {
                 .orElseThrow();
 
         console.format( "result: %s\n",
-                output.state().lastMessage()
-                        .map(AssistantMessage.class::cast)
-                        .map(AssistantMessage::getText)
-                        .orElseThrow());
+                output.state().finalResponse().orElseThrow());
 
     }
 

@@ -1,24 +1,21 @@
 package org.bsc.langgraph4j.spring.ai.agentexecutor;
 
 import org.bsc.langgraph4j.GraphStateException;
+import org.bsc.langgraph4j.RunnableConfig;
 import org.bsc.langgraph4j.StateGraph;
-import org.bsc.langgraph4j.action.AsyncNodeAction;
-import org.bsc.langgraph4j.action.AsyncNodeActionWithConfig;
+import org.bsc.langgraph4j.action.Command;
+import org.bsc.langgraph4j.agent.Agent;
 import org.bsc.langgraph4j.prebuilt.MessagesState;
-import org.bsc.langgraph4j.spring.ai.generators.StreamingChatGenerator;
 import org.bsc.langgraph4j.spring.ai.serializer.std.SpringAIStateSerializer;
 import org.bsc.langgraph4j.spring.ai.tool.SpringAIToolService;
 import org.bsc.langgraph4j.state.AgentState;
-import org.bsc.langgraph4j.utils.EdgeMappings;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import static org.bsc.langgraph4j.StateGraph.START;
-import static org.bsc.langgraph4j.action.AsyncEdgeAction.edge_async;
-import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
+import static java.util.concurrent.CompletableFuture.completedFuture;
 
 /**
  * Represents the core component responsible for executing agent logic.
@@ -51,29 +48,18 @@ public interface AgentExecutor {
                 stateSerializer =  new SpringAIStateSerializer<>(AgentExecutor.State::new);
             }
 
-            var chatService = new ChatService(this);
+            final var chatService = new ChatService(this);
 
             final var toolService = new SpringAIToolService(chatService.tools());
 
-            AsyncNodeActionWithConfig<AgentExecutor.State> callModelAction = CallModel.of( chatService, streaming );
-
-            AsyncNodeAction<State> executeToolsAction = (state ->
-                    AgentExecutor.executeTools(state, toolService));
-
-            return new StateGraph<>(State.SCHEMA, stateSerializer)
-                    .addEdge(START, "agent")
-                    .addNode("agent",  callModelAction )
-                    .addNode("action", executeToolsAction)
-                    .addConditionalEdges(
-                            "agent",
-                            edge_async(AgentExecutor::shouldContinue),
-                            EdgeMappings.builder()
-                                    .to("action", "continue")
-                                    .toEND("end")
-                                    .build()
-                    )
-                    .addEdge("action", "agent")
-                    ;
+            return Agent.<Message,State>builder()
+                    .stateSerializer(stateSerializer)
+                    .schema( State.SCHEMA )
+                    .callModelAction( CallModel.of( chatService, streaming ))
+                    .executeToolsAction( (state, config ) ->
+                            executeTools(state, toolService))
+                    .shouldContinueEdge(AgentExecutor::shouldContinue)
+                    .build();
 
         }
     }
@@ -141,21 +127,21 @@ public interface AgentExecutor {
      * @param state The current state of the game.
      * @return "end" if the game should end, otherwise "continue".
      */
-    private static String shouldContinue(State state) {
+    private static CompletableFuture<Command> shouldContinue(State state, RunnableConfig config) {
 
         var message = state.lastMessage().orElseThrow();
 
         var finishReason = message.getMetadata().getOrDefault("finishReason", "");
 
         if (Objects.equals(finishReason, "STOP")) {
-            return "end";
+            return completedFuture(new Command(Agent.END_LABEL ));
         }
 
         if (message instanceof AssistantMessage assistantMessage) {
             if (assistantMessage.hasToolCalls()) {
-                return "continue";
+                return completedFuture(new Command(Agent.CONTINUE_LABEL ));
             }
         }
-        return "end";
+        return completedFuture(new Command(Agent.END_LABEL ));
     }
 }

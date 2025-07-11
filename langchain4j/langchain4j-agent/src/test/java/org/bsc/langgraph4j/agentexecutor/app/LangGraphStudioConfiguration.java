@@ -1,4 +1,4 @@
-package org.bsc.langgraph4j.agentexecutor.studio;
+package org.bsc.langgraph4j.agentexecutor.app;
 
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.Capability;

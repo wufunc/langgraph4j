@@ -1,29 +1,26 @@
 package org.bsc.langgraph4j.spring.ai.agentexecutor;
 
 import org.bsc.langgraph4j.GraphStateException;
-import org.bsc.langgraph4j.RunnableConfig;
 import org.bsc.langgraph4j.StateGraph;
 import org.bsc.langgraph4j.action.*;
+import org.bsc.langgraph4j.agent.AgentEx;
 import org.bsc.langgraph4j.prebuilt.MessagesState;
 import org.bsc.langgraph4j.spring.ai.serializer.std.SpringAIStateSerializer;
 import org.bsc.langgraph4j.spring.ai.tool.SpringAIToolService;
 import org.bsc.langgraph4j.state.AgentState;
 import org.bsc.langgraph4j.state.Channel;
 import org.bsc.langgraph4j.state.Channels;
-import org.bsc.langgraph4j.utils.EdgeMappings;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
+import org.springframework.ai.tool.ToolCallback;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
 import static java.lang.String.format;
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static org.bsc.langgraph4j.StateGraph.START;
-import static org.bsc.langgraph4j.action.AsyncEdgeAction.edge_async;
 import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_REMOVAL;
 import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_RESET;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.mapOf;
@@ -94,111 +91,18 @@ public interface AgentExecutorEx {
         }
     }
 
-
-    enum ApprovalState {
-        APPROVED,
-        REJECTED
-    }
-
-    final class ApprovalNodeAction implements AsyncNodeActionWithConfig<State>, InterruptableAction<State> {
-
-        private final String resumePropertyName;
-        private final BiFunction<String, State, InterruptionMetadata<State>> interruptionMetadataProvider;
-
-        private ApprovalNodeAction( Builder builder ) {
-            this.resumePropertyName = builder.resumePropertyName;
-            this.interruptionMetadataProvider = builder.interruptionMetadataProvider;
-        }
-
-        @Override
-        public CompletableFuture<Map<String, Object>> apply(State state, RunnableConfig config) {
-            return completedFuture(Map.of());
-        }
-
-        @Override
-        public Optional<InterruptionMetadata<State>> interrupt(String nodeId, State state) {
-            if( state.value( resumePropertyName ).isEmpty() ) {
-                var metadata = interruptionMetadataProvider.apply(nodeId,state);
-                return Optional.of(metadata);
-            }
-            return Optional.empty();
-        }
-
-        AsyncCommandAction<State> edgeAction() {
-            return (state, config) -> {
-                var result = new CompletableFuture<Command>();
-
-                if( state.value( resumePropertyName ).isEmpty() ) {
-                    result.completeExceptionally( new IllegalStateException(format("resume property '%s' not found!", resumePropertyName) ));
-                    return result;
-                }
-
-                var resumeState = state.<String>value( resumePropertyName )
-                                    .orElseThrow( () -> new IllegalStateException(format("resume property '%s' not found!", resumePropertyName) ));
-
-                if( Objects.equals( resumeState, ApprovalState.APPROVED.name() )) {
-                    result.complete( new Command( resumeState,
-                            Map.of(resumePropertyName, MARK_FOR_REMOVAL)));
-
-                }
-                else {
-                    var actionName = state.nextAction()
-                            .map( v -> v.replace("approval_", "") )
-                            .orElseThrow( () -> new IllegalStateException("no next action found!"));
-
-                    var tools = state.toolCallsByName( actionName );
-
-                    if(tools.isEmpty())  {
-                        throw new IllegalStateException("no tool execution request found!");
-                    }
-
-                    var toolResponses = tools.stream().map( toolCall ->
-                        new ToolResponseMessage.ToolResponse(toolCall.id(), actionName, "execution has been DENIED!")
-                    ).toList();
-
-                    result.complete( new Command( resumeState,
-                            Map.of( "messages", new ToolResponseMessage( toolResponses ),
-                                    "tool_execution_results", "execution has been DENIED!",
-                                    resumePropertyName, MARK_FOR_REMOVAL)));
-
-                }
-                return result;
-            };
-        }
-        public static  Builder builder() {
-            return new Builder();
-        }
-
-        public static class Builder {
-            private String resumePropertyName;
-            private BiFunction<String, AgentExecutorEx.State, InterruptionMetadata<State>> interruptionMetadataProvider;
-
-            public Builder resumePropertyName( String name  ) {
-                resumePropertyName = name;
-                return this;
-            }
-            public Builder interruptionMetadataProvider(  BiFunction<String, State, InterruptionMetadata<State>> provider  ) {
-                interruptionMetadataProvider = provider;
-                return this;
-            }
-
-            public ApprovalNodeAction build() {
-                Objects.requireNonNull(resumePropertyName, "resumePropertyName cannot be null!");
-                Objects.requireNonNull(interruptionMetadataProvider, "interruptionMetadataProvider cannot be null!");
-                return new ApprovalNodeAction(this);
-            }
-
-        }
-    }
-
     /**
      * Class responsible for building a state graph.
      */
     class Builder extends AgentExecutorBuilder<Builder, State> {
 
-        private final Map<String,ApprovalNodeAction> approvals = new LinkedHashMap<>();
+        private final Map<String,AgentEx.ApprovalNodeAction<Message,State>> approvals = new LinkedHashMap<>();
 
-        public Builder approvalOn( String actionId, ApprovalNodeAction action ) {
+        public Builder approvalOn( String actionId, BiFunction<String, State, InterruptionMetadata<State>> interruptionMetadataProvider  ) {
+            var action = AgentEx.ApprovalNodeAction.<Message,AgentExecutorEx.State>builder()
+                    .interruptionMetadataProvider( interruptionMetadataProvider )
+                    .build();
+
             approvals.put( actionId, action  );
             return this;
         }
@@ -223,73 +127,21 @@ public interface AgentExecutorEx {
             var tools = chatService.tools();
 
             // verify approval
-            for (var approval : approvals.keySet()) {
-
-                tools.stream()
-                        .filter( tool -> Objects.equals( tool.getToolDefinition().name(), approval) )
-                        .findAny()
-                        .orElseThrow( () -> new IllegalArgumentException(format("approval action %s not found!", approval) ));
-            }
-
             final var toolService = new SpringAIToolService(tools);
 
-            AsyncNodeActionWithConfig<State> callModelAction = CallModel.of( chatService, streaming );
-
-            AsyncNodeAction<State> dispatchToolsAction = dispatchTools( approvals.keySet() );
-
-            final EdgeAction<State> dispatchAction = (state) ->
-                    state.nextAction().orElse("model");
-
-            var graph = new StateGraph<>(State.SCHEMA, stateSerializer)
-                    .addNode("model",callModelAction )
-                    .addNode("action_dispatcher", dispatchToolsAction)
-                    .addEdge(START, "model")
-                    .addConditionalEdges("model",
-                            edge_async(AgentExecutorEx::shouldContinue),
-                            EdgeMappings.builder()
-                                    .to("action_dispatcher", "continue")
-                                    .toEND("end" )
-                                    .build()) ;
-
-            var actionMappingBuilder  =  EdgeMappings.builder()
-                    .to( "model")
-                    .toEND();
-
-            for (var tool : tools) {
-
-                var tool_name = tool.getToolDefinition().name();
-
-                if( approvals.containsKey(tool_name) ) {
-
-                    var approval_nodeId = format("approval_%s", tool_name);
-
-                    var approvalAction = approvals.get(tool_name);
-
-                    graph.addNode( approval_nodeId, approvalAction );
-
-                    graph.addConditionalEdges( approval_nodeId, approvalAction.edgeAction() ,
-                            EdgeMappings.builder()
-                                    .to( "model", ApprovalState.REJECTED.name())
-                                    .to( tool_name, ApprovalState.APPROVED.name() )
-                                    .build()
-                            );
-
-                    actionMappingBuilder.to(approval_nodeId);
-                }
-                else {
-                    actionMappingBuilder.to(tool_name);
-                }
-
-                graph.addNode(tool_name,
-                        state -> executeTools( state, toolService, tool_name));
-                graph.addEdge(tool_name, "action_dispatcher");
-
-            }
-
-            return   graph.addConditionalEdges( "action_dispatcher",
-                    edge_async(dispatchAction),
-                    actionMappingBuilder.build())
+            return AgentEx.<Message, State, ToolCallback>builder()
+                    .stateSerializer( stateSerializer )
+                    .schema( State.SCHEMA )
+                    .toolName( tool -> tool.getToolDefinition().name() )
+                    .callModelAction( CallModel.of( chatService, streaming ) )
+                    .dispatchToolsAction( dispatchTools( approvals.keySet() ) )
+                    .executeToolFactory( ( toolName ) -> executeTooL( toolService, toolName ) )
+                    .shouldContinueEdge( shouldContinue() )
+                    .approvalActionEdge( approvalAction() )
+                    .dispatchActionEdge( dispatchAction() )
+                    .build( tools, approvals )
                     ;
+
         }
 
     }
@@ -303,9 +155,59 @@ public interface AgentExecutorEx {
         return new Builder();
     }
 
-    private static AsyncNodeAction<State> dispatchTools(Set<String> approvals ) {
+    private static AsyncCommandAction<State> dispatchAction() {
+        return AsyncCommandAction.command_async( (state, config ) ->
+                    state.nextAction()
+                            .map( Command::new )
+                            .orElseGet( () -> new Command("model" ) ));
 
-        return AsyncNodeAction.node_async(( state ) -> {
+    }
+
+    private static AsyncCommandAction<State> approvalAction() {
+        return (state, config) -> {
+            var result = new CompletableFuture<Command>();
+
+            if( state.value( AgentEx.APPROVAL_RESULT_PROPERTY ).isEmpty() ) {
+                result.completeExceptionally( new IllegalStateException(format("resume property '%s' not found!", AgentEx.APPROVAL_RESULT_PROPERTY) ));
+                return result;
+            }
+
+            var resumeState = state.<String>value( AgentEx.APPROVAL_RESULT_PROPERTY )
+                    .orElseThrow( () -> new IllegalStateException(format("resume property '%s' not found!", AgentEx.APPROVAL_RESULT_PROPERTY) ));
+
+            if( Objects.equals( resumeState, AgentEx.ApprovalState.APPROVED.name() )) {
+                result.complete( new Command( resumeState,
+                        Map.of(AgentEx.APPROVAL_RESULT_PROPERTY, MARK_FOR_REMOVAL)));
+
+            }
+            else {
+                var actionName = state.nextAction()
+                        .map( v -> v.replace("approval_", "") )
+                        .orElseThrow( () -> new IllegalStateException("no next action found!"));
+
+                var tools = state.toolCallsByName( actionName );
+
+                if(tools.isEmpty())  {
+                    throw new IllegalStateException("no tool execution request found!");
+                }
+
+                var toolResponses = tools.stream().map( toolCall ->
+                        new ToolResponseMessage.ToolResponse(toolCall.id(), actionName, "execution has been DENIED!")
+                ).toList();
+
+                result.complete( new Command( resumeState,
+                        Map.of( "messages", new ToolResponseMessage( toolResponses ),
+                                "tool_execution_results", "execution has been DENIED!",
+                                AgentEx.APPROVAL_RESULT_PROPERTY, MARK_FOR_REMOVAL)));
+
+            }
+            return result;
+        };
+    }
+
+    private static AsyncNodeActionWithConfig<State> dispatchTools(Set<String> approvals ) {
+
+        return AsyncNodeActionWithConfig.node_async(( state, config ) -> {
             log.trace( "DispatchTools" );
 
             var toolExecutionRequests = state.lastMessage()
@@ -331,53 +233,48 @@ public interface AgentExecutorEx {
                     .map( actionId -> Map.<String,Object>of( "next_action", actionId ))
                     .orElseGet( () ->  Map.of("messages",  state.toolExecutionResults(),
                             "tool_execution_results", MARK_FOR_RESET, /* reset results */
-                            "next_action", MARK_FOR_RESET  /* remove element */ ));
+                            "next_action", MARK_FOR_REMOVAL  /* remove element */ ));
 
         });
 
     }
-    /**
-     * Executes tools based on the provided state.
-     *
-     * @param state The current state containing necessary information to execute tools.
-     * @return A CompletableFuture containing a map with the intermediate steps, if successful. If there is no agent outcome or the tool service execution fails, an appropriate exception will be thrown.
-     */
-    static CompletableFuture<Map<String, Object>> executeTools(State state, SpringAIToolService toolService, String actionName ) {
-        log.trace( "ExecuteTool" );
 
-        var toolCalls = state.toolCallsByName(actionName);
+    static AsyncNodeActionWithConfig<State> executeTooL(SpringAIToolService toolService, String actionName  ) {
+        return ( state, config ) -> {
+            log.trace( "ExecuteTool" );
 
-        if( toolCalls.isEmpty() ) {
-            return CompletableFuture.failedFuture( new IllegalArgumentException("no tool execution request found!") );
-        }
+            var toolCalls = state.toolCallsByName(actionName);
 
-        return toolService.executeFunctions( toolCalls )
-                .thenApply(result -> Map.of("tool_execution_results", result));
+            if( toolCalls.isEmpty() ) {
+                return CompletableFuture.failedFuture( new IllegalArgumentException("no tool execution request found!") );
+            }
+
+            return toolService.executeFunctions( toolCalls )
+                    .thenApply(result -> Map.of("tool_execution_results", result));
+
+        };
 
     }
 
-    /**
-     * Determines whether the game should continue based on the current state.
-     *
-     * @param state The current state of the game.
-     * @return "end" if the game should end, otherwise "continue".
-     */
-    static String shouldContinue(State state) {
+    static AsyncCommandAction<State> shouldContinue() {
 
-        var message = state.lastMessage().orElseThrow();
+        return AsyncCommandAction.command_async( (state, config ) -> {
+            var message = state.lastMessage().orElseThrow();
 
-        var finishReason = message.getMetadata().getOrDefault("finishReason", "");
+            var finishReason = message.getMetadata().getOrDefault("finishReason", "");
 
-        if (Objects.equals(finishReason, "STOP")) {
-            return "end";
-        }
-
-        if (message instanceof AssistantMessage assistantMessage) {
-            if (assistantMessage.hasToolCalls()) {
-                return "continue";
+            if (Objects.equals(finishReason, "STOP")) {
+                return new Command(AgentEx.END_LABEL );
             }
-        }
-        return "end";
+
+            if (message instanceof AssistantMessage assistantMessage) {
+                if (assistantMessage.hasToolCalls()) {
+                    return new Command(AgentEx.CONTINUE_LABEL );
+                }
+            }
+            return new Command( AgentEx.END_LABEL );
+
+        });
     }
 }
 

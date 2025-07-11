@@ -1,7 +1,7 @@
 package org.bsc.langgraph4j.agentexecutor;
 
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
+import dev.langchain4j.model.ollama.OllamaStreamingChatModel;
 import org.bsc.async.AsyncGenerator;
 import org.bsc.langgraph4j.*;
 import org.bsc.langgraph4j.checkpoint.BaseCheckpointSaver;
@@ -9,7 +9,6 @@ import org.bsc.langgraph4j.checkpoint.MemorySaver;
 import org.bsc.langgraph4j.state.AgentState;
 import org.bsc.langgraph4j.streaming.StreamingOutput;
 import org.bsc.langgraph4j.utils.CollectionsUtils;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -26,12 +25,11 @@ public class AgentExecutorStreamingITest {
 
     private StateGraph<AgentExecutor.State> newGraph()  throws Exception {
 
-        var chatLanguageModel = OpenAiStreamingChatModel.builder()
-                .apiKey( System.getenv( "OPENAI_API_KEY") )
-                .modelName( "gpt-4o-mini" )
+        var chatLanguageModel = OllamaStreamingChatModel.builder()
+                .modelName( "qwen2.5:7b" )
+                .baseUrl("http://localhost:11434")
                 .logResponses(true)
                 .temperature(0.0)
-                .maxTokens(2000)
                 .build();
 
         return AgentExecutor.builder()
