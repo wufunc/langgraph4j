@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.bsc.langgraph4j</groupId>
         <artifactId>langgraph4j-parent</artifactId>
-        <version>1.6.0-beta6</version>
+        <version>1.6.0-rc1</version>
     </parent>
 
     <artifactId>langgraph4j-howtos</artifactId>
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-ollama</artifactId>
-            <version>${langchain4j.beta}</version>
+            <version>${langchain4j.rc}</version>
         </dependency>
 
         <dependency>

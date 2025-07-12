@@ -35,15 +35,20 @@ public abstract class AgentExecutorBuilder<B extends AgentExecutorBuilder<B,Stat
         return result();
     }
 
-    public B chatModel(ChatModel chatModel) {
+    public B chatModel(ChatModel chatModel, boolean streaming ) {
         this.chatModel = chatModel;
+        this.streaming = streaming;
         return result();
     }
 
+    @Deprecated(forRemoval = true)
+    public B chatModel(ChatModel chatModel ) {
+        return chatModel( chatModel, false );
+    }
+
+    @Deprecated(forRemoval = true)
     public B streamingChatModel(ChatModel chatModel) {
-        this.chatModel = chatModel;
-        this.streaming = true;
-        return result();
+        return chatModel( chatModel, true );
     }
 
     public B defaultSystem(String systemMessage) {

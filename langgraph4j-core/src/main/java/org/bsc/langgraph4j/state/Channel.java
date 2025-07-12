@@ -1,9 +1,12 @@
 package org.bsc.langgraph4j.state;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
+import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_REMOVAL;
+import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_RESET;
 
 /**
  *
@@ -86,6 +89,14 @@ public interface Channel<T> {
     Optional<Supplier<T>> getDefault();
 
 
+    default boolean isMarkedForReset( Object value ) {
+        return value == null || value == MARK_FOR_RESET ;
+    }
+
+    default boolean isMarkedForRemoval( Object value ) {
+        return value == MARK_FOR_REMOVAL;
+    }
+
     /**
      * Update the state property with the given key and returns the new value.
      *
@@ -96,6 +107,14 @@ public interface Channel<T> {
      */
     @SuppressWarnings("unchecked")
     default Object update(String key, Object oldValue, Object newValue) {
+        if( isMarkedForReset(newValue) ) {
+            // if newValue is null or MARK_FOR_DELETION, the channel is reset to the default value
+            return getDefault().orElse( () -> null ).get();
+        }
+        if( isMarkedForRemoval(newValue)) {
+            return null;
+        }
+
         T _new = (T)newValue;
 
         final T _old = (oldValue == null) ?

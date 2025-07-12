@@ -27,6 +27,12 @@ nav:
     # - Core Library:       
     #   - Examples: https://github.com/langgraph4j/langgraph4j-examples
     #   - JavaDoc: apidocs/index.html
+    - Tutorial:
+      - Core Library: core/low_level.md
+      - Checkpoint (Postgres): core/checkpoint-postgres.md
+      - Parallel Branch: core/parallel-branch.md
+      - Streaming: core/streaming.md
+      - Subgraphs: core/subgraph.md
     - How to(s): 
       - Adaptive RAG: how-tos/adaptiverag.ipynb
       - Agent Executor: how-tos/agentexecutor.ipynb
@@ -41,19 +47,12 @@ nav:
       - Langchain4j LLM Streaming: how-tos/llm-streaming.ipynb
       - Parallel Branch: how-tos/parallel-branch.ipynb
       - PlantUML: how-tos/plantuml.ipynb
-    - Examples: https://github.com/langgraph4j/langgraph4j-examples  
     - Studio: studio/index.md
     - Builder: builder/index.md
     - Integrations: integration.md      
     - Latest Release Notes: release-notes.md
   - Getting Started: getting-started.md
   - Features: features.md  
-  - Tutorial:
-      - Core Library: core/low_level.md
-      - Checkpoint (Postgres): core/checkpoint-postgres.md
-      - Parallel Branch: core/parallel-branch.md
-      - Streaming: core/streaming.md
-      - Subgraphs: core/subgraph.md
   - Examples: https://github.com/langgraph4j/langgraph4j-examples
   - How to(s): 
       - Adaptive RAG: how-tos/adaptiverag.ipynb

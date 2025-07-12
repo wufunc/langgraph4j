@@ -1,0 +1,8 @@
+spring:
+  profiles:
+    active: ollama
+  application:
+    name: springai-agentexecutor
+  main:
+    # console app
+    web-application-type: none

@@ -5,6 +5,8 @@ import java.util.function.Supplier;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
+import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_REMOVAL;
+import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_RESET;
 
 
 /**
@@ -198,10 +200,13 @@ public class AppenderChannel<T> implements Channel<List<T>> {
      */
     @SuppressWarnings("unchecked")
     public final Object update( String key, Object oldValue, Object newValue) {
-
-        if( newValue == null ) {
-            // if newValue is null the channel is reset to the default value
+        ;
+        if( isMarkedForReset(newValue) ) {
+            // if newValue is null or MARK_FOR_DELETION, the channel is reset to the default value
             return getDefault().orElse(ArrayList::new).get();
+        }
+        if( isMarkedForRemoval(newValue) ) {
+            return null;
         }
 
         boolean oldValueIsList = oldValue instanceof List<?>;

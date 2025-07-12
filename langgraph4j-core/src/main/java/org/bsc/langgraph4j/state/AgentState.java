@@ -1,8 +1,9 @@
 package org.bsc.langgraph4j.state;
 
+import org.bsc.langgraph4j.utils.CollectionsUtils;
+
 import java.util.*;
 import java.util.function.BinaryOperator;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
@@ -15,6 +16,8 @@ import static org.bsc.langgraph4j.utils.CollectionsUtils.entryOf;
  * Represents the state of an agent with a map of data.
  */
 public class AgentState {
+    public static final Object MARK_FOR_RESET = new Object();
+    public static final Object MARK_FOR_REMOVAL = new Object();
 
     private final java.util.Map<String,Object> data;
 
@@ -54,15 +57,40 @@ public class AgentState {
      */
     @Override
     public String toString() {
-        return data.toString();
+        return CollectionsUtils.toString(data);
     }
 
-    private static <T, K, U> Collector<T, ?, Map<K, U>> toMapAllowingNulls(
-            Function<? super T, ? extends K> keyMapper,
-            Function<? super T, ? extends U> valueMapper) {
+    private static Collector<Map.Entry<String,Object>, ?, Map<String, Object>> toMapRemovingItemMarkedForRemoval() {
+        final BinaryOperator<Object> mergeFunction = ( currentValue, newValue ) -> newValue;
+
         return Collector.of(
                 HashMap::new,
-                (map, element) -> map.put(keyMapper.apply(element), valueMapper.apply(element)),
+                (map, element) -> {
+                    var key     = element.getKey();
+                    var value   = element.getValue();
+                    if( value == null || value == MARK_FOR_RESET || value == MARK_FOR_REMOVAL) {
+                        map.remove(key);
+                    }
+                    else {
+                        map.merge(key, value, mergeFunction);
+                    }
+                },
+                (map1, map2) -> {
+                    map2.forEach( (key, value) -> {
+                        if ( value != null && value != MARK_FOR_RESET && value != MARK_FOR_REMOVAL) {
+                            map1.merge(key, value, mergeFunction);
+                        }
+                    });
+                    return map1;
+                },
+                Collector.Characteristics.UNORDERED);
+    }
+
+
+    private static Collector<Map.Entry<String,Object>, ?, Map<String, Object>> toMapAllowingNulls() {
+        return Collector.of(
+                HashMap::new,
+                (map, element) -> map.put(element.getKey(), element.getValue()),
                 (map1, map2) -> {
                     map1.putAll(map2);
                     return map1;
@@ -92,35 +120,9 @@ public class AgentState {
 
             return entry;
         })
-        .collect(toMapAllowingNulls(Map.Entry::getKey, Map.Entry::getValue));
+        .collect(toMapAllowingNulls());
     }
 
-    private static <T, K, U> Collector<T, ?, Map<K, U>> toMapRemovingNulls(
-            Function<? super T, ? extends K> keyMapper,
-            Function<? super T, ? extends U> valueMapper,
-            BinaryOperator<U> mergeFunction) {
-        return Collector.of(
-                HashMap::new,
-                (map, element) -> {
-                    K key = keyMapper.apply(element);
-                    U value = valueMapper.apply(element);
-                    if( value == null ) {
-                        map.remove(key);
-                    }
-                    else {
-                        map.merge(key, value, mergeFunction);
-                    }
-                },
-                (map1, map2) -> {
-                    map2.forEach((key, value) -> {
-                        if (value != null) {
-                            map1.merge(key, value, mergeFunction);
-                        }
-                    });
-                    return map1;
-                },
-                Collector.Characteristics.UNORDERED);
-    }
 
     /**
      * Updates a state with the provided partial state.
@@ -140,11 +142,10 @@ public class AgentState {
 
         Map<String, Object> updatedPartialState = updatePartialStateFromSchema(state, partialState, channels);
 
-        return Stream.concat( state.entrySet().stream(), updatedPartialState.entrySet().stream())
-                .collect(toMapRemovingNulls(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        ( currentValue, newValue ) -> newValue ));
+        var result =  Stream.concat( state.entrySet().stream(), updatedPartialState.entrySet().stream())
+                .collect(toMapRemovingItemMarkedForRemoval());
+
+        return result;
     }
 
     /**

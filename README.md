@@ -8,7 +8,7 @@
 
 
 LangGraph for Java. A library for building stateful, multi-agents applications with LLMs, built for work with [langchain4j] and [Spring AI]
-> It is inspired by [LangGraph] solution, part of [LangChain AI project][langchain.ai].
+> It is inspired by [LangGraph] solution, part of [LangChain AI project].
 
 
 ## Releases
@@ -19,7 +19,7 @@ LangGraph for Java. A library for building stateful, multi-agents applications w
 
 | Date         | Release        | info
 |--------------|----------------| ---
-| Jul 06, 2025 | `1.6.0-beta6` | official release
+| Jul 12, 2025 | `1.6.0-rc1` | official release
 
 ----
 
@@ -125,7 +125,7 @@ Make sure you are using Java 17 or later.
 **Latest Stable Version (Recommended):**
 ```xml
 <properties>
-    <langgraph4j.version>1.6.0-beta6</langgraph4j.version> <!-- Check for the actual latest version -->
+    <langgraph4j.version>1.6.0-rc1</langgraph4j.version> <!-- Check for the actual latest version -->
 </properties>
 
 <!-- Optional: Add the Bill of Materials (BOM) to manage langgraph4j module versions -->
