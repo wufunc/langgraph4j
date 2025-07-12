@@ -2,6 +2,76 @@
 
 
 
+<!-- "name: v1.6.0-rc1" is a release tag -->
+
+## [v1.6.0-rc1](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-rc1) (2025-07-12)
+
+### Features
+
+ *  **agent**  add approval support for agent executor both in spring-ai and langchain4j ([6cab5a5c411d748](https://github.com/bsorrentino/langgraph4j/commit/6cab5a5c411d74896c470ed0717a84ff74d27ac8))
+   
+ *  **spring-ai-agent**  allows conditional tool execution approvals (HITL), enhancing control over agent actions. ([20242925ffd870a](https://github.com/bsorrentino/langgraph4j/commit/20242925ffd870ae80b519e740afb5a49e297a19))
+     > Introduced an ApprovalNodeAction class to handle approval logic for tool executions.
+     > Updated the State class to include additional keys and methods for tracking tool execution results and next actions.
+     > Modified the dispatchTools method to handle approval for specific tool actions.
+   
+ *  **core**  add toString utility methods for collection and map ([4b43be82dba954f](https://github.com/bsorrentino/langgraph4j/commit/4b43be82dba954f671273d7750a6465a7d26a43f))
+     > Added utility methods &#x60;toString&#x60; to improve string representation of collections and maps, enhancing readability and usability in debugging and logging scenarios.
+   
+ *  **core**  improve state management by introducing marker objects for reset and removal ([4a4a875afc71c1d](https://github.com/bsorrentino/langgraph4j/commit/4a4a875afc71c1db43d8e9b30e9f16497009543d))
+     > - Added &#x60;MARK_FOR_RESET&#x60; and &#x60;MARK_FOR_REMOVAL&#x60; constants to mark entries for special handling.
+   
+ *  **core**  add support for dynamic interruptable actions ([9bb0eb086815131](https://github.com/bsorrentino/langgraph4j/commit/9bb0eb086815131e3e1a9d3069a2d94023b7a101))
+     > - Added &#x60;InterruptableAction&#x60; interface to allow actions to signal interruptions.
+     > - Added &#x60;InterruptionMetadata&#x60; that holds interruption info.
+     > resolve #173
+   
+
+### Bug Fixes
+
+ -  **NullableObjectSerializer**  switch from `readUTF/writeUTF` to `readFully/write` for binary serialization ([04fc22ad6134732](https://github.com/bsorrentino/langgraph4j/commit/04fc22ad6134732ef652f51f3796ce312ddb457f))
+     > resolve on #183
+
+
+### Documentation
+
+ -  bump version to 1.6.0-rc1 ([f93bf49eb92d086](https://github.com/bsorrentino/langgraph4j/commit/f93bf49eb92d086c5248f2e56a0c0c0e165f5ab1))
+
+ -  **site**  add dynamic interruption tutorial ([3cc226512fae209](https://github.com/bsorrentino/langgraph4j/commit/3cc226512fae209026668cd8800fc691b904672b))
+
+ -  update changelog ([ea6599ed2a4755f](https://github.com/bsorrentino/langgraph4j/commit/ea6599ed2a4755f1d1d998b4407599e017f21f69))
+
+
+### Refactor
+
+ -  **core**  refine HasMetadata interface ([074d21da5604991](https://github.com/bsorrentino/langgraph4j/commit/074d21da56049918c91b6f9d279d3fcd768da912))
+   
+ -  update snapshots repo url ([dae118fffc5499f](https://github.com/bsorrentino/langgraph4j/commit/dae118fffc5499f5cb90420a370dd766b2a3a309))
+   
+ -  **deploy-snapshot**  update deployment process to support  new sonatype central server ([70177fc588d4f8f](https://github.com/bsorrentino/langgraph4j/commit/70177fc588d4f8f737ce1acbd710e783f1e53564))
+   
+
+### ALM 
+
+ -  bump version to 1.6.0-rc1 ([d660d93ecf99cfa](https://github.com/bsorrentino/langgraph4j/commit/d660d93ecf99cfabae9d027d44f890c6540be053))
+   
+ -  update langchain4j dependencies ([8cd16c1453f1c1b](https://github.com/bsorrentino/langgraph4j/commit/8cd16c1453f1c1bd187f773437a27ffba38283b0))
+    > - Bump langchain4j version: from 1.0.1 to 1.1.0, add rc and beta version 1.1.0-rc1 and 1.1.0-beta7 respectively.
+
+ -  **core**  bump async-generator version to 3.2.2 ([bb9717b0ae71a86](https://github.com/bsorrentino/langgraph4j/commit/bb9717b0ae71a860c265626cb40e95c80399f823))
+   
+ -  bump to 1.6-SNAPSHOT ([89f541e13b48f78](https://github.com/bsorrentino/langgraph4j/commit/89f541e13b48f78b5e5a4edc0f010bb8830616a6))
+   
+ -  uncomment site distribution management coordinates ([3459c5ff70609cb](https://github.com/bsorrentino/langgraph4j/commit/3459c5ff70609cb38172ff14d0aeaf4db38468b4))
+   
+ -  update username for sonatype-central repository ([0cdfd6ce92a4580](https://github.com/bsorrentino/langgraph4j/commit/0cdfd6ce92a458089206a830f2c18679795f7181))
+   
+
+
+
+
+
+
 <!-- "name: v1.6.0-beta6" is a release tag -->
 
 ## [v1.6.0-beta6](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-beta6) (2025-07-06)
