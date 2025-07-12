@@ -414,7 +414,51 @@ See [this guide](/langgraph4j/how-tos/langgraph4j-howtos/configuration.html) for
 
 ## Breakpoints
 
-It can often be useful to set breakpoints before or after certain nodes execute. This can be used to wait for human approval before continuing. These can be set when you ["compile" a graph](#compiling-your-graph). You can set breakpoints either _before_ a node executes (using `interruptBefore`) or after a node executes (using `interruptAfter`.)
+In langgraph4j, a graph's execution can be paused at any node. This is particularly useful for implementing features like human-in-the-loop approvals, where the graph needs to
+wait for external input before proceeding.
+
+To set breakpoints before or after certain nodes execute. This can be used to wait for human approval before continuing. These can be set when you ["compile" a graph](#compiling-your-graph). 
+
+### Static definition 
+
+You can set breakpoints either _before_ a node executes (using `interruptBefore`) or _after_ a node executes (using `interruptAfter`) adding them on `CompileConfig`.
+
+```java
+var compileConfig = CompileConfig.builder()
+                    .checkpointSaver(saver)
+                    .interruptBefore( "tools")
+                    .build();
+```
+
+### Dynamic definition
+
+The `org.bsc.langgraph4j.action.InterruptableAction<State>` interface is the core component that enables this functionality. Any node action that implements this interface can conditionally interrupt the graph's execution.
+
+The heart of the interface is the interrupt method:
+
+```java
+public interface InterruptableAction<State extends AgentState> {
+   /**
+    * Determines whether the graph execution should be interrupted at the current node.
+    *
+    * @param nodeId The identifier of the current node being processed.
+    * @param state  The current state of the agent.
+    * @return An {@link Optional} containing {@link InterruptionMetadata} if the execution
+    *         should be interrupted. Returns an empty {@link Optional} to continue execution.
+   */
+   Optional<InterruptionMetadata<State>> interrupt(String nodeId, State state );
+}
+```
+
+**Here’s how it works**:
+
+ * When the graph is about to execute a node, it first checks if the node's action implements InterruptableAction.
+ * If it does, the interrupt(String nodeId, State state) method is called.
+ * If the method returns a non-empty Optional<InterruptionMetadata>, the graph's execution is paused. The InterruptionMetadata object contains information about the
+  interruption, which can be sent to an external system or user for review.
+ * If the method returns an empty Optional, the node executes normally, and the graph continues its execution without interruption.
+
+---- 
 
 You **MUST** use a [checkpoiner](#checkpointer) when using breakpoints. This is because your graph needs to be able to resume execution.
 
