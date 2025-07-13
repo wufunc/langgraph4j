@@ -1,10 +1,7 @@
 package org.bsc.langgraph4j;
 
 import org.bsc.async.AsyncGenerator;
-import org.bsc.langgraph4j.action.AsyncNodeAction;
-import org.bsc.langgraph4j.action.AsyncNodeActionWithConfig;
-import org.bsc.langgraph4j.action.Command;
-import org.bsc.langgraph4j.action.InterruptableAction;
+import org.bsc.langgraph4j.action.*;
 import org.bsc.langgraph4j.checkpoint.BaseCheckpointSaver;
 import org.bsc.langgraph4j.checkpoint.Checkpoint;
 import org.bsc.langgraph4j.internal.edge.Edge;
@@ -683,13 +680,15 @@ public class CompiledGraph<State extends AgentState> {
                     return Data.of( buildNodeOutput( END ) );
                 }
 
+                final var clonedState = cloneState(currentState);
+
                 // check on previous node
                 if( shouldInterruptAfter( currentNodeId, nextNodeId )) {
-                    return Data.done(currentNodeId);
+                    return Data.done( InterruptionMetadata.builder(currentNodeId, clonedState).build() );
                 }
 
                 if( shouldInterruptBefore( nextNodeId, currentNodeId ) ) {
-                    return Data.done(nextNodeId);
+                    return Data.done(InterruptionMetadata.builder(currentNodeId, clonedState).build() );
                 }
 
                 currentNodeId = nextNodeId;
@@ -698,8 +697,6 @@ public class CompiledGraph<State extends AgentState> {
 
                 if (action == null)
                     throw RunnableErrors.missingNode.exception(currentNodeId);
-
-                final var clonedState = cloneState(currentState);
 
                 if( action instanceof InterruptableAction<?>) {
                     @SuppressWarnings("unchecked")
