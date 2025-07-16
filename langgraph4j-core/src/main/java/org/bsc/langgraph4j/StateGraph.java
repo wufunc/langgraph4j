@@ -1,9 +1,6 @@
 package org.bsc.langgraph4j;
 
-import org.bsc.langgraph4j.action.AsyncCommandAction;
-import org.bsc.langgraph4j.action.AsyncEdgeAction;
-import org.bsc.langgraph4j.action.AsyncNodeAction;
-import org.bsc.langgraph4j.action.AsyncNodeActionWithConfig;
+import org.bsc.langgraph4j.action.*;
 import org.bsc.langgraph4j.internal.edge.Edge;
 import org.bsc.langgraph4j.internal.edge.EdgeCondition;
 import org.bsc.langgraph4j.internal.edge.EdgeValue;
@@ -20,6 +17,9 @@ import java.util.*;
 
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_REMOVAL;
+import static org.bsc.langgraph4j.utils.CollectionsUtils.mergeMap;
 
 /**
  * Represents a state graph with nodes and edges.
@@ -161,6 +161,37 @@ public class StateGraph<State extends AgentState> {
     }
 
     /**
+     * Adds node that behave as conditional edges.
+     *
+     * @param id  the identifier of the  node
+     * @param action node action to determine the next target node
+     * @param mappings  the mappings of conditions to target nodes
+     * @throws GraphStateException if the node identifier is invalid, the mappings are empty, or the node already exists
+     */
+    public StateGraph<State> addNode(String id, AsyncCommandAction<State> action, Map<String, String> mappings) throws GraphStateException {
+
+        // SIMPLER IMPLEMENTATION
+        return addNode( id, ( state, config ) -> completedFuture(Map.of()) )
+                .addConditionalEdges( id, action, mappings );
+
+        /*
+        // ALTERNATIVE IMPLEMENTATION
+        final var nextNodeIdProperty = format("%s_next_node", id );
+
+        return addNode( id, ( state, config ) ->
+            action.apply( state, config ).thenApply( command ->
+                mergeMap( Map.of( nextNodeIdProperty, command.gotoNode()) , command.update() ) )
+
+        ).addConditionalEdges( id, ( state, config ) ->
+            completedFuture(
+                    new Command( state.<String>value( nextNodeIdProperty )
+                                    .orElseThrow( () -> new IllegalStateException(format("state property '%s' has not been specified! ", nextNodeIdProperty) )),
+                            Map.of( nextNodeIdProperty, MARK_FOR_REMOVAL ) ))
+        , mappings );
+        */
+    }
+
+    /**
      * Adds a subgraph to the state graph by creating a node with the specified identifier.
      * This implies that Subgraph share the same state with parent graph
      *
@@ -185,7 +216,6 @@ public class StateGraph<State extends AgentState> {
 
     }
 
-
     /**
      * Adds a subgraph to the state graph by creating a node with the specified identifier.
      * This implies that Subgraph share the same state with parent graph
@@ -196,7 +226,7 @@ public class StateGraph<State extends AgentState> {
      * @throws GraphStateException if the node identifier is invalid or the node already exists
      * @deprecated use {@code addNode( String, CompiledGraph<State> )} instead
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public StateGraph<State> addSubgraph(String id, CompiledGraph<State> subGraph) throws GraphStateException {
         return addNode(id, subGraph);
     }
@@ -235,9 +265,9 @@ public class StateGraph<State extends AgentState> {
      * @param subGraph the subgraph to be added. it will be compiled on compilation of the parent
      * @return this state graph instance
      * @throws GraphStateException if the node identifier is invalid or the node already exists
-     * @Deprecated use {@code add( String id, StateGraph<State> )} instead
+     * @deprecated use {@code add( String id, StateGraph<State> )} instead
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public StateGraph<State> addSubgraph(String id, StateGraph<State> subGraph) throws GraphStateException {
         return addNode( id, subGraph );
     }
