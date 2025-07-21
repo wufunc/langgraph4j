@@ -84,7 +84,7 @@ public class AsyncTest {
         java.util.Optional<String> lastElement =   result.reduce((a, b) -> b);
 
         assertTrue( lastElement.isPresent());
-        assertEquals( lastElement.get(), "e9" );
+        assertEquals( "e9",lastElement.get() );
 
     }
 
