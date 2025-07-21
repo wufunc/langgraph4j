@@ -591,34 +591,6 @@ public class CompiledGraph<State extends AgentState> {
                     }));
         }
 
-        /**
-         * evaluate Action without nested support
-         */
-        private CompletableFuture<Output> evaluateActionWithoutNested( AsyncNodeAction<State> action, State withState  ) {
-
-            return action.apply( withState ).thenApply(  partialState -> {
-                try {
-                    currentState = AgentState.updateState(currentState, partialState, stateGraph.getChannels());
-
-                    var nextNodeCommand = nextNodeId(currentNodeId, currentState, config) ;
-                    nextNodeId = nextNodeCommand.gotoNode();
-                    currentState = nextNodeCommand.update();
-
-
-                    Optional<Checkpoint>  cp = addCheckpoint(config, currentNodeId, currentState, nextNodeId);
-                    return ( cp.isPresent() && config.streamMode() == StreamMode.SNAPSHOTS) ?
-                        buildStateSnapshot(cp.get()) :
-                        buildNodeOutput( currentNodeId )
-                            ;
-
-                }
-                catch (Exception e) {
-                    throw new CompletionException(e);
-                }
-            });
-
-        }
-
         private CompletableFuture<Output> getNodeOutput() throws Exception {
             Optional<Checkpoint>  cp = addCheckpoint(config, currentNodeId, currentState, nextNodeId);
             return completedFuture(( cp.isPresent() && config.streamMode() == StreamMode.SNAPSHOTS) ?
