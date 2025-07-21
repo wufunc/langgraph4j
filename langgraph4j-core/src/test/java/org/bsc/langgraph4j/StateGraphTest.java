@@ -11,6 +11,8 @@ import org.bsc.langgraph4j.utils.EdgeMappings;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -356,7 +358,11 @@ public class StateGraphTest {
 
         var app = workflow.compile();
 
-        var result = app.stream(Map.of())
+        var runnableConfig = RunnableConfig.builder()
+                .addParallelNodeExecutor( "A", ForkJoinPool.commonPool() )
+                .build( );
+
+        var result = app.stream(Map.of(), runnableConfig)
                 .stream()
                 .peek(System.out::println)
                 .reduce((a, b) -> b)
@@ -382,7 +388,11 @@ public class StateGraphTest {
 
         app = workflow.compile();
 
-        result = app.stream(Map.of())
+        runnableConfig = RunnableConfig.builder()
+                .addParallelNodeExecutor( START, Executors.newSingleThreadExecutor() )
+                .build( );
+
+        result = app.stream(Map.of(), runnableConfig)
                 .stream()
                 .peek(System.out::println)
                 .reduce((a, b) -> b)
