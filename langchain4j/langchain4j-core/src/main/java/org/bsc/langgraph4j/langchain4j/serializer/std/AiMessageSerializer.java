@@ -48,6 +48,7 @@ public class AiMessageSerializer implements Serializer<AiMessage> {
      * @throws ClassNotFoundException if the class of a serialized object cannot be found
      */
     @Override
+    @SuppressWarnings("unchecked")
     public AiMessage read(ObjectInput in) throws IOException, ClassNotFoundException {
         boolean hasToolExecutionRequests = in.readBoolean();
         if( hasToolExecutionRequests ) {

@@ -79,7 +79,7 @@ public class AgentExecutorStreamingITest {
 
         var states = executeAgent("what is the result of test with messages: 'MY FIRST TEST'");
         assertEquals( 5, states.size() );
-        var state = CollectionsUtils.last(states).orElse(null);
+        var state = CollectionsUtils.lastOf(states).orElse(null);
         assertNotNull(state);
         assertTrue(state.finalResponse().isPresent());
         System.out.println(state.finalResponse().get());
@@ -92,7 +92,7 @@ public class AgentExecutorStreamingITest {
 
         var states = executeAgent("what is the result of test with messages: 'MY FIRST TEST' and the result of test with message: 'MY SECOND TEST'");
         assertEquals( 5, states.size() );
-        var state = CollectionsUtils.last(states).orElse(null);
+        var state = CollectionsUtils.lastOf(states).orElse(null);
         assertNotNull(state);
         assertTrue(state.finalResponse().isPresent());
         System.out.println(state.finalResponse().get());
@@ -109,7 +109,7 @@ public class AgentExecutorStreamingITest {
                 saver
                 );
         assertEquals( 5, states.size() );
-        var state = CollectionsUtils.last(states).orElse(null);
+        var state = CollectionsUtils.lastOf(states).orElse(null);
         assertNotNull(state);
         assertTrue(state.finalResponse().isPresent());
         System.out.println(state.finalResponse().get());
@@ -120,7 +120,7 @@ public class AgentExecutorStreamingITest {
                 saver
         );
         assertEquals( 3, states.size() );
-        state = CollectionsUtils.last(states).orElse(null);
+        state = CollectionsUtils.lastOf(states).orElse(null);
         assertNotNull(state);
         assertTrue(state.finalResponse().isPresent());
         System.out.println(state.finalResponse().get());
