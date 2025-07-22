@@ -14,13 +14,13 @@ import org.bsc.langgraph4j.utils.TryFunction;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.stream.Collectors.toList;
 import static org.bsc.langgraph4j.StateGraph.END;
@@ -109,7 +109,7 @@ public class CompiledGraph<State extends AgentState> {
         // EVALUATES NODES
         for (var n : processedData.nodes().elements ) {
             var factory = n.actionFactory();
-            Objects.requireNonNull(factory, format("action factory for node id '%s' is null!", n.id()));
+            requireNonNull(factory, format("action factory for node id '%s' is null!", n.id()));
             nodes.put(n.id(), factory.apply(compileConfig));
         }
 
@@ -327,7 +327,7 @@ public class CompiledGraph<State extends AgentState> {
     }
 
     private boolean shouldInterruptBefore( String nodeId, String previousNodeId ) {
-        Objects.requireNonNull( nodeId, "nodeId cannot be null" );
+        requireNonNull( nodeId, "nodeId cannot be null" );
         if( previousNodeId == null ) { // FIX RESUME ERROR
             return false;
         }
@@ -371,6 +371,21 @@ public class CompiledGraph<State extends AgentState> {
         return stateGraph.getStateSerializer().cloneObject(data);
     }
 
+    /**
+     * Creates an AsyncGenerator stream of NodeOutput based on the provided inputs.
+     *
+     * @param input the input data
+     * @param config the invoke configuration
+     * @return an AsyncGenerator stream of NodeOutput
+     */
+    public AsyncGenerator<NodeOutput<State>> stream( GraphInput input, RunnableConfig config ) {
+        requireNonNull(config, "config cannot be null");
+        requireNonNull( input, "input cannot be null" );
+
+        final var generator = new AsyncNodeGenerator<>( input, config );
+
+        return new AsyncGenerator.WithEmbed<>( generator );
+    }
 
     /**
      * Creates an AsyncGenerator stream of NodeOutput based on the provided inputs.
@@ -380,10 +395,7 @@ public class CompiledGraph<State extends AgentState> {
      * @return an AsyncGenerator stream of NodeOutput
      */
     public AsyncGenerator<NodeOutput<State>> stream( Map<String,Object> inputs, RunnableConfig config ) {
-        Objects.requireNonNull(config, "config cannot be null");
-        final AsyncNodeGenerator<NodeOutput<State>> generator = new AsyncNodeGenerator<>( inputs, config );
-
-        return new AsyncGenerator.WithEmbed<>( generator );
+        return stream(  ( inputs == null ) ? new GraphResume() : new GraphArgs(inputs), config );
     }
 
     /**
@@ -393,8 +405,23 @@ public class CompiledGraph<State extends AgentState> {
      * @return an AsyncGenerator stream of NodeOutput
      */
     public AsyncGenerator<NodeOutput<State>> stream(Map<String,Object> inputs ) {
-        return this.stream( inputs, RunnableConfig.builder().build() );
+        return this.stream( GraphInput.args(inputs), RunnableConfig.builder().build() );
     }
+
+    /**
+     * Invokes the graph execution with the provided inputs and returns the final state.
+     *
+     * @param input the input data
+     * @param config the invoke configuration
+     * @return an Optional containing the final state if present, otherwise an empty Optional
+     */
+    public Optional<State> invoke(GraphInput input, RunnableConfig config ) {
+
+        return stream(input, config).stream()
+                .reduce((a, b) -> b)
+                .map( NodeOutput::state);
+    }
+
     /**
      * Invokes the graph execution with the provided inputs and returns the final state.
      *
@@ -404,7 +431,7 @@ public class CompiledGraph<State extends AgentState> {
      */
     public Optional<State> invoke(Map<String,Object> inputs, RunnableConfig config ) {
 
-       return stream(inputs, config).stream()
+       return stream(GraphInput.args(inputs), config).stream()
                                         .reduce((a, b) -> b)
                                         .map( NodeOutput::state);
     }
@@ -416,7 +443,21 @@ public class CompiledGraph<State extends AgentState> {
      * @return an Optional containing the final state if present, otherwise an empty Optional
      */
     public Optional<State> invoke(Map<String,Object> inputs )  {
-        return this.invoke( inputs, RunnableConfig.builder().build() );
+        return this.invoke( GraphInput.args(inputs), RunnableConfig.builder().build() );
+    }
+
+    /**
+     * Creates an AsyncGenerator stream of NodeOutput based on the provided inputs.
+     *
+     * @param input the input data
+     * @param config the invoke configuration
+     * @return an AsyncGenerator stream of NodeOutput
+     */
+    public AsyncGenerator<NodeOutput<State>> streamSnapshots( GraphInput input, RunnableConfig config )  {
+        requireNonNull(config, "config cannot be null");
+
+        final AsyncNodeGenerator<NodeOutput<State>> generator = new AsyncNodeGenerator<>( input, config.withStreamMode(StreamMode.SNAPSHOTS) );
+        return new AsyncGenerator.WithEmbed<>( generator );
     }
 
     /**
@@ -427,10 +468,7 @@ public class CompiledGraph<State extends AgentState> {
      * @return an AsyncGenerator stream of NodeOutput
      */
     public AsyncGenerator<NodeOutput<State>> streamSnapshots( Map<String,Object> inputs, RunnableConfig config )  {
-        Objects.requireNonNull(config, "config cannot be null");
-
-        final AsyncNodeGenerator<NodeOutput<State>> generator = new AsyncNodeGenerator<>( inputs, config.withStreamMode(StreamMode.SNAPSHOTS) );
-        return new AsyncGenerator.WithEmbed<>( generator );
+        return streamSnapshots( ( inputs == null ) ? new GraphResume() : new GraphArgs(inputs), config );
     }
 
     /**
@@ -486,8 +524,8 @@ public class CompiledGraph<State extends AgentState> {
         RunnableConfig config;
         boolean resumedFromEmbed = false;
 
-        protected AsyncNodeGenerator(Map<String,Object> inputs, RunnableConfig config )  {
-            final boolean isResumeRequest =  (inputs == null);
+        protected AsyncNodeGenerator(GraphInput input, RunnableConfig config )  {
+            final boolean isResumeRequest =  (input instanceof GraphResume);
 
             if( isResumeRequest ) {
 
@@ -512,7 +550,7 @@ public class CompiledGraph<State extends AgentState> {
 
                 log.trace( "START" );
                 
-                Map<String,Object> initState = getInitialState(inputs, config );
+                Map<String,Object> initState = getInitialState( ((GraphArgs)input).value(), config );
                 // patch for backward support of AppendableValue
                 State initializedState = stateGraph.getStateFactory().apply(initState);
                 this.currentState = initializedState.data();

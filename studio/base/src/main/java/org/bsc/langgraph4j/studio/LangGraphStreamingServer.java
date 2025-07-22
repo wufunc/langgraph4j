@@ -231,7 +231,7 @@ public interface LangGraphStreamingServer {
 
                     log.trace("RESUME REQUEST STREAM {}", runnableConfig);
 
-                    generator = compiledGraph.streamSnapshots(null, runnableConfig);
+                    generator = compiledGraph.streamSnapshots( GraphInput.resume(), runnableConfig);
 
                 } else {
 
