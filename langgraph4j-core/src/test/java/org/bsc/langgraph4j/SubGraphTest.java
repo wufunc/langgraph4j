@@ -34,8 +34,8 @@ public class SubGraphTest {
     }
 
     private List<String> _execute(CompiledGraph<?> workflow,
-                                  Map<String,Object> input ) throws Exception {
-        return workflow.stream(input)
+                                  GraphInput input ) throws Exception {
+        return workflow.stream(input, RunnableConfig.builder().build() )
                 .stream()
                 .peek(System.out::println)
                 .map(NodeOutput::node)
@@ -76,7 +76,7 @@ public class SubGraphTest {
                 B_B2,
                 "C",
                 END
-        ), _execute( app, Map.of() ) );
+        ), _execute( app, GraphInput.args(Map.of()) ) );
 
     }
 
@@ -123,7 +123,7 @@ public class SubGraphTest {
                 B_B2,
                 "C",
                 END
-        ), _execute( app, Map.of() ) );
+        ), _execute( app, GraphInput.args(Map.of()) ) );
 
     }
 
@@ -176,7 +176,7 @@ public class SubGraphTest {
                 B_C,
                 "C",
                 END
-        ), _execute( app, Map.of() ) );
+        ), _execute( app, GraphInput.args(Map.of()) ) );
 
     }
 
@@ -227,7 +227,7 @@ public class SubGraphTest {
                 B_C,
                 "C",
                 END
-        ), _execute( withSaver, Map.of()) );
+        ), _execute( withSaver, GraphInput.args(Map.of())) );
 
         // INTERRUPT AFTER B1
         var interruptAfterB1 = workflowParent.compile(
@@ -239,7 +239,7 @@ public class SubGraphTest {
                 START,
                 "A",
                 B_B1
-        ), _execute( interruptAfterB1, Map.of() ) );
+        ), _execute( interruptAfterB1, GraphInput.args(Map.of()) ) );
 
         // RESUME AFTER B1
         assertIterableEquals( List.of(
@@ -247,7 +247,7 @@ public class SubGraphTest {
                 B_C,
                 "C",
                 END
-        ), _execute( interruptAfterB1, null ) );
+        ), _execute( interruptAfterB1, GraphInput.resume() ) );
 
         // INTERRUPT AFTER B2
         var interruptAfterB2 = workflowParent.compile(
@@ -261,14 +261,14 @@ public class SubGraphTest {
                 "A",
                 B_B1,
                 B_B2
-        ), _execute( interruptAfterB2, Map.of() ) );
+        ), _execute( interruptAfterB2, GraphInput.args(Map.of()) ) );
 
         // RESUME AFTER B2
         assertIterableEquals( List.of(
                 B_C,
                 "C",
                 END
-        ), _execute( interruptAfterB2, null ) );
+        ), _execute( interruptAfterB2, GraphInput.resume() ) );
 
         // INTERRUPT BEFORE C
         var interruptBeforeC = workflowParent.compile(
@@ -283,13 +283,13 @@ public class SubGraphTest {
                 B_B1,
                 B_B2,
                 B_C
-        ), _execute( interruptBeforeC, Map.of() ) );
+        ), _execute( interruptBeforeC, GraphInput.args(Map.of()) ) );
 
         // RESUME AFTER B2
         assertIterableEquals( List.of(
                 "C",
                 END
-        ), _execute( interruptBeforeC, null ) );
+        ), _execute( interruptBeforeC, GraphInput.resume() ) );
 
         // INTERRUPT BEFORE SUBGRAPH B
          var interruptBeforeSubgraphB = workflowParent.compile(
@@ -300,7 +300,7 @@ public class SubGraphTest {
         assertIterableEquals( List.of(
                 START,
                 "A"
-        ), _execute( interruptBeforeSubgraphB, Map.of() ) );
+        ), _execute( interruptBeforeSubgraphB, GraphInput.args(Map.of()) ) );
 
         // RESUME AFTER SUBGRAPH B
         assertIterableEquals( List.of(
@@ -309,7 +309,7 @@ public class SubGraphTest {
                 B_C,
                 "C",
                 END
-        ), _execute( interruptBeforeSubgraphB, null ) );
+        ), _execute( interruptBeforeSubgraphB, GraphInput.resume() ) );
 
         // INTERRUPT AFTER SUBGRAPH B
         var exception = assertThrows( GraphStateException.class,
@@ -373,7 +373,7 @@ public class SubGraphTest {
                 B_C,
                 "C",
                 END
-        ), _execute( app, Map.of() ) );
+        ), _execute( app, GraphInput.args(Map.of()) ) );
 
     }
     @Test
@@ -427,7 +427,7 @@ public class SubGraphTest {
                 "C1",
                 "C",
                 END
-        ), _execute( withSaver, Map.of()) );
+        ), _execute( withSaver, GraphInput.args(Map.of())) );
 
         // INTERRUPT AFTER B1
         var interruptAfterB1 = workflowParent.compile(
@@ -439,7 +439,7 @@ public class SubGraphTest {
                 START,
                 "A",
                 B_B1
-        ), _execute( interruptAfterB1, Map.of() ) );
+        ), _execute( interruptAfterB1, GraphInput.args(Map.of()) ) );
 
         // RESUME AFTER B1
         assertIterableEquals( List.of(
@@ -448,7 +448,7 @@ public class SubGraphTest {
                 "C1",
                 "C",
                 END
-        ), _execute( interruptAfterB1, null ) );
+        ), _execute( interruptAfterB1, GraphInput.resume() ) );
 
         // INTERRUPT AFTER B2
         var interruptAfterB2 = workflowParent.compile(
@@ -462,7 +462,7 @@ public class SubGraphTest {
                 "A",
                 B_B1,
                 B_B2
-        ), _execute( interruptAfterB2, Map.of() ) );
+        ), _execute( interruptAfterB2, GraphInput.args(Map.of()) ) );
 
         // RESUME AFTER B2
         assertIterableEquals( List.of(
@@ -470,7 +470,7 @@ public class SubGraphTest {
                 "C1",
                 "C",
                 END
-        ), _execute( interruptAfterB2, null ) );
+        ), _execute( interruptAfterB2, GraphInput.resume() ) );
 
         // INTERRUPT BEFORE C
         var interruptBeforeC = workflowParent.compile(
@@ -486,13 +486,13 @@ public class SubGraphTest {
                 B_B2,
                 B_C,
                 "C1"
-        ), _execute( interruptBeforeC, Map.of() ) );
+        ), _execute( interruptBeforeC, GraphInput.args(Map.of()) ) );
 
         // RESUME BEFORE C
         assertIterableEquals( List.of(
                 "C",
                 END
-        ), _execute( interruptBeforeC, null ) );
+        ), _execute( interruptBeforeC, GraphInput.resume() ) );
 
         // INTERRUPT BEFORE SUBGRAPH B
         var interruptBeforeB = workflowParent.compile(
@@ -503,7 +503,7 @@ public class SubGraphTest {
         assertIterableEquals( List.of(
                 START,
                 "A"
-        ), _execute( interruptBeforeB, Map.of() ) );
+        ), _execute( interruptBeforeB, GraphInput.args(Map.of()) ) );
 
         // RESUME BEFORE SUBGRAPH B
         assertIterableEquals( List.of(
@@ -513,7 +513,7 @@ public class SubGraphTest {
                 "C1",
                 "C",
                 END
-        ), _execute( interruptBeforeB, null ) );
+        ), _execute( interruptBeforeB, GraphInput.resume() ) );
 
         //
         // INTERRUPT AFTER SUBGRAPH B
