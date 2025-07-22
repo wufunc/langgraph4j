@@ -2,6 +2,87 @@
 
 
 
+<!-- "name: v1.6.0-rc2" is a release tag -->
+
+## [v1.6.0-rc2](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-rc2) (2025-07-22)
+
+### Features
+
+ *  **core**  Add tests for parallel node with synchronous and asynchronous actions ([d48caf8febe28d6](https://github.com/bsorrentino/langgraph4j/commit/d48caf8febe28d6558f1b275fd4e616f975fcc40))
+     > work on #151
+   
+ *  **core**  add parallel node executor runnable configuration ([746e70a1e98b37e](https://github.com/bsorrentino/langgraph4j/commit/746e70a1e98b37e0432717280c7198d822c66a8d))
+     > This commit introduces a method to add custom &#x60;Executor&#x60; instances for specific parallel nodes within a &#x60;RunnableConfig&#x60;.
+     > work on #151
+   
+ *  **core/ParallelNode**  update action evaluation methods ([19b662f44ea4dd4](https://github.com/bsorrentino/langgraph4j/commit/19b662f44ea4dd45baed9a9fd448ea462a8fcefa))
+     > - Rewrite logic to support async action evaluation
+     > - Separated synchronous and asynchronous action evaluation into distinct methods for better clarity and performance.
+     > - Added Executor support to allow parallel actions to run on different threads, improving concurrency.
+     > resolve  #151
+   
+ *  **core**  add conditional node with action mappings ([ac656b9924eaa2e](https://github.com/bsorrentino/langgraph4j/commit/ac656b9924eaa2e05254351c362e1740b60d5fca))
+     > - Add a new method &#x60;addNode(String,AsyncCommandAction, Map) &#x60; in the &#x60;StateGraph&#x60; class that allows adding nodes which behave as conditional edges based on action mappings.
+     > resolve #163
+   
+ *  **core**  add conditional node with action mappings ([3ab82c6a3df57d0](https://github.com/bsorrentino/langgraph4j/commit/3ab82c6a3df57d07f4e4fd2f680a6d6fce9a9be2))
+     > - Add a new method &#x60;addNode(String,AsyncCommandAction, Map) &#x60; in the &#x60;StateGraph&#x60; class that allows adding nodes which behave as conditional edges based on action mappings.
+     > resolve #163
+   
+
+
+### Documentation
+
+ -  update Low Level Conceptual Guide ([45f5c0012039c9e](https://github.com/bsorrentino/langgraph4j/commit/45f5c0012039c9ef6837e3b7d13ee0ff8f2a31ba))
+
+ -  bump to version 1.6.0-rc2 ([73c8b93fa31bb09](https://github.com/bsorrentino/langgraph4j/commit/73c8b93fa31bb098a9ec06c46a24e7ee6b11e0fd))
+
+ -  add GraphInput usage ([8b0ef0c077a03d1](https://github.com/bsorrentino/langgraph4j/commit/8b0ef0c077a03d174657ccc9d4655811986022ed))
+
+ -  update javdocs ([aefd80dc1fc575e](https://github.com/bsorrentino/langgraph4j/commit/aefd80dc1fc575eda24c6566bfd0d046e16a5d2d))
+
+ -  update changelog ([27e3749d7d7a1df](https://github.com/bsorrentino/langgraph4j/commit/27e3749d7d7a1df3677066181252a2f05b7eea56))
+
+
+### Refactor
+
+ -  **how-to**  update to support GraphInput ([3b6c2d8fa347cf8](https://github.com/bsorrentino/langgraph4j/commit/3b6c2d8fa347cf88cedc88a4790328c1ee701eb6))
+   
+ -  add GraphInput to standardize graph input ([97bed35ff774179](https://github.com/bsorrentino/langgraph4j/commit/97bed35ff774179f15d81644aad8befed77eaa4c))
+    > Added sealed record GraphArgs and GraphResume
+ > BREAKING CHANGE: no longer support null argument to resume execution
+
+ -  replace deprecated methods invocation ([0c32bf622b1890c](https://github.com/bsorrentino/langgraph4j/commit/0c32bf622b1890c717c08e8a7c204b81b62644d1))
+   
+ -  remove unused method `evaluateActionWithoutNested` ([31360eca1bbd381](https://github.com/bsorrentino/langgraph4j/commit/31360eca1bbd381b5af5076fe44301ad4bc99102))
+   
+ -  **spring-ai-agent**  remove @Deprecated annotation from chatModel method ([2cf4d60a1e3fc71](https://github.com/bsorrentino/langgraph4j/commit/2cf4d60a1e3fc713027c34f5fb2c001be1b7411f))
+   
+ -  **lcore**  return `InterruptionMetadata` for interruptible actions ([a8336e7f8adf6e5](https://github.com/bsorrentino/langgraph4j/commit/a8336e7f8adf6e58f02588dca241fc1ae3da852f))
+    > - Updated return values to include &#x60;InterruptionMetadata&#x60; when interrupts are detected.
+
+
+### ALM 
+
+ -  bump to version 1.6.0-rc2 ([b8788df0b204bd4](https://github.com/bsorrentino/langgraph4j/commit/b8788df0b204bd402a32a33c3ba2e35e3236be8e))
+   
+ -  maven-compiler-plugin` configuration updated to specify Java release version as 17 ([862331cd956ceba](https://github.com/bsorrentino/langgraph4j/commit/862331cd956cebaaeb9471de91fa91aef08f4410))
+   
+ -  bump version to 1.6-SNAPSHOT ([cc30a62520d4268](https://github.com/bsorrentino/langgraph4j/commit/cc30a62520d426818e3443b5fa7c5403ba2a4f3e))
+   
+
+### Test 
+
+ -  fix subgraph test to support GraphInput ([97d9206cbf4643d](https://github.com/bsorrentino/langgraph4j/commit/97d9206cbf4643d80e18c6ca5fa18ef24cc2378f))
+   
+ -  add parallel execution configuration for workflow ([90a1acf7598cfd8](https://github.com/bsorrentino/langgraph4j/commit/90a1acf7598cfd86ab1063189d2adb3a44c0ed0d))
+    > work on #151
+
+
+
+
+
+
 <!-- "name: v1.6.0-rc1" is a release tag -->
 
 ## [v1.6.0-rc1](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-rc1) (2025-07-12)
