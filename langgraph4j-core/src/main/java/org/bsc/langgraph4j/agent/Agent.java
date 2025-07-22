@@ -17,6 +17,7 @@ import static org.bsc.langgraph4j.StateGraph.START;
 /**
  * Interface representing an Agent Executor (AKA ReACT agent).
  * This implementation make in evidence the tools execution using and action dispatcher node
+ * <pre>
  *              ┌─────┐
  *              │start│
  *              └─────┘
@@ -32,6 +33,7 @@ import static org.bsc.langgraph4j.StateGraph.START;
  *               ┌────┐
  *               │stop│
  *               └────┘
+ * </pre>
  */
 public interface Agent {
 

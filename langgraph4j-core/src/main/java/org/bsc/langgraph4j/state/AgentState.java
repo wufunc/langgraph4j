@@ -142,10 +142,8 @@ public class AgentState {
 
         Map<String, Object> updatedPartialState = updatePartialStateFromSchema(state, partialState, channels);
 
-        var result =  Stream.concat( state.entrySet().stream(), updatedPartialState.entrySet().stream())
+        return  Stream.concat( state.entrySet().stream(), updatedPartialState.entrySet().stream())
                 .collect(toMapRemovingItemMarkedForRemoval());
-
-        return result;
     }
 
     /**

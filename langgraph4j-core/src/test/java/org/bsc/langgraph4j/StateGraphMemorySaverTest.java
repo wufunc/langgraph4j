@@ -301,7 +301,7 @@ public class StateGraphMemorySaverTest
             log.info( "SNAPSHOT HISTORY:\n{}\n", s );
         }
 
-        results = app.stream( null, runnableConfig ).stream().collect( Collectors.toList() );
+        results = app.stream( GraphInput.resume(), runnableConfig ).stream().collect( Collectors.toList() );
 
         assertNotNull( results );
         assertFalse( results.isEmpty() );
@@ -317,7 +317,7 @@ public class StateGraphMemorySaverTest
         var toReplay = firstSnapshot.get().config();
 
         toReplay = app.updateState( toReplay, Map.of( "messages", "i'm bartolo") );
-        results = app.stream( null, toReplay ).stream().collect( Collectors.toList() );
+        results = app.stream( GraphInput.resume(), toReplay ).stream().collect( Collectors.toList() );
 
         assertNotNull( results );
         assertFalse( results.isEmpty() );
@@ -370,7 +370,7 @@ public class StateGraphMemorySaverTest
         assertEquals( "tools", state.next() );
 
         log.info( "RESUME CALL");
-        results = app.stream( null, state.config() ).stream()
+        results = app.stream( GraphInput.resume(), state.config() ).stream()
                                         .peek(n -> log.info( "{}", n ) )
                                         .collect(Collectors.toList());
 

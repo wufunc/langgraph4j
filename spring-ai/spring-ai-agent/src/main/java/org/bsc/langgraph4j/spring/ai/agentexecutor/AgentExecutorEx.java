@@ -29,6 +29,7 @@ import static org.bsc.langgraph4j.utils.CollectionsUtils.mergeMap;
 /**
  * Interface representing an Agent Executor (AKA ReACT agent).
  * This implementation make in evidence the tools execution using and action dispatcher node
+ * <pre>
  *              ┌─────┐
  *              │start│
  *              └─────┘
@@ -44,6 +45,7 @@ import static org.bsc.langgraph4j.utils.CollectionsUtils.mergeMap;
  *       ┌────┐         ┌─────────────┐ ┌─────────────┐      ┌─────────────┐
  *       │stop│         │ tool_name 1 │ │ tool_name 2 │......│ tool_name N │
  *       └────┘         └─────────────┘ └─────────────┘      └─────────────┘
+ * </pre>
  */
 public interface AgentExecutorEx {
 

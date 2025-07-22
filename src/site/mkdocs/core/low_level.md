@@ -1,4 +1,4 @@
-# Core Library: Low Level Conceptual Guide
+# Core Library: Conceptual Guide
 
 ## Graphs
 
@@ -310,7 +310,7 @@ graph.addConditionalEdges("nodeA", continueToJokes);
 
 LangGraph4j has a built-in persistence layer, implemented through [Checkpointers]. When you use a checkpointer with a graph, you can interact with the state of that graph. When you use a checkpointer with a graph, you can interact with and manage the graph's state. The checkpointer saves a _checkpoint_ of the graph state at every step, enabling several powerful capabilities:
 
-First, checkpointers facilitate [human-in-the-loop workflows](agentic_concepts.md#human-in-the-loop) workflows by allowing humans to inspect, interrupt, and approve steps. Checkpointers are needed for these workflows as the human has to be able to view the state of a graph at any point in time, and the graph has to be to resume execution after the human has made any updates to the state.
+First, checkpointers facilitate **human-in-the-loop workflows**<!--[human-in-the-loop workflows](agentic_concepts.md#human-in-the-loop)--> workflows by allowing humans to inspect, interrupt, and approve steps. Checkpointers are needed for these workflows as the human has to be able to view the state of a graph at any point in time, and the graph has to be to resume execution after the human has made any updates to the state.
 
 Second, it allows for ["memory"](agentic_concepts.md#memory) between interactions. You can use checkpointers to create threads and save the state of a thread after a graph executes. In the case of repeated human interactions (like conversations) any follow up messages can be sent to that checkpoint, which will retain its memory of previous ones.
 
@@ -462,17 +462,17 @@ public interface InterruptableAction<State extends AgentState> {
 
 You **MUST** use a [checkpoiner](#checkpointer) when using breakpoints. This is because your graph needs to be able to resume execution.
 
-In order to resume execution, you can just invoke your graph with `null` as the input.
+In order to resume execution, you can just invoke your graph with `GraphInput.resume()` as the input.
 
 ```java
 // Initial run of graph
 graph.invoke(inputs, config);
 
 // Let's assume it hit a breakpoint somewhere, you can then resume by passing in None
-graph.invoke(null, config);
+graph.invoke(GraphInput.resume(), config);
 ```
 
-See [this guide](/langgraph4j/how-tos/langgraph4j-howtos/breakpoints.html) for a full walkthrough of how to add breakpoints.
+See [Wait for user Input (HITL)](../how-tos/wait-user-input.ipynb) for a full walkthrough of how to add breakpoints.
 
 ## Visualization
 

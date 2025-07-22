@@ -36,12 +36,12 @@ public class GSonSerializerTest {
 
         assertEquals(State.class, type);
 
-        byte[] bytes = serializer.writeObject(state);
+        byte[] bytes = serializer.objectToBytes(state);
 
         assertNotNull(bytes);
         assertTrue(bytes.length > 0);
 
-        AgentState deserializedState = serializer.readObject(bytes);
+        AgentState deserializedState = serializer.bytesToObject(bytes);
 
         assertNotNull(deserializedState);
         assertEquals( 1, deserializedState.data().size() );

@@ -41,7 +41,6 @@ public abstract class AgentExecutorBuilder<B extends AgentExecutorBuilder<B,Stat
         return result();
     }
 
-    @Deprecated(forRemoval = true)
     public B chatModel(ChatModel chatModel ) {
         return chatModel( chatModel, false );
     }
