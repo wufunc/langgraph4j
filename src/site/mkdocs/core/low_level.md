@@ -462,17 +462,17 @@ public interface InterruptableAction<State extends AgentState> {
 
 You **MUST** use a [checkpoiner](#checkpointer) when using breakpoints. This is because your graph needs to be able to resume execution.
 
-In order to resume execution, you can just invoke your graph with `null` as the input.
+In order to resume execution, you can just invoke your graph with `GraphInput.resume()` as the input.
 
 ```java
 // Initial run of graph
 graph.invoke(inputs, config);
 
 // Let's assume it hit a breakpoint somewhere, you can then resume by passing in None
-graph.invoke(null, config);
+graph.invoke(GraphInput.resume(), config);
 ```
 
-See [this guide](/langgraph4j/how-tos/langgraph4j-howtos/breakpoints.html) for a full walkthrough of how to add breakpoints.
+See [Wait for user Input (HITL)](/langgraph4j/how-tos/langgraph4j-howtos/wait-user-input.html) for a full walkthrough of how to add breakpoints.
 
 ## Visualization
 
