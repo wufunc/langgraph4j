@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AsyncTest {
+public class AsyncGeneratorTest {
     @Test
     public void asyncIteratorTest() throws Exception {
 
