@@ -178,11 +178,13 @@ public interface AgentExecutorEx {
                     .orElseThrow( () -> new IllegalStateException(format("resume property '%s' not found!", AgentEx.APPROVAL_RESULT_PROPERTY) ));
 
             if( Objects.equals( resumeState, AgentEx.ApprovalState.APPROVED.name() )) {
+                // APPROVED
                 result.complete( new Command( resumeState,
                         Map.of(AgentEx.APPROVAL_RESULT_PROPERTY, MARK_FOR_REMOVAL)));
 
             }
             else {
+                // DENIED
                 var actionName = state.nextAction()
                         .map( v -> v.replace("approval_", "") )
                         .orElseThrow( () -> new IllegalStateException("no next action found!"));
@@ -197,9 +199,11 @@ public interface AgentExecutorEx {
                         new ToolResponseMessage.ToolResponse(toolCall.id(), actionName, "execution has been DENIED!")
                 ).toList();
 
+                var toolResponseMessages = new ToolResponseMessage( toolResponses );
+
                 result.complete( new Command( resumeState,
-                        Map.of( "messages", new ToolResponseMessage( toolResponses ),
-                                "tool_execution_results", "execution has been DENIED!",
+                        Map.of( "messages",toolResponseMessages,
+                                "tool_execution_results", toolResponseMessages,
                                 AgentEx.APPROVAL_RESULT_PROPERTY, MARK_FOR_REMOVAL)));
 
             }
