@@ -9,9 +9,9 @@ import org.bsc.langgraph4j.agent.AgentEx;
 import org.bsc.langgraph4j.checkpoint.MemorySaver;
 import org.bsc.langgraph4j.streaming.StreamingOutput;
 import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Controller;
 
@@ -50,9 +50,9 @@ public class DemoConsoleController implements CommandLineRunner {
 
         var console = System.console();
 
-        var userMessage = "perform a test";
+        var userMessage = "perform test twice with message 'this is a test' and return their results and also number of current active threads\"";
 
-        var streaming = true;
+        var streaming = false;
 
         runAgent( userMessage, streaming, console  );
 
@@ -69,7 +69,7 @@ public class DemoConsoleController implements CommandLineRunner {
 
         var agent = AgentExecutorEx.builder()
                 .chatModel(chatModel, streaming)
-                .toolsFromObject( new TestTool()) // Support without providing tools
+                .toolsFromObject( new TestTools()) // Support without providing tools
                 .approvalOn( "execTest", ( nodeId, state ) ->
                         InterruptionMetadata.builder( nodeId, state )
                                 .addMetadata( "label", "confirm execution of test?")
@@ -139,11 +139,23 @@ public class DemoConsoleController implements CommandLineRunner {
                 .checkpointSaver(saver)
                 .build();
 
-        var agent = AgentExecutor.builder()
-                .chatModel(chatModel, streaming)
-                .toolsFromObject( new TestTool())
-                .build()
-                .compile(compileConfig);
+        var agentBuilder =  AgentExecutor.builder()
+                .chatModel(chatModel, streaming);
+
+        // FIX for GEMINI MODEL
+        if( chatModel instanceof VertexAiGeminiChatModel ) {
+            agentBuilder
+//                .defaultSystem( """
+//                When call tools, You must only output the function or tool to call, using strict JSON.
+//                Do not output commentary or internal thoughts.
+//                """)
+                .toolsFromObject( new TestTools4Gemini());
+        }
+        else {
+            agentBuilder.toolsFromObject( new TestTools());
+        }
+
+        var agent = agentBuilder.build().compile(compileConfig);
 
         log.info( "{}", agent.getGraph( GraphRepresentation.Type.MERMAID, "ReAct Agent", false));
 

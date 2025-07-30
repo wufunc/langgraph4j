@@ -6,7 +6,7 @@ import org.springframework.ai.tool.annotation.ToolParam;
 
 import static java.lang.String.format;
 
-public class TestTool {
+public class TestTools {
 
     @Tool( description="tool for test AI agent executor")
     String execTest(@ToolParam( description = "test message") String message) {
