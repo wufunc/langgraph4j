@@ -2,6 +2,54 @@
 
 
 
+<!-- "name: v1.6.0-rc3" is a release tag -->
+
+## [v1.6.0-rc3](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-rc3) (2025-08-01)
+
+### Features
+
+ *  **core**  Add `TrySupplier` functional interface to handle Supplier with exceptions. ([2b83a97c890a86c](https://github.com/bsorrentino/langgraph4j/commit/2b83a97c890a86c540e39f743eb1f55dcb8a7291))
+   
+
+### Bug Fixes
+
+ -  **spring-ai-agent**  update type of result in  state's attribute 'tool_execution_results' ([74e2387e2af8eba](https://github.com/bsorrentino/langgraph4j/commit/74e2387e2af8eba558509952a4bd8baf10c771a3))
+
+ -  **postgres-saver**  update checkpoint deleting previous and inserting a new one ([03a43538df1687f](https://github.com/bsorrentino/langgraph4j/commit/03a43538df1687fabf259895f196ba232bf8b589))
+     > resolve #194
+
+
+### Documentation
+
+ -  bump to version 1.6.0-rc3 ([3aaac7b063355f7](https://github.com/bsorrentino/langgraph4j/commit/3aaac7b063355f7f247138447679d0d42dceb09f))
+
+ -  update changelog ([84b5895648fa015](https://github.com/bsorrentino/langgraph4j/commit/84b5895648fa01518785e41619bdb0f10304b010))
+
+
+### Refactor
+
+ -  **spring-ai-agent**  make Spring AI agent working with gemini-2.5-pro ([a550e1d706d2409](https://github.com/bsorrentino/langgraph4j/commit/a550e1d706d24092484a1d8da2155a956c7f8294))
+    > work on #196
+
+
+### ALM 
+
+ -  bump to version 1.6.0-rc3 ([bd1267d9c9974da](https://github.com/bsorrentino/langgraph4j/commit/bd1267d9c9974daa7554762fb68517a88d2ad749))
+   
+ -  bump langchain4j version to 1.2.0 ([4ded04ffb1e1391](https://github.com/bsorrentino/langgraph4j/commit/4ded04ffb1e13916a5e3e13a2607eba8cb1fc064))
+   
+ -  bump to version 1.6-SNAPSHOT ([28bc8b9a735fa8e](https://github.com/bsorrentino/langgraph4j/commit/28bc8b9a735fa8ef67e39d066a15c31cb5c37500))
+   
+
+### Test 
+
+ -  **core**  Add async node action executed in independent thread ([f2870d58faba5f1](https://github.com/bsorrentino/langgraph4j/commit/f2870d58faba5f1cd1261f0d7d3db93c07ca53dd))
+   
+
+
+
+
+
 <!-- "name: v1.6.0-rc2" is a release tag -->
 
 ## [v1.6.0-rc2](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-rc2) (2025-07-22)
