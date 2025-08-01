@@ -518,13 +518,10 @@ public class StateGraphTest {
 
     @Test
     void testCommandNode_Issue163() throws Exception {
-
-
         AsyncCommandAction<State> commandAction = (state, config) ->
             completedFuture( new Command("C2",
                     Map.of( "messages", "B",
                             "next_node", "C2")) );
-
 
         var graph = new StateGraph<>(State.SCHEMA, State::new)
                 .addNode("A", makeNode("A"))
@@ -550,4 +547,6 @@ public class StateGraphTest {
         assertEquals( "C2", steps.get(2).state().value("next_node").orElse(null));
 
     }
+
+
 }

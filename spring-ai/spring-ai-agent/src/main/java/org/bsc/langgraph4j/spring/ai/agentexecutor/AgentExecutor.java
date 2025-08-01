@@ -133,15 +133,16 @@ public interface AgentExecutor {
 
         var finishReason = message.getMetadata().getOrDefault("finishReason", "");
 
-        if (Objects.equals(finishReason, "STOP")) {
-            return completedFuture(new Command(Agent.END_LABEL ));
-        }
-
         if (message instanceof AssistantMessage assistantMessage) {
             if (assistantMessage.hasToolCalls()) {
                 return completedFuture(new Command(Agent.CONTINUE_LABEL ));
             }
         }
+
+        if (Objects.equals( Objects.toString(finishReason), "STOP")) {
+            return completedFuture(new Command(Agent.END_LABEL ));
+        }
+
         return completedFuture(new Command(Agent.END_LABEL ));
     }
 }

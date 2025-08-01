@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ollama
+    active: gemini
   application:
     name: springai-agentexecutor
   main:

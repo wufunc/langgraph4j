@@ -4,12 +4,13 @@
     <parent>
         <groupId>org.bsc.langgraph4j</groupId>
         <artifactId>langgraph4j-parent</artifactId>
-        <version>1.6.0-rc2</version>
+        <version>1.6.0-rc3</version>
     </parent>
 
     <artifactId>langgraph4j-postgres-saver</artifactId>
     <packaging>jar</packaging>
 
+    <description>PostgreSQL Saver for LangGraph4j</description>
     <name>langgraph4j::postgres-saver</name>
     <url>https://github.com/langgraph4j/langgraph4j</url>
 
@@ -26,9 +27,9 @@
     <dependencies>
 
         <dependency>
-            <groupId>${parent.groupId}</groupId>
+            <groupId>${project.parent.groupId}</groupId>
             <artifactId>langgraph4j-core</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>

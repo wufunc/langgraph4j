@@ -34,6 +34,22 @@ public class PostgresSaver extends MemorySaver {
         return new Builder();
     }
 
+    private void rollback( Connection conn, Checkpoint checkpoint, String threadId ) {
+        if (conn == null) return;
+
+        requireNonNull(checkpoint, "checkpoint cannot be null");
+
+        try {
+            conn.rollback();
+            log.warn("Transaction rolled back for checkpoint {}", checkpoint.getId());
+        } catch (SQLException exRollback) {
+            log.error("Failed to rollback transaction for checkpoint id {} in thread {}",
+                            checkpoint.getId(),
+                            threadId,
+                            exRollback);
+        }
+    }
+
     private String encodeState( Map<String,Object> data ) throws IOException {
         var binaryData = stateSerializer.dataToBytes(data);
         var base64Data = Base64.getEncoder().encodeToString(binaryData);
@@ -172,8 +188,7 @@ public class PostgresSaver extends MemorySaver {
         return checkpoints;
     }
 
-    @Override
-    protected void insertedCheckpoint( RunnableConfig config, LinkedList<Checkpoint> checkpoints, Checkpoint checkpoint) throws Exception {
+    private void insertCheckpoint( Connection conn, RunnableConfig config, LinkedList<Checkpoint> checkpoints, Checkpoint checkpoint) throws Exception {
         var threadId = config.threadId().orElse( THREAD_ID_DEFAULT );
 
         var upsertThreadSql = """
@@ -203,72 +218,75 @@ public class PostgresSaver extends MemorySaver {
                 state_content_type)
                 VALUES (?, ?, ?, ?, ?, ?::jsonb, ?)
                 """;
+        UUID threadUUID = null;
+
+        // 1. Upsert thread information
+        try (PreparedStatement ps = conn.prepareStatement(upsertThreadSql)) {
+            var field = 0;
+            ps.setObject(++field, UUID.randomUUID(), Types.OTHER);
+            ps.setString(++field, threadId);
+            ps.setString(++field, threadId);
+
+            log.trace( "Executing upsert thread:\n---\n{}---", upsertThreadSql);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    threadUUID = rs.getObject("thread_id", UUID.class);
+                }
+            }
+        }
+
+
+
+        // 2. Insert checkpoint data
+        try (PreparedStatement ps = conn.prepareStatement(insertCheckpointSql)) {
+            var field = 0;
+            // checkpoint_id
+            ps.setObject(++field,
+                    UUID.fromString(checkpoint.getId()),
+                    Types.OTHER);
+            // parent_checkpoint_id
+            ps.setNull(++field, java.sql.Types.OTHER);
+            // thread_id
+            ps.setObject(++field,
+                    requireNonNull(threadUUID, "threadUUID cannot be null"),
+                    Types.OTHER);
+            // node_id
+            ps.setString(++field, checkpoint.getNodeId());
+            // next_node_id
+            ps.setString(++field, checkpoint.getNextNodeId());
+            // state_data
+            ps.setString(++field, encodeState(checkpoint.getState()));
+            // state_content_type
+            ps.setString(++field, stateSerializer.contentType());
+
+            // DB schema has DEFAULT CURRENT_TIMESTAMP for saved_at.
+            // If checkpoint provides a specific time, use it. Otherwise, use current time from Java.
+            // To use DB default, one would typically omit the column or pass NULL if the column definition allows it to trigger default.
+            // OffsetDateTime savedAt = checkpoint.getSavedAt().orElse(OffsetDateTime.now());
+            // psCheckpoint.setObject(8, savedAt);
+            log.trace( "Executing insert checkpoint:\n---\n{}---", insertCheckpointSql);
+            ps.executeUpdate();
+        }
+
+    }
+
+    @Override
+    protected void insertedCheckpoint( RunnableConfig config, LinkedList<Checkpoint> checkpoints, Checkpoint checkpoint) throws Exception {
+        var threadId = config.threadId().orElse( THREAD_ID_DEFAULT );
 
         Connection conn = null;
         try( Connection ignored = conn = getConnection() )  {
             conn.setAutoCommit(false); // Start transaction
 
-            UUID threadUUID = null;
-
-            // 1. Upsert thread information
-            try (PreparedStatement ps = conn.prepareStatement(upsertThreadSql)) {
-                var field = 0;
-                ps.setObject(++field, UUID.randomUUID(), Types.OTHER);
-                ps.setString(++field, threadId);
-                ps.setString(++field, threadId);
-
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        threadUUID = rs.getObject("thread_id", UUID.class);
-                    }
-                }
-            }
-
-            log.trace( "Executing insert checkpoint:\n---\n{}---", insertCheckpointSql);
-            // 2. Insert checkpoint data
-            try (PreparedStatement ps = conn.prepareStatement(insertCheckpointSql)) {
-                var field = 0;
-                // checkpoint_id
-                ps.setObject(++field,
-                        UUID.fromString(checkpoint.getId()),
-                        Types.OTHER);
-                // parent_checkpoint_id
-                ps.setNull(++field, java.sql.Types.OTHER);
-                // thread_id
-                ps.setObject(++field,
-                        requireNonNull(threadUUID, "threadUUID cannot be null"),
-                        Types.OTHER);
-                // node_id
-                ps.setString(++field, checkpoint.getNodeId());
-                // next_node_id
-                ps.setString(++field, checkpoint.getNextNodeId());
-                // state_data
-                ps.setString(++field, encodeState(checkpoint.getState()));
-                // state_content_type
-                ps.setString(++field, stateSerializer.contentType());
-
-                // DB schema has DEFAULT CURRENT_TIMESTAMP for saved_at.
-                // If checkpoint provides a specific time, use it. Otherwise, use current time from Java.
-                // To use DB default, one would typically omit the column or pass NULL if the column definition allows it to trigger default.
-                // OffsetDateTime savedAt = checkpoint.getSavedAt().orElse(OffsetDateTime.now());
-                // psCheckpoint.setObject(8, savedAt);
-
-                ps.executeUpdate();
-            }
+            insertCheckpoint( conn, config, checkpoints, checkpoint );
 
             conn.commit();
             log.debug("Checkpoint {} for thread {} inserted successfully.", checkpoint.getId(), threadId);
 
         } catch (SQLException | IOException e) { // IOException from convertStateToJson
-            log.error("Error inserting checkpoint with id {}: {}", checkpoint.getId(), e.getMessage(), e);
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                    log.warn("Transaction rolled back for checkpoint {}", checkpoint.getId());
-                } catch (SQLException exRollback) {
-                    log.error("Failed to rollback transaction for checkpoint id {}: {}", checkpoint.getId(), exRollback.getMessage(), exRollback);
-                }
-            }
+            log.error("Error inserting checkpoint with id {} in thread {}", checkpoint.getId(), threadId, e);
+            rollback( conn, checkpoint, threadId );
             throw e;
         }
 
@@ -279,29 +297,48 @@ public class PostgresSaver extends MemorySaver {
                                       LinkedList<Checkpoint> checkpoints,
                                       Checkpoint checkpoint) throws Exception {
 
-        var updateCheckpointSql = """
-                UPDATE LG4JCheckpoint
-                SET
-                    node_id = ?,
-                    next_node_id = ?,
-                    state_data = ?::jsonb
+        final var threadId = config.threadId().orElse(THREAD_ID_DEFAULT);
+
+        var deletePreviousCheckpointSql = """
+                DELETE FROM LG4JCheckpoint
                 WHERE checkpoint_id = ?;
                 """;
 
-        log.trace( "Executing update checkpoints:\n---\n{}---", updateCheckpointSql);
-        try( Connection conn = getConnection() ; PreparedStatement ps = conn.prepareStatement(updateCheckpointSql) )  {
-            var field = 0;
-            // node_id
-            ps.setString(++field, checkpoint.getNodeId());
-            // next_node_id
-            ps.setString(++field, checkpoint.getNextNodeId());
-            // state_data
-            ps.setString(++field, encodeState(checkpoint.getState()));
+        Connection conn = null;
 
-            ps.setObject(++field,
-                    UUID.fromString(checkpoint.getId()),
-                    Types.OTHER); // nullable
-            ps.executeUpdate();
+        try( Connection ignored = conn = getConnection()  )  {
+            conn.setAutoCommit(false); // Start transaction
+
+            if( config.checkPointId().isPresent() ) {
+
+                try (PreparedStatement ps = conn.prepareStatement(deletePreviousCheckpointSql)) {
+                    var field = 0;
+                    ps.setObject(++field,
+                            UUID.fromString(config.checkPointId().get()),
+                            Types.OTHER); // nullable
+                    log.trace( "Executing deleting previous checkpoint with id {} in thread {}:\n---\n{}---",
+                                    config.checkPointId().get(),
+                                    threadId,
+                                    deletePreviousCheckpointSql);
+                    ps.executeUpdate();
+                }
+            }
+
+            insertCheckpoint( conn, config, checkpoints, checkpoint);
+
+            conn.commit();
+
+            log.debug("Checkpoint with id {} for thread {} inserted successfully.",
+                        checkpoint.getId(),
+                        threadId);
+
+        } catch (SQLException | IOException e) { // IOException from convertStateToJson
+            log.error("Error inserting checkpoint with id {} in thread {}",
+                    checkpoint.getId(),
+                    threadId,
+                    e);
+            rollback( conn, checkpoint, threadId );
+            throw e;
         }
     }
 

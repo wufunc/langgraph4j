@@ -124,7 +124,7 @@ public class PostgresSaverITest {
         assertEquals( END, lastSnapshot.get().next() );
 
         // UPDATE STATE
-        var updatedConfig = workflow.updateState( lastSnapshot.get().config(), Map.of( "update", "update test") );
+        final var updatedConfig = workflow.updateState( lastSnapshot.get().config(), Map.of( "update", "update test") );
 
         var updatedSnapshot = workflow.stateOf( updatedConfig );
         assertTrue( updatedSnapshot.isPresent() );
@@ -149,7 +149,8 @@ public class PostgresSaverITest {
         assertFalse( history.isEmpty() );
         assertEquals( 2, history.size() );
 
-        lastSnapshot = workflow.lastStateOf( runnableConfig );
+        lastSnapshot = workflow.stateOf(updatedConfig);
+        // lastSnapshot = workflow.lastStateOf( runnableConfig );
 
         assertTrue( lastSnapshot.isPresent() );
         assertEquals( "agent_1", lastSnapshot.get().node() );
