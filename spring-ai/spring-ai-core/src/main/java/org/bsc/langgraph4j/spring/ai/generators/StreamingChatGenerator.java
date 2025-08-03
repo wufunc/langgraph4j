@@ -13,19 +13,15 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static java.util.Objects.requireNonNull;
-import static java.util.Optional.ofNullable;
 
 public interface StreamingChatGenerator {
 
-    public static class Builder<State extends AgentState> {
+    class Builder<State extends AgentState> {
         private Function<ChatResponse, Map<String,Object>> mapResult;
         private String startingNode;
         private State startingState;
@@ -81,7 +77,7 @@ public interface StreamingChatGenerator {
                         return response;
                     }
 
-                    var currentMessage = response.getResult().getOutput();
+                    final var currentMessage = response.getResult().getOutput();
 
                     if( currentMessage.hasToolCalls() ) {
                         return response;
@@ -89,6 +85,7 @@ public interface StreamingChatGenerator {
 
                     final var lastMessageText = requireNonNull(lastResponse.getResult().getOutput().getText(),
                             "lastResponse text cannot be null" );
+
                     final var currentMessageText = currentMessage.getText();
 
                     var newMessage =  new AssistantMessage(
@@ -107,6 +104,7 @@ public interface StreamingChatGenerator {
             };
 
             var processedFlux = flux
+                    .filter( response -> response.getResult() != null && response.getResult().getOutput() != null )
                     .doOnNext(mergeMessage)
                     .map(next ->
                             new StreamingOutput<>( next.getResult().getOutput().getText(),
@@ -120,7 +118,7 @@ public interface StreamingChatGenerator {
         }
     }
 
-    public static <State extends AgentState> Builder<State> builder() {
+    static <State extends AgentState> Builder<State> builder() {
         return new Builder<>();
     }
 
