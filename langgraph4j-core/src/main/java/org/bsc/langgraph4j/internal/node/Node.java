@@ -66,6 +66,22 @@ public class Node<State extends AgentState> {
         return new Node<>( newId.apply( id), actionFactory );
     }
 
+    public void validate() throws GraphStateException {
+        System.err.printf( ">> NODE VALIDATE ID: [%s]\n", id );
+
+        if( Objects.equals(id, StateGraph.END) || Objects.equals(id, StateGraph.START) ) {
+            return;
+        }
+
+        if( id.isBlank() ) {
+            throw StateGraph.Errors.invalidNodeIdentifier.exception("blank node id");
+        }
+
+        if( id.startsWith("__") ) {
+            throw StateGraph.Errors.invalidNodeIdentifier.exception("id that start with __");
+        }
+    }
+
     /**
      * Checks if this node is equal to another object.
      *
