@@ -67,8 +67,6 @@ public class Node<State extends AgentState> {
     }
 
     public void validate() throws GraphStateException {
-        System.err.printf( ">> NODE VALIDATE ID: [%s]\n", id );
-
         if( Objects.equals(id, StateGraph.END) || Objects.equals(id, StateGraph.START) ) {
             return;
         }
