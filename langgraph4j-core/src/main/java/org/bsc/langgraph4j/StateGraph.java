@@ -31,8 +31,8 @@ public class StateGraph<State extends AgentState> {
      * Enum representing various error messages related to graph state.
      */
     public enum Errors {
-        invalidNodeIdentifier("END is not a valid node id!"),
-        invalidEdgeIdentifier("END is not a valid edge sourceId!"),
+        invalidNodeIdentifier("[%s] is not a valid node id!"),
+        invalidEdgeIdentifier("[%s] is not a valid edge sourceId!"),
         duplicateNodeError("node with id: %s already exist!"),
         duplicateEdgeError("edge with id: %s already exist!"),
         duplicateConditionalEdgeError("conditional edge from '%s' already exist!"),
@@ -339,6 +339,10 @@ public class StateGraph<State extends AgentState> {
     }
 
     void validateGraph( ) throws GraphStateException {
+        for( var node : nodes.elements ) {
+            node.validate();
+        }
+
         var edgeStart = edges.edgeBySourceId(START)
                 .orElseThrow(Errors.missingEntryPoint::exception);
 

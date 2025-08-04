@@ -22,7 +22,7 @@ public final class StateSnapshot<State extends AgentState> extends NodeOutput<St
     /**
      * @deprecated Use {@link #config()} instead.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public RunnableConfig getConfig( ) {
         return config();
     }
@@ -30,7 +30,7 @@ public final class StateSnapshot<State extends AgentState> extends NodeOutput<St
     /**
      * @deprecated Use {@link #next()} instead.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public String getNext( ) {
         return next();
     }
