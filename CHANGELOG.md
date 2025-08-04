@@ -2,6 +2,52 @@
 
 
 
+<!-- "name: v1.6.0-rc4" is a release tag -->
+
+## [v1.6.0-rc4](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-rc4) (2025-08-04)
+
+### Features
+
+ *  **core/CompiledGraph**  add support for interruption before edge evaulation ([436c18b04012249](https://github.com/bsorrentino/langgraph4j/commit/436c18b04012249331a66362f014d76028ba4322))
+     > resolve #197
+   
+ *  **core/CompileConfig**  add flag to interrupt graph execution before evaluating conditional edges ([29b5c69d8980230](https://github.com/bsorrentino/langgraph4j/commit/29b5c69d8980230d4d715e28e0ee6068d83cef89))
+     > work on #197
+   
+ *  **core**  add "Node Id" validation to avoid reserved name conflicts ([80d15970a66acaf](https://github.com/bsorrentino/langgraph4j/commit/80d15970a66acafa810d4ba24a991647995fe77c))
+   
+ *  **spring-ai**  add support for JSON state serialization through Jackson library ([5358be61ef390ab](https://github.com/bsorrentino/langgraph4j/commit/5358be61ef390ab927814d8f4c8a7e6f46904e0f))
+   
+ *  **spring-ai**  add guard filter for null in StreamingChatGenerator ([8141ab788add71e](https://github.com/bsorrentino/langgraph4j/commit/8141ab788add71e1beb0a0cc9f5bf1394388020b))
+     > - Added a filter to ensure &#x60;response.getResult() !&#x3D; null &amp;&amp; response.getResult().getOutput() !&#x3D; null&#x60; before processing the flux
+     > resolve #202
+   
+
+
+### Documentation
+
+ -  bump to version 1.6.0-rc4 ([bd7f2b4a5af4e8d](https://github.com/bsorrentino/langgraph4j/commit/bd7f2b4a5af4e8d5bb4d6382e57b860b6d4300bd))
+
+ -  update changelog ([bb33aa2ffad3bcf](https://github.com/bsorrentino/langgraph4j/commit/bb33aa2ffad3bcfd7ea83f3c6527321b9a7f0f2f))
+
+
+### Refactor
+
+ -  **core**  update deprecation annotations for removal ([261e97d869d9531](https://github.com/bsorrentino/langgraph4j/commit/261e97d869d95310dd9cb4996c056c8420f06eaf))
+   
+
+### ALM 
+
+ -  bump to version 1.6.0-rc4 ([95b702a9de2d88c](https://github.com/bsorrentino/langgraph4j/commit/95b702a9de2d88c20d9617715c842db0c77018eb))
+   
+ -  bump to 1.6-SNAPSHOT ([572eccda6b8232b](https://github.com/bsorrentino/langgraph4j/commit/572eccda6b8232b7f4004cb3c2a970901635e67c))
+   
+
+
+
+
+
+
 <!-- "name: v1.6.0-rc3" is a release tag -->
 
 ## [v1.6.0-rc3](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-rc3) (2025-08-01)
