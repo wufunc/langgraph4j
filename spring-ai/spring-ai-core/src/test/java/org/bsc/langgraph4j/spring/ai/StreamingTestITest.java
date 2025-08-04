@@ -253,7 +253,7 @@ public class StreamingTestITest {
 
         var generator = app.stream( Map.of( "messages", new UserMessage( "what is the whether today?")) );
 
-        generator.forEachAsync( out -> System.out.println( out ) ).join();
+        generator.forEachAsync(System.out::println).join();
 
     }
 

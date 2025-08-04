@@ -20,13 +20,14 @@ public class CompileConfig {
     private Set<String> interruptsBefore = Set.of();
     private Set<String> interruptsAfter = Set.of();
     private boolean releaseThread = false;
+    private boolean interruptBeforeEdge = false;
 
     /**
      * Returns the array of interrupts that will occur before the specified node.
      *
      * @return an array of interruptible nodes.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public String[] getInterruptBefore() { return interruptsBefore.toArray( new String[0]); }
 
     /**
@@ -34,7 +35,7 @@ public class CompileConfig {
      *
      * @return an array of interruptible nodes.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public String[] getInterruptAfter() { return interruptsAfter.toArray( new String[0]); }
 
     /**
@@ -68,6 +69,16 @@ public class CompileConfig {
     public boolean releaseThread() {
         return releaseThread;
     }
+
+    /**
+     * return the current state of option concerning whether to interrupt the graph execution before evaluating conditional edges
+     *
+     * @return true if option is enabled, false otherwise
+     */
+    public boolean interruptBeforeEdge() {
+        return interruptBeforeEdge;
+    }
+
     /**
      * Returns a new {@link Builder} instance with the default {@link CompileConfig}.
      *
@@ -166,6 +177,21 @@ public class CompileConfig {
         }
 
         /**
+         * Sets whether to interrupt the graph execution before evaluating conditional edges.
+         * <p>
+         * By default, interruptions happen after a node has finished executing. If this is set to {@code true},
+         * the interruption will occur after the node finishes but *before* any of its
+         * conditional edges are evaluated. This allows for inspecting the state before a branch is chosen.
+         *
+         * @param interruptBeforeEdge if {@code true}, interrupt before evaluating edges, otherwise interrupt after.
+         * @return The current {@code Builder} instance for method chaining.
+         */
+        public Builder interruptBeforeEdge( boolean interruptBeforeEdge)  {
+            this.config.interruptBeforeEdge = interruptBeforeEdge;
+            return this;
+        }
+
+        /**
          * Initializes the compilation configuration and returns it.
          *
          * @return the compiled {@link CompileConfig} object
@@ -177,7 +203,7 @@ public class CompileConfig {
 
 
     /**
-     * Default constructor for the {@class CompileConfig} class. This constructor is private to enforce that instances of this class are not created outside its package.
+     * Default constructor for the {@link CompileConfig} class. This constructor is private to enforce that instances of this class are not created outside its package.
      */
     private CompileConfig() {}
 
@@ -191,6 +217,8 @@ public class CompileConfig {
         this.interruptsBefore = config.interruptsBefore;
         this.interruptsAfter = config.interruptsAfter;
         this.releaseThread = config.releaseThread;
+        this.interruptBeforeEdge = config.interruptBeforeEdge;
+
     }
 
 }
