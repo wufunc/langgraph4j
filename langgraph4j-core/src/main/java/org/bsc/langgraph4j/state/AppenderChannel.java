@@ -35,6 +35,16 @@ public class AppenderChannel<T> implements Channel<List<T>> {
         int compareTo(T element, int atIndex );
     }
 
+    public record ReplaceAllWith<T>(List<T> newValues ) {
+
+        public static <T> ReplaceAllWith<T> of(List<T> newValues ) {
+            return new ReplaceAllWith<>(newValues);
+        }
+        public static <T> ReplaceAllWith<T> of(T newValue ) {
+            return new ReplaceAllWith<>( List.of(newValue) );
+        }
+    }
+
     /**
      * Reducer that disallow duplicates
      * @param <T>
@@ -212,6 +222,9 @@ public class AppenderChannel<T> implements Channel<List<T>> {
         boolean oldValueIsList = oldValue instanceof List<?>;
 
         try {
+            if( newValue instanceof ReplaceAllWith<?> replaceAll ) {
+                return List.copyOf(replaceAll.newValues());
+            }
             if( oldValueIsList && newValue instanceof RemoveIdentifier<?> ) {
                 return remove( (List<T>)oldValue, (RemoveIdentifier<T>)newValue);
             }
