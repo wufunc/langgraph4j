@@ -1,8 +1,9 @@
-package org.bsc.langgraph4j;
+package org.bsc.langgraph4j.serializer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bsc.langgraph4j.NodeOutput;
 import org.bsc.langgraph4j.serializer.plain_text.jackson.JacksonStateSerializer;
 import org.bsc.langgraph4j.serializer.plain_text.jackson.TypeMapper;
 import org.bsc.langgraph4j.state.AgentState;
@@ -69,20 +70,26 @@ public class JacksonSerializerTest {
         }
     }
 
+    static class NodeOutputTest extends NodeOutput<AgentState> {
+        protected NodeOutputTest(String node, AgentState state, boolean subGraph) {
+            super(node, state);
+            setSubGraph(subGraph);
+        }
+    }
+
     @Test
     public void NodOutputJacksonSerializationTest() throws Exception {
 
         JacksonSerializer serializer = new JacksonSerializer();
 
-        NodeOutput<AgentState> output = NodeOutput.of("node", null);
-        output.setSubGraph(true);
+        NodeOutput<AgentState> output = new NodeOutputTest("node", null, true);
         var mapper = serializer.getObjectMapper()
                             .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         var json = mapper.writeValueAsString(output);
         assertEquals("""
                 {"end":false,"node":"node","start":false,"state":null,"subGraph":true}""", json );
 
-        output.setSubGraph(false);
+        output = new NodeOutputTest("node", null, false);
         json = serializer.getObjectMapper().writeValueAsString(output);
 
         assertEquals( """

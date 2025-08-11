@@ -1,6 +1,7 @@
 package org.bsc.langgraph4j.langchain4j.serializer.std;
 
 import dev.langchain4j.agent.tool.ToolExecutionRequest;
+import org.bsc.langgraph4j.serializer.Serializer;
 import org.bsc.langgraph4j.serializer.std.NullableObjectSerializer;
 
 import java.io.IOException;
@@ -29,8 +30,8 @@ public class ToolExecutionRequestSerializer implements NullableObjectSerializer<
             log.trace( "ToolExecutionRequest id is null!" );
         }
         writeNullableUTF(object.id(), out);
-        out.writeUTF( object.name() );
-        out.writeUTF( object.arguments() );
+        Serializer.writeUTF( object.name(), out );
+        Serializer.writeUTF( object.arguments(), out );
     }
 
     /**
@@ -45,8 +46,8 @@ public class ToolExecutionRequestSerializer implements NullableObjectSerializer<
     public ToolExecutionRequest read(ObjectInput in) throws IOException, ClassNotFoundException {
         return ToolExecutionRequest.builder()
                 .id( readNullableUTF(in).orElse(null) )
-                .name(in.readUTF())
-                .arguments(in.readUTF())
+                .name(Serializer.readUTF(in))
+                .arguments(Serializer.readUTF(in))
                 .build();
     }
 }

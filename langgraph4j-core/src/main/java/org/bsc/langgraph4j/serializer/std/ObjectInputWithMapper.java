@@ -145,6 +145,6 @@ public class ObjectInputWithMapper implements ObjectInput {
 
     @Override
     public String readUTF() throws IOException {
-        return in.readUTF();
+        return Serializer.readUTF(in);
     }
 }

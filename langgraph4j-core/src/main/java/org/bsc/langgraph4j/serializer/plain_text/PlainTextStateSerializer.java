@@ -1,5 +1,6 @@
 package org.bsc.langgraph4j.serializer.plain_text;
 
+import org.bsc.langgraph4j.serializer.Serializer;
 import org.bsc.langgraph4j.serializer.StateSerializer;
 import org.bsc.langgraph4j.state.AgentState;
 import org.bsc.langgraph4j.state.AgentStateFactory;
@@ -36,7 +37,7 @@ public abstract class PlainTextStateSerializer<State extends AgentState> extends
         ByteArrayOutputStream bytesStream =  new ByteArrayOutputStream();
 
         try(ObjectOutputStream out = new ObjectOutputStream( bytesStream )) {
-            out.writeUTF(data);
+            Serializer.writeUTF(data, out);
             out.flush();
         }
 

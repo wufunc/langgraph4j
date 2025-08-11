@@ -1,5 +1,6 @@
 package org.bsc.langgraph4j.serializer.std;
 
+import org.bsc.langgraph4j.serializer.Serializer;
 import org.bsc.langgraph4j.serializer.StateSerializer;
 import org.bsc.langgraph4j.state.AgentState;
 import org.bsc.langgraph4j.state.AgentStateFactory;
@@ -56,7 +57,7 @@ public class ObjectStreamStateSerializer<State extends AgentState> extends State
 
             for( Map.Entry<String,Object> e : object.entrySet() ) {
                 try {
-                    out.writeUTF(e.getKey());
+                    Serializer.writeUTF(e.getKey(), out);
 
                     writeNullableObject( e.getValue(), out );
 
@@ -77,7 +78,7 @@ public class ObjectStreamStateSerializer<State extends AgentState> extends State
             int size = in.readInt();
 
             for( int i = 0; i < size; i++ ) {
-                String key = in.readUTF();
+                String key = Serializer.readUTF(in);
 
                 Object value = readNullableObject(in).orElse(null);
 

@@ -5,7 +5,6 @@ import org.bsc.langgraph4j.serializer.Serializer;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface NullableObjectSerializer<T> extends Serializer<T> {
 
@@ -36,7 +35,6 @@ public interface NullableObjectSerializer<T> extends Serializer<T> {
         byte[] utf8Bytes = object.getBytes(StandardCharsets.UTF_8);
         out.writeInt(utf8Bytes.length); // prefix with length
         out.write(utf8Bytes);
-        //out.writeUTF(object);
     }
 
     default Optional<String> readNullableUTF(ObjectInput in) throws IOException {
@@ -49,8 +47,7 @@ public interface NullableObjectSerializer<T> extends Serializer<T> {
         }
         byte[] utf8Bytes = new byte[length];
         in.readFully(utf8Bytes);
-        return Optional.of( new String(utf8Bytes, StandardCharsets.UTF_8) );
-        //return Optional.of(in.readUTF());
+        return Optional.of(new String(utf8Bytes, StandardCharsets.UTF_8));
     }
 
 }

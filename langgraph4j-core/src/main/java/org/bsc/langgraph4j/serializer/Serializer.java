@@ -1,6 +1,7 @@
 package org.bsc.langgraph4j.serializer;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public interface Serializer<T> {
@@ -49,5 +50,27 @@ public interface Serializer<T> {
         return readObject(writeObject(object));
     }
 
+    // Fix issue for string greater than 65K
+    static void writeUTF(String object, ObjectOutput out) throws IOException {
+        Objects.requireNonNull( object, "object cannot be null" );
+        if( object.isEmpty()) {
+            out.writeInt(0);
+            return;
+        }
+        byte[] utf8Bytes = object.getBytes(StandardCharsets.UTF_8);
+        out.writeInt(utf8Bytes.length); // prefix with length
+        out.write(utf8Bytes);
+    }
+
+    // Fix issue for string greater than 65K
+    static String readUTF(ObjectInput in) throws IOException {
+        int length = in.readInt();
+        if( length == 0 ) {
+            return "";
+        }
+        byte[] utf8Bytes = new byte[length];
+        in.readFully(utf8Bytes);
+        return new String(utf8Bytes, StandardCharsets.UTF_8);
+    }
 
 }

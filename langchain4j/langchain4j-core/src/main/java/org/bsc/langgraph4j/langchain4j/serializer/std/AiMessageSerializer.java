@@ -34,7 +34,7 @@ public class AiMessageSerializer implements Serializer<AiMessage> {
 
         }
         else {
-            out.writeUTF(object.text());
+            Serializer.writeUTF(object.text(), out);
         }
 
     }
@@ -55,6 +55,6 @@ public class AiMessageSerializer implements Serializer<AiMessage> {
             List<ToolExecutionRequest> toolExecutionRequests = (List<ToolExecutionRequest>)in.readObject();
             return AiMessage.aiMessage( toolExecutionRequests );
         }
-        return AiMessage.aiMessage(in.readUTF());
+        return AiMessage.aiMessage(Serializer.readUTF(in));
     }
 }
