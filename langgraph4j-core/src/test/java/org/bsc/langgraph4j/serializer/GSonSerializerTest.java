@@ -1,7 +1,8 @@
-package org.bsc.langgraph4j;
+package org.bsc.langgraph4j.serializer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.bsc.langgraph4j.NodeOutput;
 import org.bsc.langgraph4j.serializer.plain_text.gson.GsonStateSerializer;
 import org.bsc.langgraph4j.state.AgentState;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,13 @@ public class GSonSerializerTest {
          */
         public State(Map<String, Object> initData) {
             super(initData);
+        }
+    }
+
+    static class NodeOutputTest extends NodeOutput<AgentState> {
+        protected NodeOutputTest(String node, AgentState state, boolean subGraph) {
+            super(node, state);
+            setSubGraph(subGraph);
         }
     }
 
@@ -66,13 +74,12 @@ public class GSonSerializerTest {
 
         GsonSerializer serializer = new GsonSerializer();
 
-        NodeOutput<AgentState> output = NodeOutput.of("node", null);
-        output.setSubGraph(true);
+        NodeOutput<AgentState> output = new NodeOutputTest("node", null, true);
         String json = serializer.getGson().toJson(output);
 
         assertEquals( "{\"node\":\"node\",\"state\":null,\"subGraph\":true}", json );
 
-        output.setSubGraph(false);
+        output = new NodeOutputTest("node", null, false);
         json = serializer.getGson().toJson(output);
 
         assertEquals( "{\"node\":\"node\",\"state\":null,\"subGraph\":false}", json );
