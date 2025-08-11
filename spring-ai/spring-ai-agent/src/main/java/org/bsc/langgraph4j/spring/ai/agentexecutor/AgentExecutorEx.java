@@ -19,8 +19,11 @@ import org.springframework.ai.tool.ToolCallback;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_REMOVAL;
 import static org.bsc.langgraph4j.state.AgentState.MARK_FOR_RESET;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.mapOf;
@@ -118,18 +121,16 @@ public interface AgentExecutorEx {
          * @return A configured StateGraph object.
          * @throws GraphStateException If there is an issue with building the graph state.
          */
-        public StateGraph<State> build() throws GraphStateException {
+        public StateGraph<State> build( Function<AgentExecutorBuilder<?,?>, AgentExecutor.ChatService> chatServiceFactory ) throws GraphStateException {
 
             if (stateSerializer == null) {
                 stateSerializer = new SpringAIStateSerializer<>(AgentExecutorEx.State::new);
             }
 
-            var chatService = new ChatService(this);
-
-            var tools = chatService.tools();
+            final var chatService = requireNonNull(chatServiceFactory, "chatServiceFactory cannot be null!").apply(this);
 
             // verify approval
-            final var toolService = new SpringAIToolService(tools);
+            final var toolService = new SpringAIToolService(tools());
 
             return AgentEx.<Message, State, ToolCallback>builder()
                     .stateSerializer( stateSerializer )
@@ -143,7 +144,6 @@ public interface AgentExecutorEx {
                     .dispatchActionEdge( dispatchAction() )
                     .build( tools, approvals )
                     ;
-
         }
 
     }

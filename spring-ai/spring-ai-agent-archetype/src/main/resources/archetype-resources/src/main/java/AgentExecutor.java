@@ -53,7 +53,7 @@ public interface AgentExecutor {
 
             final var chatService = new ChatService(this);
 
-            final var toolService = new SpringAIToolService(chatService.tools());
+            final var toolService = new SpringAIToolService(tools);
 
             return Agent.<Message,State>builder()
                     .stateSerializer(stateSerializer)

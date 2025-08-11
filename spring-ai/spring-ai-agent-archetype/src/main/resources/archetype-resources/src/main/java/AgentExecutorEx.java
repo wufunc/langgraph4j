@@ -129,8 +129,6 @@ public interface AgentExecutorEx {
 
             var chatService = new ChatService(this);
 
-            var tools = chatService.tools();
-
             // verify approval
             final var toolService = new SpringAIToolService(tools);
 
@@ -146,7 +144,6 @@ public interface AgentExecutorEx {
                     .dispatchActionEdge( dispatchAction() )
                     .build( tools, approvals )
                     ;
-
         }
 
     }

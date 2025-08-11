@@ -53,7 +53,9 @@ public class DemoConsoleController implements CommandLineRunner {
 
         var console = System.console();
 
-        var userMessage = "perform test twice with message 'this is a test' and return their results and also number of current active threads${symbol_escape}"";
+        var userMessage = """
+        perform test twice with message 'this is a test' and reports their results and also number of current active threads
+        """;
 
         var streaming = false;
 
