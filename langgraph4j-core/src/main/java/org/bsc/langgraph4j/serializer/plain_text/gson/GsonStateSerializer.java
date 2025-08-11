@@ -1,9 +1,9 @@
 package org.bsc.langgraph4j.serializer.plain_text.gson;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.bsc.langgraph4j.serializer.Serializer;
 import org.bsc.langgraph4j.serializer.plain_text.PlainTextStateSerializer;
 import org.bsc.langgraph4j.state.AgentState;
 import org.bsc.langgraph4j.state.AgentStateFactory;
@@ -11,7 +11,6 @@ import org.bsc.langgraph4j.state.AgentStateFactory;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -42,12 +41,12 @@ public abstract class GsonStateSerializer<State extends AgentState> extends Plai
     @Override
     public final void writeData(Map<String, Object> data, ObjectOutput out) throws IOException {
         String json = gson.toJson(data);
-        out.writeUTF(json);
+        Serializer.writeUTF(json, out);
     }
 
     @Override
     public final Map<String, Object> readData(ObjectInput in) throws IOException, ClassNotFoundException {
-        String json = in.readUTF();
+        String json = Serializer.readUTF(in);
         var typeToken = new TypeToken<Map<String, Object>>() {};
         return gson.fromJson(json, typeToken);
     }

@@ -179,7 +179,7 @@ record CheckPointSerializer(
 
     @Override
     public void write(Checkpoint object, ObjectOutput out) throws IOException {
-        out.writeUTF(object.getId());
+        Serializer.writeUTF(object.getId(), out);
         writeNullableUTF(object.getNodeId(), out);
         writeNullableUTF(object.getNextNodeId(), out);
         AgentState state = stateSerializer.stateFactory().apply(object.getState());
@@ -189,7 +189,7 @@ record CheckPointSerializer(
     @Override
     public Checkpoint read(ObjectInput in) throws IOException, ClassNotFoundException {
         return Checkpoint.builder()
-                .id(in.readUTF())
+                .id(Serializer.readUTF(in))
                 .nextNodeId(readNullableUTF(in).orElse(null))
                 .nodeId(readNullableUTF(in).orElse(null))
                 .state(stateSerializer.read(in))

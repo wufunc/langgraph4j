@@ -13,13 +13,13 @@ class SystemMessageSerializer implements Serializer<SystemMessage> {
     @Override
     public void write(SystemMessage object, ObjectOutput out) throws IOException {
         var text = Objects.requireNonNull( object.getText(), "text cannot be null" );
-        out.writeUTF( text );
+        Serializer.writeUTF( text, out );
 
     }
 
     @Override
     public SystemMessage read(ObjectInput in) throws IOException, ClassNotFoundException {
-        var text = in.readUTF();
+        var text = Serializer.readUTF(in);
         return new SystemMessage( text );
     }
 }

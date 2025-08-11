@@ -110,12 +110,12 @@ public class SerializeTest {
 
             @Override
             public void write(NonSerializableElement object, ObjectOutput out) throws IOException {
-                out.writeUTF(object.value);
+                Serializer.writeUTF(object.value, out);
             }
 
             @Override
             public NonSerializableElement read(ObjectInput in) throws IOException, ClassNotFoundException {
-                return new NonSerializableElement(in.readUTF());
+                return new NonSerializableElement(Serializer.readUTF(in));
             }
         });
 

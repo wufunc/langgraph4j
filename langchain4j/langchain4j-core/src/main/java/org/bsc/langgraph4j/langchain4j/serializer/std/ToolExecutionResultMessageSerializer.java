@@ -1,6 +1,7 @@
 package org.bsc.langgraph4j.langchain4j.serializer.std;
 
 import dev.langchain4j.data.message.ToolExecutionResultMessage;
+import org.bsc.langgraph4j.serializer.Serializer;
 import org.bsc.langgraph4j.serializer.std.NullableObjectSerializer;
 
 import java.io.IOException;
@@ -28,8 +29,8 @@ public class ToolExecutionResultMessageSerializer implements NullableObjectSeria
             log.trace( "ToolExecutionResultMessage id is null!" );
         }
         writeNullableUTF( object.id(), out );
-        out.writeUTF( object.toolName() );
-        out.writeUTF( object.text() );
+        Serializer.writeUTF( object.toolName(), out );
+        Serializer.writeUTF( object.text(), out );
     }
 
     /**
@@ -45,8 +46,8 @@ public class ToolExecutionResultMessageSerializer implements NullableObjectSeria
     @Override
     public ToolExecutionResultMessage read(ObjectInput in) throws IOException, ClassNotFoundException {
         String id = readNullableUTF( in ).orElse( null );
-        String toolName = in.readUTF();
-        String text = in.readUTF();
+        String toolName = Serializer.readUTF(in);
+        String text = Serializer.readUTF(in);
         return new ToolExecutionResultMessage( id, toolName, text );
     }
 }
