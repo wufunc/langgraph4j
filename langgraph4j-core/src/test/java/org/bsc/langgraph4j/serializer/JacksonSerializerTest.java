@@ -2,7 +2,6 @@ package org.bsc.langgraph4j.serializer;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bsc.langgraph4j.NodeOutput;
 import org.bsc.langgraph4j.serializer.plain_text.jackson.JacksonStateSerializer;
 import org.bsc.langgraph4j.serializer.plain_text.jackson.TypeMapper;
@@ -10,7 +9,10 @@ import org.bsc.langgraph4j.state.AgentState;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -59,14 +61,10 @@ public class JacksonSerializerTest {
         assertEquals( "value1", deserializedState.data().get("prop1") );
     }
 
-    static class JacksonSerializer extends JacksonStateSerializer<AgentState> {
+    static class MyJacksonStateSerializer extends JacksonStateSerializer<AgentState> {
 
-        public JacksonSerializer() {
+        public MyJacksonStateSerializer() {
             super(AgentState::new);
-        }
-
-        ObjectMapper getObjectMapper() {
-            return objectMapper;
         }
     }
 
@@ -80,17 +78,17 @@ public class JacksonSerializerTest {
     @Test
     public void NodOutputJacksonSerializationTest() throws Exception {
 
-        JacksonSerializer serializer = new JacksonSerializer();
+        var serializer = new MyJacksonStateSerializer();
 
         NodeOutput<AgentState> output = new NodeOutputTest("node", null, true);
-        var mapper = serializer.getObjectMapper()
+        var mapper = serializer.objectMapper()
                             .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         var json = mapper.writeValueAsString(output);
         assertEquals("""
                 {"end":false,"node":"node","start":false,"state":null,"subGraph":true}""", json );
 
         output = new NodeOutputTest("node", null, false);
-        json = serializer.getObjectMapper().writeValueAsString(output);
+        json = serializer.objectMapper().writeValueAsString(output);
 
         assertEquals( """
                 {"end":false,"node":"node","start":false,"state":null,"subGraph":false}""", json );
@@ -111,5 +109,51 @@ public class JacksonSerializerTest {
         assertEquals( "MyState", ref.get().getTypeName() );
         System.out.println( ref.get().getType() );
         assertEquals( State.class, ref.get().getType() );
+    }
+
+    record Person ( String name, int age ){}
+
+    @Test
+    public void valueFromNodeTest() throws Exception {
+
+        var serializer = new MyJacksonStateSerializer();
+
+        var data = Map.of(
+                "integer", 10,
+                "string", "value",
+                "boolean", true,
+                "long", 10_000_000_000_000L,
+                "double", 10_000.34567,
+                "big_decimal", new BigDecimal(123412345678901L),
+                "person", new Person("John", 30));
+
+        var state = serializer.stateFactory().apply( data );
+
+        var bytes = serializer.objectToBytes( state );
+
+        var clonedState = serializer.bytesToObject( bytes );
+
+        var clonedData = clonedState.data();
+
+        assertEquals( data.size(), clonedData.size() );
+        assertEquals( data.get("integer"), clonedData.get("integer") );
+        assertEquals( data.get("string"), clonedData.get("string") );
+        assertEquals( data.get("boolean"), clonedData.get("boolean") );
+        assertEquals( data.get("long"), clonedData.get("long") );
+        assertEquals( data.get("double"), clonedData.get("double") );
+        assertInstanceOf( Number.class, data.get("big_decimal"));
+        assertInstanceOf( Number.class, clonedData.get("big_decimal"));
+        assertEquals( Objects.toString(data.get("big_decimal")), Objects.toString(clonedData.get("big_decimal")) );
+        assertInstanceOf( Map.class, clonedData.get("person") );
+        @SuppressWarnings("unchecked")
+        final Map<String,Object> personMap = (Map<String, Object>) clonedData.get("person");
+        assertInstanceOf( Person.class, data.get("person") );
+        final Person person = (Person) data.get("person");
+        assertEquals( person.name(), personMap.get("name"));
+        assertEquals( person.age(), personMap.get("age"));
+
+
+
+
     }
 }
