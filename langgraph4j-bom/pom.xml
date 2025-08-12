@@ -35,7 +35,7 @@
     <artifactId>langgraph4j-bom</artifactId>
     <packaging>pom</packaging>
 
-    <name>LangGraph4j BOM</name>
+    <name>LangGraph4j::bom</name>
     <description>Bill of Materials POM (BOM) for the LangGraph4j modules</description>
 
     <url>https://github.com/langgraph4j/langgraph4j</url>
