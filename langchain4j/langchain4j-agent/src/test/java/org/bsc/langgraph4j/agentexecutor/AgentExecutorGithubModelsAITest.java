@@ -1,6 +1,5 @@
 package org.bsc.langgraph4j.agentexecutor;
 
-import dev.langchain4j.model.azure.AzureOpenAiChatModel;
 import dev.langchain4j.model.github.GitHubModelsChatModel;
 import dev.langchain4j.model.github.GitHubModelsChatModelName;
 import org.bsc.langgraph4j.StateGraph;
