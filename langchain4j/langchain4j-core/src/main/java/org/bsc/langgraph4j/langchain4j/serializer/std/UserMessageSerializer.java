@@ -1,6 +1,7 @@
 package org.bsc.langgraph4j.langchain4j.serializer.std;
 
 import dev.langchain4j.data.message.UserMessage;
+import org.bsc.langgraph4j.serializer.Serializer;
 import org.bsc.langgraph4j.serializer.std.NullableObjectSerializer;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class UserMessageSerializer implements NullableObjectSerializer<UserMessa
     public void write(UserMessage object, ObjectOutput out) throws IOException {
 
         if( object.hasSingleText() ) {
-            out.writeUTF( object.singleText() );
+            Serializer.writeUTF( object.singleText(), out );
             writeNullableUTF( object.name(), out);
             return;
         }
@@ -42,7 +43,7 @@ public class UserMessageSerializer implements NullableObjectSerializer<UserMessa
      */
     @Override
     public UserMessage read(ObjectInput in) throws IOException, ClassNotFoundException {
-        String text = in.readUTF();
+        String text = Serializer.readUTF(in);
         return readNullableUTF(in)
                 .map( name -> UserMessage.from(name, text) )
                 .orElseGet( () -> UserMessage.from(text) );

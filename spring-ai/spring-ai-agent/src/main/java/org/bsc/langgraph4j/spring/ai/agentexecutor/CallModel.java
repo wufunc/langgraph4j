@@ -13,14 +13,14 @@ import static org.bsc.langgraph4j.action.AsyncNodeActionWithConfig.node_async;
 
 class CallModel<State extends MessagesState<Message>> implements NodeActionWithConfig<State> {
 
-    public static <State extends MessagesState<Message>> AsyncNodeActionWithConfig<State> of(ChatService chatService, boolean streaming ) {
+    public static <State extends MessagesState<Message>> AsyncNodeActionWithConfig<State> of( AgentExecutor.ChatService chatService, boolean streaming ) {
         return node_async(new CallModel<>(chatService, streaming));
     }
 
-    private final ChatService chatService;
+    private final AgentExecutor.ChatService chatService;
     private final boolean streaming;
 
-    protected CallModel(ChatService chatService, boolean streaming) {
+    protected CallModel(AgentExecutor.ChatService chatService, boolean streaming) {
         this.chatService = chatService;
         this.streaming = streaming;
     }

@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import org.bsc.langgraph4j.state.AppenderChannel.ReplaceAllWith;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.mapOf;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AgentStateTest {
 
@@ -95,6 +95,45 @@ public class AgentStateTest {
 
         assertEquals( 0, data.size() );
 
+    }
+
+    @Test
+    public void replaceDataFromStateTest() {
+
+        AgentStateFactory<MessagesState<String> > sf = MessagesState::new;
+
+        var state = new MessagesState<String>( new HashMap<>() );
+
+        var data = AgentState.updateState( state, Map.of( "messages", List.of("v1", "v2")), MessagesState.SCHEMA);
+        assertEquals( 1, data.size() );
+
+        state = sf.apply(data);
+
+        assertIterableEquals( List.of( "v1", "v2"), state.messages() );
+
+        data = AgentState.updateState( data, Map.of( "messages", "v3"), MessagesState.SCHEMA);
+
+        state = sf.apply(data);
+
+        assertIterableEquals( List.of( "v1", "v2", "v3"), state.messages() );
+
+        data = AgentState.updateState( data, Map.of( "messages", ReplaceAllWith.of( List.of("a1", "a2"))), MessagesState.SCHEMA);
+
+        state = sf.apply(data);
+
+        assertIterableEquals( List.of( "a1", "a2"), state.messages() );
+
+        data = AgentState.updateState( data, Map.of( "messages", ReplaceAllWith.of( "x1") ), MessagesState.SCHEMA);
+
+        state = sf.apply(data);
+
+        assertIterableEquals( List.of( "x1"), state.messages() );
+
+        data = AgentState.updateState( data, Map.of( "messages", List.of("v1", "v2", "v3")  ), MessagesState.SCHEMA);
+
+        state = sf.apply(data);
+
+        assertIterableEquals( List.of( "x1", "v1", "v2", "v3"), state.messages() );
     }
 
 }

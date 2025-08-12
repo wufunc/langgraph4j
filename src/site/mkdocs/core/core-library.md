@@ -82,29 +82,34 @@ In the example above we specify for `messages` property a built-in channel [Appe
 
 [AppenderChannel] supports the message deletion throught its nested functional interface [RemoveIdentifier]. Inheriting such interface you can create a particular value that when will be put inside a State's property, with [AppenderChannel] schema, instrucs the [Reducer] to remove the  element that match the specified conditions in [RemoveIdentifier] throught `compareTo( element, index )` method. 
 
-Langgraph4j provides a Built in [RemoveIdentifier] named [RemoveByHash] that allow to remove messages comparing their `hashCode`, below an example of its usage:
+##### RemoveByHash
+
+Langgraph4j provides a Built in [AppederChannel.RemoveIdentifier] named [RemoveByHash] that allow to remove messages comparing their `hashCode`, below an example of its usage:
 
 ```java
-class MessagesState extends AgentState {
-
-    static Map<String, Channel<?>> SCHEMA = Map.of(
-            "messages", Channels.appender(ArrayList::new)
-    );
-
-    public MessagesState(Map<String, Object> initData) {
-        super(initData);
-    }
-
-    List<String> messages() {
-        return this.<List<String>>value("messages").orElse( List.of() )
-    }
-}
 
 var workflow = new StateGraph<>(MessagesState.SCHEMA, MessagesState::new)
         .addNode("agent_1", node_async(state -> Map.of("messages", "message1")))
         .addNode("agent_2", node_async(state -> Map.of("messages", List.of("message2", "message2.1"))))
         .addNode("agent_3", node_async(state -> 
             Map.of("messages", RemoveByHash.of("message2.1")) // this remove "message2.1" from messages values
+        ))
+        .addEdge("agent_1", "agent_2")
+        .addEdge("agent_2", "agent_3")
+        .addEdge(START, "agent_1")
+        .addEdge("agent_3", END);
+
+```
+##### ReplaceAllWith
+
+Langgraph4j provides a built in [AppederChannel.ReplaceAllWith]  that allow to replace all elements with new ones, below an example of its usage:
+
+```java
+var workflow = new StateGraph<>(MessagesState.SCHEMA, MessagesState::new)
+        .addNode("agent_1", node_async(state -> Map.of("messages", "message1")))
+        .addNode("agent_2", node_async(state -> Map.of("messages", List.of("message2", "message2.1"))))
+        .addNode("agent_3", node_async(state -> 
+            Map.of("messages", ReplaceAllWith.of( List.of("a1", "a2"))) // this replace current messages values with ["a1", "a2"]
         ))
         .addEdge("agent_1", "agent_2")
         .addEdge("agent_2", "agent_3")

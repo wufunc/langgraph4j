@@ -1,8 +1,23 @@
 # Parallel nodes definition
 
-LangGraph4j lets you run nodes in parallel to speed up your total graph execution.
+LangGraph4j lets you defines parallel nodes to speed up your total graph execution.
 
-‼️ Currently there are some overall **limitations** on parallel node implementation execution:
+## Graph Managed Concurrent Execution
+
+To do this you must provide an `Executor` to graph for specific parallel node using `RunnableConfig`
+
+```java
+var runnableConfig = RunnableConfig.builder()
+        .addParallelNodeExecutor( "<parallel node id>", ForkJoinPool.commonPool() )
+        .build( );
+```
+
+**Note:**
+> If an `Executor` is not specified the parallel nodes will be **scheduled sequentially** and to run them concurrently you'll must rely on the async features of `CompletableFuture` using `AsyncNodeAction`
+
+## Parallel nodes limitation ‼️ 
+
+Currently there are some overall **limitations** on parallel nodes implementation execution:
 
  
 * Only the **Fork-Join** model is supported
@@ -24,7 +39,7 @@ LangGraph4j lets you run nodes in parallel to speed up your total graph executio
           │B│       
           └─┘       
 ```
-* Only **one paraller step** is allowed 
+* Only **one paraller step** is allowed ⚠️
 ```
           ┌─┐
           │A│      
@@ -47,7 +62,7 @@ LangGraph4j lets you run nodes in parallel to speed up your total graph executio
           └─┘       
 ```
 
-* No **Conditional Edges** are allowed
+* No **Conditional Edges** are allowed ⚠️
   
 Below are some examples showing how to add create branching dataflows.
 

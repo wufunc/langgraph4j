@@ -1,4 +1,7 @@
-package org.bsc.langgraph4j.spring.ai.agentexecutor;
+#set( $symbol_pound = '#' )
+#set( $symbol_dollar = '$' )
+#set( $symbol_escape = '\' )
+package ${package};
 
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -12,13 +15,9 @@ import java.util.Objects;
 
 class ChatService {
     final ChatClient chatClient;
-    final List<ToolCallback> tools;
-    final boolean streaming;
 
     public ChatService(AgentExecutorBuilder<?,?> builder ) {
         Objects.requireNonNull(builder.chatModel,"chatModel cannot be null!");
-        this.tools = builder.tools;
-        this.streaming = builder.streaming;
         var toolOptions = ToolCallingChatOptions.builder()
                 .internalToolExecutionEnabled(false) // Disable automatic tool execution
                 .build();
@@ -50,10 +49,6 @@ class ChatService {
                 .messages( messages )
                 .stream()
                 .chatResponse();
-    }
-
-    public List<ToolCallback> tools() {
-        return List.copyOf(tools);
     }
 
 }

@@ -111,6 +111,6 @@ class ObjectOutputWithMapper implements ObjectOutput {
 
     @Override
     public void writeUTF(String s) throws IOException {
-        out.writeUTF(s);
+        Serializer.writeUTF( s, out );
     }
 }

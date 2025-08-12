@@ -22,7 +22,7 @@ public class SystemMessageSerializer implements Serializer<SystemMessage> {
      */
     @Override
     public void write(SystemMessage object, ObjectOutput out) throws IOException {
-        out.writeUTF(object.text());
+        Serializer.writeUTF(object.text(), out);
     }
 
     /**
@@ -35,7 +35,7 @@ public class SystemMessageSerializer implements Serializer<SystemMessage> {
      */
     @Override
     public SystemMessage read(ObjectInput in) throws IOException, ClassNotFoundException {
-        String text = in.readUTF();
+        String text = Serializer.readUTF(in);
         return SystemMessage.systemMessage(text);
     }
 }

@@ -28,7 +28,7 @@ nav:
     #   - Examples: https://github.com/langgraph4j/langgraph4j-examples
     #   - JavaDoc: apidocs/index.html
     - Tutorial:
-      - Core Library: core/low_level.md
+      - Core Library: core/core-library.md
       - Parallel Branch: core/parallel-branch.md
       - Streaming: core/streaming.md
       - Subgraphs: core/subgraph.md

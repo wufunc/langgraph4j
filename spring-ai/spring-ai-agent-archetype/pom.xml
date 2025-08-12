@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.bsc.langgraph4j</groupId>
+    <artifactId>langgraph4j-parent</artifactId>
+    <version>1.6.0</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>spring-ai-agent-archetype</artifactId>
+  <packaging>maven-archetype</packaging>
+
+  <name>langgraph4j::springai::agent::archetype</name>
+  <description>A Maven archetype to create a Spring AI Agent project powered by LangGraph4j</description>
+
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-packaging</artifactId>
+        <version>3.4.0</version>
+      </extension>
+    </extensions>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <excludes>
+          <exclude>**/src/site/**</exclude>
+        </excludes>
+      </resource>
+    </resources>
+  </build>
+</project>
