@@ -2,6 +2,69 @@
 
 
 
+<!-- "name: v1.6.0" is a release tag -->
+
+## [v1.6.0](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0) (2025-08-12)
+
+### Features
+
+ *  **spring-ai-agent**  enhance customizability feature ([58bb756531ed5da](https://github.com/bsorrentino/langgraph4j/commit/58bb756531ed5da5f3ab3399e8f24c0847fca889))
+     > allow to provide a custom ChatClient
+   
+ *  add spring-ai-agent maven archetype ([f1e15817bac19c4](https://github.com/bsorrentino/langgraph4j/commit/f1e15817bac19c4d63c1017394eed08277ec6d67))
+     > work on #207
+   
+ *  **appenderchannel**  add new `ReplaceAllWith` record for batch replacement ([788c7376647dbb4](https://github.com/bsorrentino/langgraph4j/commit/788c7376647dbb47f357823f4932f828d9bddd6b))
+     > discussion #204
+     > resolve #206
+   
+
+### Bug Fixes
+
+ -  **serialization**  add support  of deserialization of all managed types by jackson ([206ab64c73e255a](https://github.com/bsorrentino/langgraph4j/commit/206ab64c73e255a310d9b27d2fec7dc5efa0b6c2))
+     > resolve #211
+
+ -  replace usage of `Serializable.writeUTF()` and `Serializable.readUTF()` with raw implementation ([86a60cb8f5c4ca5](https://github.com/bsorrentino/langgraph4j/commit/86a60cb8f5c4ca5132b31092c283d8b70d46e8da))
+     > work on #209
+
+ -  replace `out.writeUTF()` with `Serializable.writeUTF()` and `in.readUTF()` with `Serializable.readUTF()` ([eb98ac97a1cfe4c](https://github.com/bsorrentino/langgraph4j/commit/eb98ac97a1cfe4c054b63dcfc65a46fce10610d2))
+     > fix [#209](https://github.com/langgraph4j/langgraph4j/issues/209)
+
+ -  replace `out.writeUTF()` with `Serializable.writeUTF()` and `in.readUTF()` with `Serializable.readUTF()` ([ad13ca509ae67be](https://github.com/bsorrentino/langgraph4j/commit/ad13ca509ae67be9401f20969d7e60c85671db59))
+     > fix #209
+
+
+### Documentation
+
+ -  bump to version 1.6.0 ([e6bc15dcca50886](https://github.com/bsorrentino/langgraph4j/commit/e6bc15dcca508863fbe61e5bf7e0ab425c47643f))
+
+ -  **core**  update parallel nodes documentation and clarify limitations ([343f993776e2ae7](https://github.com/bsorrentino/langgraph4j/commit/343f993776e2ae720445815cb9816fbe9a717c19))
+     > Provided an example of configuring an Executor using RunnableConfig.
+
+ -  : add new `ReplaceAllWith` record for batch replacement ([aa6eab17f18aaf8](https://github.com/bsorrentino/langgraph4j/commit/aa6eab17f18aaf8e71fa19040f4b782f8246aa88))
+     > discussion [#204]
+     > work on [#206]
+
+ -  update changelog ([ee71c81befe0ad9](https://github.com/bsorrentino/langgraph4j/commit/ee71c81befe0ad9931d23a5f1dafe5fdc5b4cf8a))
+
+
+
+### ALM 
+
+ -  bump to version 1.6.0 ([024ed90e6e2b289](https://github.com/bsorrentino/langgraph4j/commit/024ed90e6e2b2896760b617778b9df0479fc9e08))
+   
+ -  bump to 1.6-SNAPSHOT ([491711f8e31ffab](https://github.com/bsorrentino/langgraph4j/commit/491711f8e31ffabe77ad1865b526d82052bb67b4))
+   
+
+### Test 
+
+ -  **langchain4j**  first test using GITHUB AI MODELS ([5286fe0ed471d93](https://github.com/bsorrentino/langgraph4j/commit/5286fe0ed471d9350a8e258a815fe30d186a6e0e))
+   
+
+
+
+
+
 <!-- "name: v1.6.0-rc4" is a release tag -->
 
 ## [v1.6.0-rc4](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0-rc4) (2025-08-04)
