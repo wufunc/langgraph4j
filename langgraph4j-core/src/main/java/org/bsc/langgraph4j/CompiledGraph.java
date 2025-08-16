@@ -36,12 +36,12 @@ import static org.bsc.langgraph4j.StateGraph.START;
 public class CompiledGraph<State extends AgentState> {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CompiledGraph.class);
 
-    private static String INTERRUPT_AFTER = "__INTERRUPTED__";
+    private static final String INTERRUPT_AFTER = "__INTERRUPTED__";
 
     /**
      * Enum representing various error messages related to graph runner.
      */
-    enum RunnableErrors {
+    public enum RunnableErrors {
         missingNodeInEdgeMapping("cannot find edge mapping for id: '%s' in conditional edge with sourceId: '%s' "),
         missingNode("node with id: '%s' doesn't exist!"),
         missingEdge("edge with sourceId: '%s' doesn't exist!"),
