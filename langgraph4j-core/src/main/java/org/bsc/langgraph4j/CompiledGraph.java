@@ -413,44 +413,6 @@ public class CompiledGraph<State extends AgentState> {
     }
 
     /**
-     * Invokes the graph execution with the provided inputs and returns the final state.
-     *
-     * @param input the input data
-     * @param config the invoke configuration
-     * @return an Optional containing the final state if present, otherwise an empty Optional
-     */
-    public Optional<State> invoke(GraphInput input, RunnableConfig config ) {
-
-        return stream(input, config).stream()
-                .reduce((a, b) -> b)
-                .map( NodeOutput::state);
-    }
-
-    /**
-     * Invokes the graph execution with the provided inputs and returns the final state.
-     *
-     * @param inputs the input map
-     * @param config the invoke configuration
-     * @return an Optional containing the final state if present, otherwise an empty Optional
-     */
-    public Optional<State> invoke(Map<String,Object> inputs, RunnableConfig config ) {
-
-       return stream(GraphInput.args(inputs), config).stream()
-                                        .reduce((a, b) -> b)
-                                        .map( NodeOutput::state);
-    }
-
-    /**
-     * Invokes the graph execution with the provided inputs and returns the final state.
-     *
-     * @param inputs the input map
-     * @return an Optional containing the final state if present, otherwise an empty Optional
-     */
-    public Optional<State> invoke(Map<String,Object> inputs )  {
-        return this.invoke( GraphInput.args(inputs), RunnableConfig.builder().build() );
-    }
-
-    /**
      * Creates an AsyncGenerator stream of NodeOutput based on the provided inputs.
      *
      * @param input the input data
@@ -474,6 +436,56 @@ public class CompiledGraph<State extends AgentState> {
     public AsyncGenerator<NodeOutput<State>> streamSnapshots( Map<String,Object> inputs, RunnableConfig config )  {
         return streamSnapshots( ( inputs == null ) ? new GraphResume() : new GraphArgs(inputs), config );
     }
+
+    /**
+     * Invokes the graph execution with the provided inputs and returns the final {@link NodeOutput}.
+     * <p>
+     * The {@code NodeOutput} contains the final state of the graph and the ID of the last
+     * node that was executed. This is useful for determining if the graph finished
+     * normally (the node ID will be {@link StateGraph#END}) or was interrupted.
+     *
+     * @param input the input data for the graph execution.
+     * @param config the configuration for this specific invocation.
+     * @return an {@link Optional} containing the final {@link NodeOutput} if the
+     *         graph execution produced any output, otherwise an empty Optional.
+     */
+    public Optional<NodeOutput<State>> invokeFinal( GraphInput input, RunnableConfig config ) {
+        return stream(input, config).stream()
+                .reduce((a, b) -> b);
+    }
+
+    /**
+     * Invokes the graph execution with the provided inputs and returns the final state.
+     *
+     * @param input the input data
+     * @param config the invoke configuration
+     * @return an Optional containing the final state if present, otherwise an empty Optional
+     */
+    public Optional<State> invoke(GraphInput input, RunnableConfig config ) {
+        return invokeFinal( input, config ).map( NodeOutput::state);
+    }
+
+    /**
+     * Invokes the graph execution with the provided inputs and returns the final state.
+     *
+     * @param inputs the input map
+     * @param config the invoke configuration
+     * @return an Optional containing the final state if present, otherwise an empty Optional
+     */
+    public Optional<State> invoke(Map<String,Object> inputs, RunnableConfig config ) {
+        return invokeFinal( GraphInput.args(inputs), config ).map( NodeOutput::state);
+    }
+
+    /**
+     * Invokes the graph execution with the provided inputs and returns the final state.
+     *
+     * @param inputs the input map
+     * @return an Optional containing the final state if present, otherwise an empty Optional
+     */
+    public Optional<State> invoke(Map<String,Object> inputs )  {
+        return invokeFinal( GraphInput.args(inputs), RunnableConfig.builder().build() ).map( NodeOutput::state);
+    }
+
 
     /**
      * Generates a drawable graph representation of the state graph.
