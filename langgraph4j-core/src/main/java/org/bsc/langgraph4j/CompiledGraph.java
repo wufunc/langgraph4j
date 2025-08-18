@@ -448,6 +448,7 @@ public class CompiledGraph<State extends AgentState> {
      * @param config the configuration for this specific invocation.
      * @return an {@link Optional} containing the final {@link NodeOutput} if the
      *         graph execution produced any output, otherwise an empty Optional.
+     * @since 1.6.1
      */
     public Optional<NodeOutput<State>> invokeFinal( GraphInput input, RunnableConfig config ) {
         return stream(input, config).stream()
