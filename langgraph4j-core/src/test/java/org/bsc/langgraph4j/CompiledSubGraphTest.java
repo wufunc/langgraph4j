@@ -26,6 +26,7 @@ import static org.bsc.langgraph4j.utils.CollectionsUtils.mergeMap;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CompiledSubGraphTest {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CompiledSubGraphTest.class);
 
     static class MyState extends MessagesState<String> {
 
@@ -102,7 +103,6 @@ public class CompiledSubGraphTest {
 
     @Test
     public void testCompileSubGraphWithInterruptionUsingException() throws Exception {
-        final var console = System.console();
 
         var saver = new MemorySaver();
 
@@ -135,7 +135,7 @@ public class CompiledSubGraphTest {
             try {
                 for (var output : parentGraph.stream(input, runnableConfig)) {
 
-                    console.format("output: %s\n", output);
+                    log.info("output: {}", output);
                 }
 
                 break;
@@ -144,7 +144,7 @@ public class CompiledSubGraphTest {
                 var interruptException = SubGraphInterruptionException.from(ex);
                 if( interruptException.isPresent() ) {
 
-                    console.format("SubGraphInterruptionException: %s\n", interruptException.get().getMessage());
+                    log.info("SubGraphInterruptionException: {}", interruptException.get().getMessage());
                     var interruptionState = interruptException.get().state();
 
 
@@ -165,7 +165,7 @@ public class CompiledSubGraphTest {
                     runnableConfig = parentGraph.updateState( runnableConfig, interruptionState, nodeBeforeSubgraph );
                     input = GraphInput.resume();
 
-                    console.format( "RESUME GRAPH FROM END OF NODE: %s\n", nodeBeforeSubgraph);
+                    log.info( "RESUME GRAPH FROM END OF NODE: {}", nodeBeforeSubgraph);
                     continue;
                 }
 
@@ -246,7 +246,6 @@ public class CompiledSubGraphTest {
 
     @Test
     public void testCompileSubGraphWithInterruptionWithDifferentSaver() throws Exception {
-        final var console = System.console();
 
         var parentSaver = new MemorySaver();
 
@@ -280,7 +279,7 @@ public class CompiledSubGraphTest {
         var graphIterator = parentGraph.stream(input, runnableConfig);
 
         var output = graphIterator.stream()
-                .peek( out -> console.format("output: %s\n", out) )
+                .peek( out -> log.info("output: {}", out) )
                 .reduce((a, b) -> b);
 
         assertTrue( output.isPresent() );
@@ -298,7 +297,7 @@ public class CompiledSubGraphTest {
         graphIterator = parentGraph.stream(input, runnableConfig);
 
         output = graphIterator.stream()
-                .peek( out -> console.format("output: %s\n", out) )
+                .peek( out -> log.info("output: {}}", out) )
                 .reduce((a, b) -> b);
 
         assertTrue( output.isPresent() );
