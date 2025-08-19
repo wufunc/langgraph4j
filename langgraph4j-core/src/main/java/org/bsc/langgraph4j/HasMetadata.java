@@ -1,5 +1,7 @@
 package org.bsc.langgraph4j;
 
+import org.bsc.langgraph4j.utils.TypeRef;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -16,6 +18,21 @@ public interface HasMetadata<B extends HasMetadata.Builder<B>> {
      *
      */
     Optional<Object> metadata( String key );
+
+    /**
+     * Returns a type-safe metadata value for the given key.
+     * <p>
+     * This method retrieves the metadata object and attempts to cast it to the specified type.
+     *
+     * @param <T> the type of the metadata value
+     * @param key the metadata key
+     * @param typeRef a {@link TypeRef} representing the desired type of the value
+     * @return an {@link Optional} containing the metadata value cast to the specified type,
+     *         or an empty {@link Optional} if the key is not found or the value cannot be cast.
+     */
+    default <T> Optional<T> metadata(String key, TypeRef<T> typeRef ) {
+        return metadata(key).flatMap( typeRef::cast );
+    }
 
     /**
      * return metadata value for key
@@ -39,7 +56,9 @@ public interface HasMetadata<B extends HasMetadata.Builder<B>> {
         protected Builder() {}
 
         protected Builder( Map<String,Object> metadata ) {
-            this.metadata = metadata;
+            if( metadata != null && !metadata.isEmpty() ) {
+                this.metadata = new HashMap<>(metadata);
+            }
         }
 
         @SuppressWarnings("unchecked")

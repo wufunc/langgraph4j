@@ -19,6 +19,8 @@ import static java.lang.String.format;
  */
 public class Node<State extends AgentState> {
 
+    public static final String PRIVATE_PREFIX = "__";
+
     public interface ActionFactory<State extends AgentState> {
         AsyncNodeActionWithConfig<State> apply(CompileConfig config ) throws GraphStateException;
     }
@@ -75,8 +77,8 @@ public class Node<State extends AgentState> {
             throw StateGraph.Errors.invalidNodeIdentifier.exception("blank node id");
         }
 
-        if( id.startsWith("__") ) {
-            throw StateGraph.Errors.invalidNodeIdentifier.exception("id that start with __");
+        if( id.startsWith(PRIVATE_PREFIX) ) {
+            throw StateGraph.Errors.invalidNodeIdentifier.exception("id that start with %s", PRIVATE_PREFIX);
         }
     }
 
