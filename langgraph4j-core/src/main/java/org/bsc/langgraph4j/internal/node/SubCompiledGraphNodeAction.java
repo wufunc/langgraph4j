@@ -1,11 +1,13 @@
 package org.bsc.langgraph4j.internal.node;
 
+import org.bsc.langgraph4j.CompileConfig;
 import org.bsc.langgraph4j.CompiledGraph;
+import org.bsc.langgraph4j.GraphInput;
 import org.bsc.langgraph4j.RunnableConfig;
 import org.bsc.langgraph4j.action.AsyncNodeActionWithConfig;
 import org.bsc.langgraph4j.state.AgentState;
+import org.bsc.langgraph4j.utils.TypeRef;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -24,7 +26,18 @@ import static java.lang.String.format;
  * @see AsyncNodeActionWithConfig
  */
 public record SubCompiledGraphNodeAction<State extends AgentState>(
-        CompiledGraph<State> subGraph) implements AsyncNodeActionWithConfig<State> {
+        String nodeId,
+        CompileConfig parentCompileConfig,
+        CompiledGraph<State> subGraph
+) implements AsyncNodeActionWithConfig<State> {
+
+    public String subGraphId() {
+        return  format("subgraph_%s", nodeId);
+    }
+
+    public String resumeSubGraphId() {
+        return  format("resume_%s",subGraphId() );
+    }
 
     /**
      * Executes the given graph with the provided state and configuration.
@@ -36,16 +49,39 @@ public record SubCompiledGraphNodeAction<State extends AgentState>(
      */
     @Override
     public CompletableFuture<Map<String, Object>> apply(State state, RunnableConfig config) {
-        CompletableFuture<Map<String, Object>> future = new CompletableFuture<>();
+
+        final boolean resumeSubgraph = config.metadata( resumeSubGraphId(), new TypeRef<Boolean>() {} )
+                                        .orElse( false );
+
+        RunnableConfig subGraphRunnableConfig = config;
+        var parentSaver = parentCompileConfig.checkpointSaver();
+        var subGraphSaver = subGraph.compileConfig.checkpointSaver();
+
+        if( subGraphSaver.isPresent() ) {
+            if( parentSaver.isEmpty() ) {
+                return CompletableFuture.failedFuture(new IllegalStateException("Missing CheckpointSaver in parent graph!"));
+            }
+
+            // Check saver are the same instance
+            if( parentSaver.get() == subGraphSaver.get() ) {
+                subGraphRunnableConfig = RunnableConfig.builder()
+                        .threadId( config.threadId()
+                                            .map( threadId -> format("%s_%s", threadId, subGraphId()))
+                                            .orElseGet(this::subGraphId))
+                                            .build();
+            }
+        }
+
+
+        final CompletableFuture<Map<String, Object>> future = new CompletableFuture<>();
 
         try {
-            final Map<String, Object> input = (subGraph.compileConfig.checkpointSaver().isPresent()) ?
-                    Map.of() :
-                    state.data();
 
-            var generator = subGraph.stream(input, config);
+            var input = ( resumeSubgraph ) ? GraphInput.resume() : GraphInput.args(state.data());
 
-            future.complete(Map.of(format("_subgraph-%s", UUID.randomUUID()), generator));
+            var generator = subGraph.stream(input, subGraphRunnableConfig);
+
+            future.complete( Map.of(format("%s_%s",subGraphId(), UUID.randomUUID()), generator));
 
         } catch (Exception e) {
 
