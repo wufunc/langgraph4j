@@ -177,7 +177,6 @@ public class CompiledSubGraphTest {
 
     @Test
     public void testCompileSubGraphWithInterruptionSharingSaver() throws Exception {
-        final var console = System.console();
 
         var saver = new MemorySaver();
 
@@ -209,7 +208,7 @@ public class CompiledSubGraphTest {
         var graphIterator = parentGraph.stream(input, runnableConfig);
 
         var output = graphIterator.stream()
-                .peek( out -> console.format("output: %s\n", out) )
+                .peek( out -> log.info("output: {}", out) )
                 .reduce((a, b) -> b);
 
         assertTrue( output.isPresent() );
@@ -227,7 +226,7 @@ public class CompiledSubGraphTest {
         graphIterator = parentGraph.stream(input, runnableConfig);
 
         output = graphIterator.stream()
-                .peek( out -> console.format("output: %s\n", out) )
+                .peek( out -> log.info("output: {}", out) )
                 .reduce((a, b) -> b);
 
         assertTrue( output.isPresent() );
