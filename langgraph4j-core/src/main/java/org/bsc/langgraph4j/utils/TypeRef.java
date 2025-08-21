@@ -49,6 +49,11 @@ public abstract class TypeRef<T> implements Comparable<TypeRef<T>> {
                 ;
     }
 
+    @SuppressWarnings("unchecked")
+    public Optional<Class<T>> erasureOf() {
+        return erasureOf(this._type).map( c -> (Class<T>)c );
+    }
+
     public static Optional<Class<?>> erasureOf(Type t) {
         if (t instanceof Class<?> c) {
             return Optional.of(c);
