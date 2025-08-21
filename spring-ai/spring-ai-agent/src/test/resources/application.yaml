@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: ollama
+    active: github-models
   application:
     name: springai-agentexecutor
   main:
