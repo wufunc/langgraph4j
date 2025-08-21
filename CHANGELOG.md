@@ -2,6 +2,79 @@
 
 
 
+<!-- "name: v1.6.1" is a release tag -->
+
+## [v1.6.1](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.1) (2025-08-21)
+
+### Features
+
+ *  **core**  allows interruptions in compiled subgraph ([134b56b1022036e](https://github.com/bsorrentino/langgraph4j/commit/134b56b1022036eeafe0f150c249fcd355289572))
+     > resolve #193
+   
+ *  **HasMetadata**  Add type-safe metadata retrieval method with TypeRef ([79bea93b7780d91](https://github.com/bsorrentino/langgraph4j/commit/79bea93b7780d9198b35eabbf715849e563202f4))
+     > This commit introduces a new method &#x60;metadata(String key, TypeRef&lt;T&gt; typeRef)&#x60; to safely retrieve metadata values, enhancing the type-safety of metadata operations.
+   
+ *  **TypeRef**  Add TypeRef class to handle generic types ([dff653ab5c42b28](https://github.com/bsorrentino/langgraph4j/commit/dff653ab5c42b2896cf3452120710aa12bad42c2))
+     > This new class inspired by Jackson&#x27;s TypeReference allows passing full generics type information and avoids problems with type erasure. It provides methods for casting objects to the specified type and handling different type arguments.
+   
+ *  **spring-ai-agent**  enable github-models ([f64f57ea09201fa](https://github.com/bsorrentino/langgraph4j/commit/f64f57ea09201fabae3e363c0b342daf6000c1ab))
+   
+
+### Bug Fixes
+
+ -  **Node**  Update private prefix handling in Node.java ([59834c5cd3e2835](https://github.com/bsorrentino/langgraph4j/commit/59834c5cd3e2835b0f1ef383151134e37f5b6ef8))
+     > This commit updates the private prefix handling in the &#x60;Node&#x60; class. It introduces a constant &#x60;PRIVATE_PREFIX&#x60; and uses it to validate node identifiers. This change ensures consistency and clarity in identifying private nodes.
+
+
+### Documentation
+
+ -  update readme ([d442faccbdba63b](https://github.com/bsorrentino/langgraph4j/commit/d442faccbdba63b6b7d3543e6026eed0084db525))
+
+ -  bumpo to version 1.6.1 ([d6972a51842eab0](https://github.com/bsorrentino/langgraph4j/commit/d6972a51842eab0ad33a84523daec220d2aeeb77))
+
+ -  update subgraph site documentation ([f3dec1c75c983a1](https://github.com/bsorrentino/langgraph4j/commit/f3dec1c75c983a1b6f6126fe2943f9803b0c2500))
+     > work on #193
+
+ -  **RunnableConfig**  update javadoc ([afc654ea232e24d](https://github.com/bsorrentino/langgraph4j/commit/afc654ea232e24d80d9461ee0abb9e9d8c48c7e4))
+
+ -  **CompiledGraph**  Update @since tag in invokeFinal method ([a0ee6548e88b010](https://github.com/bsorrentino/langgraph4j/commit/a0ee6548e88b010246d90ea7bf87c0558063d7eb))
+
+ -  update changelog ([c206b63dde6dd72](https://github.com/bsorrentino/langgraph4j/commit/c206b63dde6dd72eefa0db888152d3dd0abc0ce9))
+
+
+### Refactor
+
+ -  **CompiledSubGraphTest**  Add logging instead of console output ([0c3a25583817621](https://github.com/bsorrentino/langgraph4j/commit/0c3a255838176216337945c1fb7227383acded00))
+   
+ -  **CompiledSubGraphTest**  Add logging instead of console output ([c44dc2603ba8974](https://github.com/bsorrentino/langgraph4j/commit/c44dc2603ba8974184db02258b2803e69331298a))
+   
+ -  **CompiledGraph**  Refactored method signatures and updated return types for 'invoke' methods ([8c62070746fa5de](https://github.com/bsorrentino/langgraph4j/commit/8c62070746fa5de1427a861016008446a74baaa3))
+    > Add a new method &#x60;invokeFinal&#x60; was added to return an Optional&lt;NodeOutput&gt; containing the final NodeOutput of the graph execution.
+
+ -  **CompiledGraph**  Make private static string final and use public enum for error handling ([4699b9555e7676f](https://github.com/bsorrentino/langgraph4j/commit/4699b9555e7676f0da8a9f99d30543e2a8b065f3))
+    > Refactored &#x27;INTERRUPT_AFTER&#x27; to be a public static final string. Changed the &#x27;RunnableErrors&#x27; enum to a public enum to improve visibility and access across different parts of the codebase.
+
+
+### ALM 
+
+ -  bumpo to version 1.6.1 ([50019b5ff0e870d](https://github.com/bsorrentino/langgraph4j/commit/50019b5ff0e870d3f9b7300aa51632f35bfdc21f))
+   
+ -  **spring**  update dependency version to 1.0.1 ([b59ae21c98f4d62](https://github.com/bsorrentino/langgraph4j/commit/b59ae21c98f4d62445d5512b52ba154e3f992951))
+    > resolve #212
+
+ -  bump to  1.6-SNAPSHOT ([c30f3b0eeb7b47f](https://github.com/bsorrentino/langgraph4j/commit/c30f3b0eeb7b47fd7598ccd710de0e4e75642e01))
+   
+
+### Test 
+
+ -  setup test case scenarios for validate interruptions in compiled subgraph ([d1abb9bc9623829](https://github.com/bsorrentino/langgraph4j/commit/d1abb9bc962382967c5d4ff4e50204d3b151248c))
+    > work on #193
+
+
+
+
+
+
 <!-- "name: v1.6.0" is a release tag -->
 
 ## [v1.6.0](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.0) (2025-08-12)
