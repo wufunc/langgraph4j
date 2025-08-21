@@ -7,7 +7,7 @@
 <dependency>
     <groupId>org.bsc.langgraph4j</groupId>
     <artifactId>langgraph4j-studio-jetty</artifactId>
-    <version>1.6.0 </version>
+    <version>1.6.1</version>
 </dependency>
 ```
 
