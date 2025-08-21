@@ -26,6 +26,13 @@ public class GSonSerializerTest {
         }
     }
 
+    static class MyStateSerializer extends GsonStateSerializer<State> {
+        public MyStateSerializer() {
+            super(State::new);
+        }
+
+    }
+
     static class NodeOutputTest extends NodeOutput<AgentState> {
         protected NodeOutputTest(String node, AgentState state, boolean subGraph) {
             super(node, state);
@@ -38,11 +45,12 @@ public class GSonSerializerTest {
 
         State state = new State( Map.of( "prop1", "value1") );
 
-        GsonStateSerializer<State> serializer = new GsonStateSerializer<State>(State::new) {};
+        GsonStateSerializer<State> serializer = new MyStateSerializer();
 
-        Class<?> type = serializer.getStateType();
+        var type = serializer.getStateType();
 
-        assertEquals(State.class, type);
+        assertTrue( type.isPresent() );
+        assertEquals(State.class, type.get());
 
         byte[] bytes = serializer.objectToBytes(state);
 

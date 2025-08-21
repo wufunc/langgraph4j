@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.Objects;
 
@@ -38,16 +37,23 @@ public class JacksonSerializerTest {
         }
     }
 
+    static class MyStateSerializer extends JacksonStateSerializer<State> {
+        public MyStateSerializer() {
+            super(State::new);
+        }
+
+    }
     @Test
     public void serializeWithTypeInferenceTest() throws IOException, ClassNotFoundException {
 
         State state = new State( Map.of( "prop1", "value1") );
 
-        JacksonStateSerializer<State> serializer = new JacksonStateSerializer<State>(State::new) {};
+        var serializer = new MyStateSerializer();
 
-        Class<?> type = serializer.getStateType();
+        var type = serializer.getStateType();
 
-        assertEquals(State.class, type);
+        assertTrue(type.isPresent());
+        assertEquals(State.class, type.get());
 
         byte[] bytes = serializer.objectToBytes(state);
 
