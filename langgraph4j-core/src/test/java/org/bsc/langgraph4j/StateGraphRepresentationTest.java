@@ -1,6 +1,5 @@
 package org.bsc.langgraph4j;
 
-
 import org.bsc.langgraph4j.action.AsyncNodeAction;
 import org.bsc.langgraph4j.prebuilt.MessagesState;
 import org.bsc.langgraph4j.prebuilt.MessagesStateGraph;
@@ -14,7 +13,6 @@ import java.util.concurrent.CompletableFuture;
 import static org.bsc.langgraph4j.StateGraph.END;
 import static org.bsc.langgraph4j.StateGraph.START;
 import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
-import static org.bsc.langgraph4j.utils.CollectionsUtils.mapOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StateGraphRepresentationTest {
@@ -426,5 +424,96 @@ flowchart TD
 	classDef ___END__ fill:black,stroke-width:1px,font-size:xx-small;
                 """, result.content());
     }
+
+    @Test
+    public void issue216() throws Exception {
+        var mockedAction = AsyncNodeAction.node_async((ignored) -> Map.of());
+
+        var subSubGraph = new StateGraph<>(AgentState::new)
+                .addNode("foo1", mockedAction)
+                .addNode("foo2", mockedAction)
+                .addNode("foo3", mockedAction)
+                .addEdge(StateGraph.START, "foo1")
+                .addEdge("foo1", "foo2")
+                .addEdge("foo2", "foo3")
+                .addEdge("foo3", StateGraph.END)
+                ;
+
+        var subGraph = new StateGraph<>(AgentState::new)
+                .addNode("bar1", mockedAction)
+                .addNode("subGraph2", subSubGraph.compile())
+                .addNode("bar2", mockedAction)
+                .addEdge(StateGraph.START, "bar1")
+                .addEdge("bar1", "subGraph2")
+                .addEdge("subGraph2", "bar2")
+                .addEdge("bar2", StateGraph.END)
+                ;
+
+        var stateGraph = new StateGraph<>(AgentState::new)
+                .addNode("main1", mockedAction)
+                .addNode("subgraph1", subGraph.compile())
+                .addNode("main2", mockedAction)
+                .addEdge(StateGraph.START, "main1")
+                .addEdge("main1", "subgraph1")
+                .addEdge("subgraph1", "main2")
+                .addEdge("main2", StateGraph.END)
+                ;
+
+        var mermaid = stateGraph.getGraph(GraphRepresentation.Type.MERMAID, "Example graph", false);
+
+        System.out.println( mermaid.content() );
+
+        var plantuml = stateGraph.getGraph(GraphRepresentation.Type.PLANTUML, "Example graph", false);
+        assertEquals("""
+@startuml Example_graph
+skinparam usecaseFontSize 14
+skinparam usecaseStereotypeFontSize 12
+skinparam hexagonFontSize 14
+skinparam hexagonStereotypeFontSize 12
+title "Example graph"
+footer
+
+powered by langgraph4j
+end footer
+circle start<<input>> as __START__
+circle stop as __END__
+usecase "main1"<<Node>>
+package subgraph1 [
+{{
+circle " " as __START__
+circle exit as __END__
+usecase "bar1"<<Node>>
+package subGraph2 [
+{{
+circle " " as __START__
+circle exit as __END__
+usecase "foo1"<<Node>>
+usecase "foo2"<<Node>>
+usecase "foo3"<<Node>>
+"__START__" -down-> "foo1"
+"foo1" -down-> "foo2"
+"foo2" -down-> "foo3"
+"foo3" -down-> "__END__"
+}}
+]
+usecase "bar2"<<Node>>
+"__START__" -down-> "bar1"
+"bar1" -down-> "subGraph2"
+"subGraph2" -down-> "bar2"
+"bar2" -down-> "__END__"
+}}
+]
+usecase "main2"<<Node>>
+"__START__" -down-> "main1"
+"main1" -down-> "subgraph1"
+"subgraph1" -down-> "main2"
+"main2" -down-> "__END__"
+@enduml
+	""",
+                plantuml.content()
+        );
+
+    }
+
 
 }
