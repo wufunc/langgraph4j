@@ -9,7 +9,6 @@ import org.bsc.langgraph4j.state.AgentState;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Objects;
@@ -75,30 +74,23 @@ public class JacksonSerializerTest {
         }
     }
 
-    static class NodeOutputTest extends NodeOutput<AgentState> {
-        protected NodeOutputTest(String node, AgentState state, boolean subGraph) {
-            super(node, state);
-            setSubGraph(subGraph);
-        }
-    }
-
     @Test
     public void NodOutputJacksonSerializationTest() throws Exception {
 
         var serializer = new MyJacksonStateSerializer();
 
-        NodeOutput<AgentState> output = new NodeOutputTest("node", null, true);
+        NodeOutput<AgentState> output = new NodeOutput<>("node", null);
         var mapper = serializer.objectMapper()
                             .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         var json = mapper.writeValueAsString(output);
         assertEquals("""
-                {"end":false,"node":"node","start":false,"state":null,"subGraph":true}""", json );
+                {"end":false,"node":"node","start":false,"state":null}""", json );
 
-        output = new NodeOutputTest("node", null, false);
+        output = new NodeOutput<>("node", null);
         json = serializer.objectMapper().writeValueAsString(output);
 
         assertEquals( """
-                {"end":false,"node":"node","start":false,"state":null,"subGraph":false}""", json );
+                {"end":false,"node":"node","start":false,"state":null}""", json );
     }
 
     @Test
