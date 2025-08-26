@@ -254,8 +254,8 @@ public class StateGraphRepresentationTest {
                 \tagent_generic_plantuml:::agent_generic_plantuml --> evaluate_result:::evaluate_result
                 \tevaluate_result:::evaluate_result --> __END__:::__END__
                 
-                \tclassDef ___START__ fill:black,stroke-width:1px,font-size:xx-small;
-                \tclassDef ___END__ fill:black,stroke-width:1px,font-size:xx-small;
+                \tclassDef __START__ fill:black,stroke-width:1px,font-size:xx-small;
+                \tclassDef __END__ fill:black,stroke-width:1px,font-size:xx-small;
                 """,
                 result.content() );
     }
@@ -343,8 +343,8 @@ public class StateGraphRepresentationTest {
                 	B:::B --> C:::C
                 	C:::C --> __END__:::__END__
                 
-                	classDef ___START__ fill:black,stroke-width:1px,font-size:xx-small;
-                	classDef ___END__ fill:black,stroke-width:1px,font-size:xx-small;
+                	classDef __START__ fill:black,stroke-width:1px,font-size:xx-small;
+                	classDef __END__ fill:black,stroke-width:1px,font-size:xx-small;
                 """, result.content());
     }
 
@@ -420,8 +420,8 @@ flowchart TD
 	B:::B --> C:::C
 	C:::C --> __END__:::__END__
 
-	classDef ___START__ fill:black,stroke-width:1px,font-size:xx-small;
-	classDef ___END__ fill:black,stroke-width:1px,font-size:xx-small;
+	classDef __START__ fill:black,stroke-width:1px,font-size:xx-small;
+	classDef __END__ fill:black,stroke-width:1px,font-size:xx-small;
                 """, result.content());
     }
 
