@@ -437,21 +437,23 @@ flowchart TD
                 .addEdge("foo1", "foo2")
                 .addEdge("foo2", "foo3")
                 .addEdge("foo3", StateGraph.END)
+                .compile()
                 ;
 
         var subGraph = new StateGraph<>(AgentState::new)
                 .addNode("bar1", mockedAction)
-                .addNode("subGraph2", subSubGraph.compile())
+                .addNode("subGraph2", subSubGraph)
                 .addNode("bar2", mockedAction)
                 .addEdge(StateGraph.START, "bar1")
                 .addEdge("bar1", "subGraph2")
                 .addEdge("subGraph2", "bar2")
                 .addEdge("bar2", StateGraph.END)
+                .compile()
                 ;
 
         var stateGraph = new StateGraph<>(AgentState::new)
                 .addNode("main1", mockedAction)
-                .addNode("subgraph1", subGraph.compile())
+                .addNode("subgraph1", subGraph)
                 .addNode("main2", mockedAction)
                 .addEdge(StateGraph.START, "main1")
                 .addEdge("main1", "subgraph1")
@@ -461,7 +463,44 @@ flowchart TD
 
         var mermaid = stateGraph.getGraph(GraphRepresentation.Type.MERMAID, "Example graph", false);
 
-        System.out.println( mermaid.content() );
+        assertEquals("""
+---
+title: Example graph
+---
+flowchart TD
+	__START__((start))
+	__END__((stop))
+	main1("main1")
+subgraph subgraph1
+	__START__subgraph1((start)):::__START__subgraph1
+	__END__subgraph1((stop)):::__END__subgraph1
+	bar1_subgraph1("bar1")
+subgraph subGraph2
+	__START__subGraph2((start)):::__START__subGraph2
+	__END__subGraph2((stop)):::__END__subGraph2
+	foo1_subGraph2("foo1")
+	foo2_subGraph2("foo2")
+	foo3_subGraph2("foo3")
+	__START__subGraph2:::__START__subGraph2 --> foo1_subGraph2:::foo1_subGraph2
+	foo1_subGraph2:::foo1_subGraph2 --> foo2_subGraph2:::foo2_subGraph2
+	foo2_subGraph2:::foo2_subGraph2 --> foo3_subGraph2:::foo3_subGraph2
+	foo3_subGraph2:::foo3_subGraph2 --> __END__subGraph2:::__END__subGraph2
+end
+	bar2_subgraph1("bar2")
+	__START__subgraph1:::__START__subgraph1 --> bar1_subgraph1:::bar1_subgraph1
+	bar1_subgraph1:::bar1_subgraph1 --> subGraph2:::subGraph2
+	subGraph2:::subGraph2 --> bar2_subgraph1:::bar2_subgraph1
+	bar2_subgraph1:::bar2_subgraph1 --> __END__subgraph1:::__END__subgraph1
+end
+	main2("main2")
+	__START__:::__START__ --> main1:::main1
+	main1:::main1 --> subgraph1:::subgraph1
+	subgraph1:::subgraph1 --> main2:::main2
+	main2:::main2 --> __END__:::__END__
+
+	classDef __START__ fill:black,stroke-width:1px,font-size:xx-small;
+	classDef __END__ fill:black,stroke-width:1px,font-size:xx-small;
+                """, mermaid.content());
 
         var plantuml = stateGraph.getGraph(GraphRepresentation.Type.PLANTUML, "Example graph", false);
         assertEquals("""
