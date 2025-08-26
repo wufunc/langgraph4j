@@ -75,7 +75,11 @@ public record SubCompiledGraphNodeAction<State extends AgentState>(
 
         try {
 
-            var input = ( resumeSubgraph ) ? GraphInput.resume() : GraphInput.args(state.data());
+            var input =  GraphInput.args(state.data());
+            if( resumeSubgraph ) {
+                subGraphRunnableConfig = subGraph.updateState(subGraphRunnableConfig, state.data());
+                input = GraphInput.resume();
+            }
 
             var generator = subGraph.stream(input, subGraphRunnableConfig)
                     .map( n -> SubGraphOutput.of( n, nodeId) );
