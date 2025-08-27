@@ -9,6 +9,7 @@ import org.bsc.langgraph4j.exception.SubGraphInterruptionException;
 import org.bsc.langgraph4j.prebuilt.MessagesState;
 import org.bsc.langgraph4j.serializer.std.ObjectStreamStateSerializer;
 import org.bsc.langgraph4j.state.AgentState;
+import org.bsc.langgraph4j.subgraph.SubGraphOutput;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -215,7 +216,7 @@ public class CompiledSubGraphTest {
         assertTrue( output.isPresent() );
 
         assertFalse( output.get().isEND() );
-        assertTrue( output.get().isSubGraph() );
+        assertInstanceOf(SubGraphOutput.class,  output.get() );
 
         var iteratorResult = AsyncGenerator.resultValue(graphIterator);
 
@@ -287,7 +288,7 @@ public class CompiledSubGraphTest {
         assertTrue( output.isPresent() );
 
         assertFalse( output.get().isEND() );
-        assertTrue( output.get().isSubGraph() );
+        assertInstanceOf( SubGraphOutput.class, output.get() );
 
         var iteratorResult = AsyncGenerator.resultValue(graphIterator);
 
@@ -318,4 +319,48 @@ public class CompiledSubGraphTest {
                 "[NODE5]"), output.get().state().messages() );
     }
 
+    @Test
+    public void testNestedCompiledSubgraphFormIssue216() throws Exception {
+
+        var subSubGraph = new StateGraph<>(MyState::new)
+                .addNode("foo1", _makeNode("foo1"))
+                .addNode("foo2", _makeNode("foo2"))
+                .addNode("foo3", _makeNode("foo3"))
+                .addEdge(StateGraph.START, "foo1")
+                .addEdge("foo1", "foo2")
+                .addEdge("foo2", "foo3")
+                .addEdge("foo3", StateGraph.END)
+                .compile();
+
+        var subGraph = new StateGraph<>(MyState::new)
+                .addNode("bar1", _makeNode("bar1"))
+                .addNode("subgraph2", subSubGraph)
+                .addNode("bar2", _makeNode("bar2"))
+                .addEdge(StateGraph.START, "bar1")
+                .addEdge("bar1", "subgraph2")
+                .addEdge("subgraph2", "bar2")
+                .addEdge("bar2", StateGraph.END)
+                .compile();
+
+        var stateGraph = new StateGraph<>(MyState::new)
+                .addNode("main1", _makeNode("main1"))
+                .addNode("subgraph1", subGraph)
+                .addNode("main2", _makeNode("main2"))
+                .addEdge(StateGraph.START, "main1")
+                .addEdge("main1", "subgraph1")
+                .addEdge("subgraph1", "main2")
+                .addEdge("main2", StateGraph.END)
+                .compile();
+
+        var runnableConfig = RunnableConfig.builder().build();
+
+        var input = GraphInput.args(Map.of());
+
+        var graphIterator = stateGraph.stream(input, runnableConfig);
+
+        var output = graphIterator.stream()
+                .peek( out -> log.info("output: {}", out) )
+                .reduce((a, b) -> b);
+
+    }
 }

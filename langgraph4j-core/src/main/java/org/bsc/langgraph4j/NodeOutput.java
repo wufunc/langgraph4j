@@ -30,22 +30,6 @@ public class NodeOutput<State extends AgentState> {
     private final State state;
 
     /**
-     * If the output is from a subgraph.
-     */
-    private boolean subGraph = false;
-
-    protected void setSubGraph( boolean subgraph ) {
-        this.subGraph = subgraph;
-    }
-
-    /**
-     * @return boolean if the output is from a subgraph
-     */
-    public boolean isSubGraph() {
-        return subGraph;
-    }
-
-    /**
      * Returns the node name.
      *
      * @return the node name
@@ -76,14 +60,16 @@ public class NodeOutput<State extends AgentState> {
         return Objects.equals(node(),END);
     }
 
-    protected NodeOutput( String node, State state ) {
+    public NodeOutput( String node, State state ) {
         this.node = node;
         this.state = state;
     }
 
     @Override
     public String toString() {
-        return format("NodeOutput{node=%s, state=%s}", node(), state());
+        return format("NodeOutput{node=%s, state=%s}",
+                node(),
+                state());
     }
 
 }

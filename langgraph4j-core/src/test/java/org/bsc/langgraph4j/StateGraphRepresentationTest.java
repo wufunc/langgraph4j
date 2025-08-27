@@ -1,6 +1,5 @@
 package org.bsc.langgraph4j;
 
-
 import org.bsc.langgraph4j.action.AsyncNodeAction;
 import org.bsc.langgraph4j.prebuilt.MessagesState;
 import org.bsc.langgraph4j.prebuilt.MessagesStateGraph;
@@ -14,7 +13,6 @@ import java.util.concurrent.CompletableFuture;
 import static org.bsc.langgraph4j.StateGraph.END;
 import static org.bsc.langgraph4j.StateGraph.START;
 import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
-import static org.bsc.langgraph4j.utils.CollectionsUtils.mapOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StateGraphRepresentationTest {
@@ -256,8 +254,8 @@ public class StateGraphRepresentationTest {
                 \tagent_generic_plantuml:::agent_generic_plantuml --> evaluate_result:::evaluate_result
                 \tevaluate_result:::evaluate_result --> __END__:::__END__
                 
-                \tclassDef ___START__ fill:black,stroke-width:1px,font-size:xx-small;
-                \tclassDef ___END__ fill:black,stroke-width:1px,font-size:xx-small;
+                \tclassDef __START__ fill:black,stroke-width:1px,font-size:xx-small;
+                \tclassDef __END__ fill:black,stroke-width:1px,font-size:xx-small;
                 """,
                 result.content() );
     }
@@ -345,8 +343,8 @@ public class StateGraphRepresentationTest {
                 	B:::B --> C:::C
                 	C:::C --> __END__:::__END__
                 
-                	classDef ___START__ fill:black,stroke-width:1px,font-size:xx-small;
-                	classDef ___END__ fill:black,stroke-width:1px,font-size:xx-small;
+                	classDef __START__ fill:black,stroke-width:1px,font-size:xx-small;
+                	classDef __END__ fill:black,stroke-width:1px,font-size:xx-small;
                 """, result.content());
     }
 
@@ -422,9 +420,139 @@ flowchart TD
 	B:::B --> C:::C
 	C:::C --> __END__:::__END__
 
-	classDef ___START__ fill:black,stroke-width:1px,font-size:xx-small;
-	classDef ___END__ fill:black,stroke-width:1px,font-size:xx-small;
+	classDef __START__ fill:black,stroke-width:1px,font-size:xx-small;
+	classDef __END__ fill:black,stroke-width:1px,font-size:xx-small;
                 """, result.content());
     }
+
+    @Test
+    public void issue216() throws Exception {
+        var mockedAction = AsyncNodeAction.node_async((ignored) -> Map.of());
+
+        var subSubGraph = new StateGraph<>(AgentState::new)
+                .addNode("foo1", mockedAction)
+                .addNode("foo2", mockedAction)
+                .addNode("foo3", mockedAction)
+                .addEdge(StateGraph.START, "foo1")
+                .addEdge("foo1", "foo2")
+                .addEdge("foo2", "foo3")
+                .addEdge("foo3", StateGraph.END)
+                .compile()
+                ;
+
+        var subGraph = new StateGraph<>(AgentState::new)
+                .addNode("bar1", mockedAction)
+                .addNode("subGraph2", subSubGraph)
+                .addNode("bar2", mockedAction)
+                .addEdge(StateGraph.START, "bar1")
+                .addEdge("bar1", "subGraph2")
+                .addEdge("subGraph2", "bar2")
+                .addEdge("bar2", StateGraph.END)
+                .compile()
+                ;
+
+        var stateGraph = new StateGraph<>(AgentState::new)
+                .addNode("main1", mockedAction)
+                .addNode("subgraph1", subGraph)
+                .addNode("main2", mockedAction)
+                .addEdge(StateGraph.START, "main1")
+                .addEdge("main1", "subgraph1")
+                .addEdge("subgraph1", "main2")
+                .addEdge("main2", StateGraph.END)
+                ;
+
+        var mermaid = stateGraph.getGraph(GraphRepresentation.Type.MERMAID, "Example graph", false);
+
+        assertEquals("""
+---
+title: Example graph
+---
+flowchart TD
+	__START__((start))
+	__END__((stop))
+	main1("main1")
+subgraph subgraph1
+	__START__subgraph1((start)):::__START__subgraph1
+	__END__subgraph1((stop)):::__END__subgraph1
+	bar1_subgraph1("bar1")
+subgraph subGraph2
+	__START__subGraph2((start)):::__START__subGraph2
+	__END__subGraph2((stop)):::__END__subGraph2
+	foo1_subGraph2("foo1")
+	foo2_subGraph2("foo2")
+	foo3_subGraph2("foo3")
+	__START__subGraph2:::__START__subGraph2 --> foo1_subGraph2:::foo1_subGraph2
+	foo1_subGraph2:::foo1_subGraph2 --> foo2_subGraph2:::foo2_subGraph2
+	foo2_subGraph2:::foo2_subGraph2 --> foo3_subGraph2:::foo3_subGraph2
+	foo3_subGraph2:::foo3_subGraph2 --> __END__subGraph2:::__END__subGraph2
+end
+	bar2_subgraph1("bar2")
+	__START__subgraph1:::__START__subgraph1 --> bar1_subgraph1:::bar1_subgraph1
+	bar1_subgraph1:::bar1_subgraph1 --> subGraph2:::subGraph2
+	subGraph2:::subGraph2 --> bar2_subgraph1:::bar2_subgraph1
+	bar2_subgraph1:::bar2_subgraph1 --> __END__subgraph1:::__END__subgraph1
+end
+	main2("main2")
+	__START__:::__START__ --> main1:::main1
+	main1:::main1 --> subgraph1:::subgraph1
+	subgraph1:::subgraph1 --> main2:::main2
+	main2:::main2 --> __END__:::__END__
+
+	classDef __START__ fill:black,stroke-width:1px,font-size:xx-small;
+	classDef __END__ fill:black,stroke-width:1px,font-size:xx-small;
+                """, mermaid.content());
+
+        var plantuml = stateGraph.getGraph(GraphRepresentation.Type.PLANTUML, "Example graph", false);
+        assertEquals("""
+@startuml Example_graph
+skinparam usecaseFontSize 14
+skinparam usecaseStereotypeFontSize 12
+skinparam hexagonFontSize 14
+skinparam hexagonStereotypeFontSize 12
+title "Example graph"
+footer
+
+powered by langgraph4j
+end footer
+circle start<<input>> as __START__
+circle stop as __END__
+usecase "main1"<<Node>>
+package subgraph1 [
+{{
+circle " " as __START__
+circle exit as __END__
+usecase "bar1"<<Node>>
+package subGraph2 [
+{{
+circle " " as __START__
+circle exit as __END__
+usecase "foo1"<<Node>>
+usecase "foo2"<<Node>>
+usecase "foo3"<<Node>>
+"__START__" -down-> "foo1"
+"foo1" -down-> "foo2"
+"foo2" -down-> "foo3"
+"foo3" -down-> "__END__"
+}}
+]
+usecase "bar2"<<Node>>
+"__START__" -down-> "bar1"
+"bar1" -down-> "subGraph2"
+"subGraph2" -down-> "bar2"
+"bar2" -down-> "__END__"
+}}
+]
+usecase "main2"<<Node>>
+"__START__" -down-> "main1"
+"main1" -down-> "subgraph1"
+"subgraph1" -down-> "main2"
+"main2" -down-> "__END__"
+@enduml
+	""",
+                plantuml.content()
+        );
+
+    }
+
 
 }

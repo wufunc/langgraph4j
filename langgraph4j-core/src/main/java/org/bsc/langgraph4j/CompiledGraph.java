@@ -670,13 +670,17 @@ public class CompiledGraph<State extends AgentState> {
         }
 
         @SuppressWarnings("unchecked")
-        private Optional<Data<Output>> getEmbedGenerator( Map<String,Object> partialState ) {
+        private Optional<Data<Output>> getEmbedGenerator( AsyncNodeActionWithConfig<State> action,
+                                                          Map<String,Object> partialState )
+        {
             return partialState.entrySet().stream()
-                    .filter( e -> e.getValue() instanceof AsyncGenerator)
-                    .findFirst()
-                    .map( generatorEntry -> {
-                        final var generator = (AsyncGenerator<Output>) generatorEntry.getValue();
-                        return Data.composeWith( generator.map( n -> { n.setSubGraph(true); return n; } ), data -> {
+                .filter( e -> e.getValue() instanceof AsyncGenerator)
+                .findFirst()
+                .map( generatorEntry -> {
+
+                    final var generator = (AsyncGenerator<Output>) generatorEntry.getValue();
+
+                    return Data.composeWith( generator, data -> {
 
                             if (data != null) {
 
@@ -712,12 +716,13 @@ public class CompiledGraph<State extends AgentState> {
                     ;
         }
 
-        private CompletableFuture<Data<Output>> evaluateAction(AsyncNodeActionWithConfig<State> action ) {
+        private CompletableFuture<Data<Output>> evaluateAction( AsyncNodeActionWithConfig<State> action ) {
                 try {
                     return action.apply( cloneState(currentState), config)
                             .thenApply(TryFunction.Try(updateState -> {
 
-                                Optional<Data<Output>> embed = getEmbedGenerator(updateState);
+
+                                Optional<Data<Output>> embed = getEmbedGenerator( action, updateState);
                                 if (embed.isPresent()) {
                                     return embed.get();
                                 }

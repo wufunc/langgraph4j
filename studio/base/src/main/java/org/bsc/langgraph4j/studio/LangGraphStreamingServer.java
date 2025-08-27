@@ -20,6 +20,7 @@ import org.bsc.langgraph4j.serializer.plain_text.PlainTextStateSerializer;
 import org.bsc.langgraph4j.serializer.plain_text.jackson.JacksonStateSerializer;
 import org.bsc.langgraph4j.state.AgentState;
 import org.bsc.langgraph4j.state.StateSnapshot;
+import org.bsc.langgraph4j.subgraph.SubGraphOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.entryOf;
 
@@ -471,8 +473,9 @@ class NodeOutputSerializer extends StdSerializer<NodeOutput>  {
                 gen.writeStringField("checkpoint", checkpoint.get());
             }
         }
-        if(nodeOutput.isSubGraph()) {
-            gen.writeStringField("node", MermaidGenerator.SUBGRAPH_PREFIX + nodeOutput.node());
+
+        if( nodeOutput instanceof SubGraphOutput<?> subgraph) {
+            gen.writeStringField("node", format( "%s_%s", subgraph.node(), subgraph.subGraphId() ));
         }
         else {
             gen.writeStringField("node", nodeOutput.node());
