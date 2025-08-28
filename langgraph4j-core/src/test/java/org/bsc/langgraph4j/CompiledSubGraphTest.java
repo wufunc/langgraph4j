@@ -1,9 +1,7 @@
 package org.bsc.langgraph4j;
 
 import org.bsc.async.AsyncGenerator;
-import org.bsc.langgraph4j.action.AsyncCommandAction;
 import org.bsc.langgraph4j.action.AsyncNodeAction;
-import org.bsc.langgraph4j.action.Command;
 import org.bsc.langgraph4j.action.InterruptionMetadata;
 import org.bsc.langgraph4j.checkpoint.BaseCheckpointSaver;
 import org.bsc.langgraph4j.checkpoint.MemorySaver;
@@ -11,16 +9,15 @@ import org.bsc.langgraph4j.exception.SubGraphInterruptionException;
 import org.bsc.langgraph4j.prebuilt.MessagesState;
 import org.bsc.langgraph4j.serializer.std.ObjectStreamStateSerializer;
 import org.bsc.langgraph4j.state.AgentState;
+import org.bsc.langgraph4j.subgraph.SubGraphOutput;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
 import static org.bsc.langgraph4j.StateGraph.END;
 import static org.bsc.langgraph4j.StateGraph.START;
-import static org.bsc.langgraph4j.action.AsyncCommandAction.command_async;
 import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.mergeMap;
 import static org.junit.jupiter.api.Assertions.*;
@@ -46,14 +43,15 @@ public class CompiledSubGraphTest {
         );
     }
 
-    private AsyncCommandAction<MyState> _makeCommandNode(Command command) {
-        return command_async((state, config) ->
-                requireNonNull(command)
-        );
-    }
+    private AsyncNodeAction<MyState> _makeNodeAndCheckState(String withMessage, String attributeKey) {
+        return node_async(state -> {
+                    var attributeValue = state.value(attributeKey).orElse("");
 
-    private AsyncCommandAction<MyState> _makeCommandNode(String goToNode) {
-        return _makeCommandNode(new Command(goToNode));
+                    return Map.of("messages", format("[%s]", withMessage + attributeValue ));
+
+                }
+
+        );
     }
 
     private AsyncNodeAction<MyState> _makeSubgraphNode(String parentNodeId, CompiledGraph<MyState> subGraph) {
@@ -93,7 +91,7 @@ public class CompiledSubGraphTest {
                 .addNode("NODE3.1", _makeNode("NODE3.1"))
                 .addNode("NODE3.2", _makeNode("NODE3.2"))
                 .addNode("NODE3.3", _makeNode("NODE3.3"))
-                .addNode("NODE3.4", _makeNode("NODE3.4"))
+                .addNode("NODE3.4", _makeNodeAndCheckState("NODE3.4", "newAttribute"))
                 .addEdge("NODE3.1", "NODE3.2")
                 .addEdge("NODE3.2", "NODE3.3")
                 .addEdge("NODE3.3", "NODE3.4")
@@ -175,6 +173,7 @@ public class CompiledSubGraphTest {
 
     }
 
+
     @Test
     public void testCompileSubGraphWithInterruptionSharingSaver() throws Exception {
 
@@ -194,14 +193,17 @@ public class CompiledSubGraphTest {
                 .addNode("NODE2", _makeNode("NODE2"))
                 .addNode("NODE3", subGraph)
                 .addNode("NODE4", _makeNode("NODE4"))
-                .addNode("NODE5", _makeNode("NODE5"))
+                .addNode("NODE5", _makeNodeAndCheckState("NODE5", "newAttribute"))
                 .addEdge("NODE1", "NODE2")
                 .addEdge("NODE2", "NODE3")
                 .addEdge("NODE3", "NODE4")
                 .addEdge("NODE4", "NODE5")
                 .addEdge("NODE5", END)
                 .compile(compileConfig);
-        var runnableConfig = RunnableConfig.builder().build();
+
+        var runnableConfig = RunnableConfig.builder()
+                                .threadId("1")
+                                .build();
 
         var input = GraphInput.args(Map.of());
 
@@ -214,12 +216,14 @@ public class CompiledSubGraphTest {
         assertTrue( output.isPresent() );
 
         assertFalse( output.get().isEND() );
-        assertTrue( output.get().isSubGraph() );
+        assertInstanceOf(SubGraphOutput.class,  output.get() );
 
         var iteratorResult = AsyncGenerator.resultValue(graphIterator);
 
         assertTrue( iteratorResult.isPresent() );
         assertInstanceOf(InterruptionMetadata.class, iteratorResult.get());
+
+        runnableConfig = parentGraph.updateState( runnableConfig, Map.of( "newAttribute", "<myNewValue>") );
 
         input = GraphInput.resume();
 
@@ -238,9 +242,9 @@ public class CompiledSubGraphTest {
                 "[NODE3.1]",
                 "[NODE3.2]",
                 "[NODE3.3]",
-                "[NODE3.4]",
+                "[NODE3.4<myNewValue>]",
                 "[NODE4]",
-                "[NODE5]"), output.get().state().messages() );
+                "[NODE5<myNewValue>]"), output.get().state().messages() );
     }
 
     @Test
@@ -262,7 +266,7 @@ public class CompiledSubGraphTest {
                 .addNode("NODE1", _makeNode("NODE1"))
                 .addNode("NODE2", _makeNode("NODE2"))
                 .addNode("NODE3", subGraph)
-                .addNode("NODE4", _makeNode("NODE4"))
+                .addNode("NODE4", _makeNodeAndCheckState("NODE4", "newAttribute"))
                 .addNode("NODE5", _makeNode("NODE5"))
                 .addEdge("NODE1", "NODE2")
                 .addEdge("NODE2", "NODE3")
@@ -284,12 +288,14 @@ public class CompiledSubGraphTest {
         assertTrue( output.isPresent() );
 
         assertFalse( output.get().isEND() );
-        assertTrue( output.get().isSubGraph() );
+        assertInstanceOf( SubGraphOutput.class, output.get() );
 
         var iteratorResult = AsyncGenerator.resultValue(graphIterator);
 
         assertTrue( iteratorResult.isPresent() );
         assertInstanceOf(InterruptionMetadata.class, iteratorResult.get());
+
+        runnableConfig = parentGraph.updateState( runnableConfig, Map.of( "newAttribute", "<myNewValue>") );
 
         input = GraphInput.resume();
 
@@ -308,9 +314,53 @@ public class CompiledSubGraphTest {
                 "[NODE3.1]",
                 "[NODE3.2]",
                 "[NODE3.3]",
-                "[NODE3.4]",
-                "[NODE4]",
+                "[NODE3.4<myNewValue>]",
+                "[NODE4<myNewValue>]",
                 "[NODE5]"), output.get().state().messages() );
     }
 
+    @Test
+    public void testNestedCompiledSubgraphFormIssue216() throws Exception {
+
+        var subSubGraph = new StateGraph<>(MyState::new)
+                .addNode("foo1", _makeNode("foo1"))
+                .addNode("foo2", _makeNode("foo2"))
+                .addNode("foo3", _makeNode("foo3"))
+                .addEdge(StateGraph.START, "foo1")
+                .addEdge("foo1", "foo2")
+                .addEdge("foo2", "foo3")
+                .addEdge("foo3", StateGraph.END)
+                .compile();
+
+        var subGraph = new StateGraph<>(MyState::new)
+                .addNode("bar1", _makeNode("bar1"))
+                .addNode("subgraph2", subSubGraph)
+                .addNode("bar2", _makeNode("bar2"))
+                .addEdge(StateGraph.START, "bar1")
+                .addEdge("bar1", "subgraph2")
+                .addEdge("subgraph2", "bar2")
+                .addEdge("bar2", StateGraph.END)
+                .compile();
+
+        var stateGraph = new StateGraph<>(MyState::new)
+                .addNode("main1", _makeNode("main1"))
+                .addNode("subgraph1", subGraph)
+                .addNode("main2", _makeNode("main2"))
+                .addEdge(StateGraph.START, "main1")
+                .addEdge("main1", "subgraph1")
+                .addEdge("subgraph1", "main2")
+                .addEdge("main2", StateGraph.END)
+                .compile();
+
+        var runnableConfig = RunnableConfig.builder().build();
+
+        var input = GraphInput.args(Map.of());
+
+        var graphIterator = stateGraph.stream(input, runnableConfig);
+
+        var output = graphIterator.stream()
+                .peek( out -> log.info("output: {}", out) )
+                .reduce((a, b) -> b);
+
+    }
 }

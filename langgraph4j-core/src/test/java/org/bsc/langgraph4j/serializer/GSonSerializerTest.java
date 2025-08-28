@@ -26,11 +26,11 @@ public class GSonSerializerTest {
         }
     }
 
-    static class NodeOutputTest extends NodeOutput<AgentState> {
-        protected NodeOutputTest(String node, AgentState state, boolean subGraph) {
-            super(node, state);
-            setSubGraph(subGraph);
+    static class MyStateSerializer extends GsonStateSerializer<State> {
+        public MyStateSerializer() {
+            super(State::new);
         }
+
     }
 
     @Test
@@ -38,11 +38,12 @@ public class GSonSerializerTest {
 
         State state = new State( Map.of( "prop1", "value1") );
 
-        GsonStateSerializer<State> serializer = new GsonStateSerializer<State>(State::new) {};
+        GsonStateSerializer<State> serializer = new MyStateSerializer();
 
-        Class<?> type = serializer.getStateType();
+        var type = serializer.getStateType();
 
-        assertEquals(State.class, type);
+        assertTrue( type.isPresent() );
+        assertEquals(State.class, type.get());
 
         byte[] bytes = serializer.objectToBytes(state);
 
@@ -74,15 +75,15 @@ public class GSonSerializerTest {
 
         GsonSerializer serializer = new GsonSerializer();
 
-        NodeOutput<AgentState> output = new NodeOutputTest("node", null, true);
+        NodeOutput<AgentState> output = new NodeOutput<>("node", null);
         String json = serializer.getGson().toJson(output);
 
-        assertEquals( "{\"node\":\"node\",\"state\":null,\"subGraph\":true}", json );
+        assertEquals( "{\"node\":\"node\",\"state\":null}", json );
 
-        output = new NodeOutputTest("node", null, false);
+        output = new NodeOutput<>("node", null);
         json = serializer.getGson().toJson(output);
 
-        assertEquals( "{\"node\":\"node\",\"state\":null,\"subGraph\":false}", json );
+        assertEquals( "{\"node\":\"node\",\"state\":null}", json );
     }
 
 

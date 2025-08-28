@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.Objects;
 
@@ -38,16 +37,23 @@ public class JacksonSerializerTest {
         }
     }
 
+    static class MyStateSerializer extends JacksonStateSerializer<State> {
+        public MyStateSerializer() {
+            super(State::new);
+        }
+
+    }
     @Test
     public void serializeWithTypeInferenceTest() throws IOException, ClassNotFoundException {
 
         State state = new State( Map.of( "prop1", "value1") );
 
-        JacksonStateSerializer<State> serializer = new JacksonStateSerializer<State>(State::new) {};
+        var serializer = new MyStateSerializer();
 
-        Class<?> type = serializer.getStateType();
+        var type = serializer.getStateType();
 
-        assertEquals(State.class, type);
+        assertTrue(type.isPresent());
+        assertEquals(State.class, type.get());
 
         byte[] bytes = serializer.objectToBytes(state);
 
@@ -68,30 +74,23 @@ public class JacksonSerializerTest {
         }
     }
 
-    static class NodeOutputTest extends NodeOutput<AgentState> {
-        protected NodeOutputTest(String node, AgentState state, boolean subGraph) {
-            super(node, state);
-            setSubGraph(subGraph);
-        }
-    }
-
     @Test
     public void NodOutputJacksonSerializationTest() throws Exception {
 
         var serializer = new MyJacksonStateSerializer();
 
-        NodeOutput<AgentState> output = new NodeOutputTest("node", null, true);
+        NodeOutput<AgentState> output = new NodeOutput<>("node", null);
         var mapper = serializer.objectMapper()
                             .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         var json = mapper.writeValueAsString(output);
         assertEquals("""
-                {"end":false,"node":"node","start":false,"state":null,"subGraph":true}""", json );
+                {"end":false,"node":"node","start":false,"state":null}""", json );
 
-        output = new NodeOutputTest("node", null, false);
+        output = new NodeOutput<>("node", null);
         json = serializer.objectMapper().writeValueAsString(output);
 
         assertEquals( """
-                {"end":false,"node":"node","start":false,"state":null,"subGraph":false}""", json );
+                {"end":false,"node":"node","start":false,"state":null}""", json );
     }
 
     @Test

@@ -2,13 +2,16 @@ package org.bsc.langgraph4j;
 
 
 import org.bsc.langgraph4j.internal.edge.EdgeCondition;
+import org.bsc.langgraph4j.internal.node.Node;
 import org.bsc.langgraph4j.state.AgentState;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.bsc.langgraph4j.StateGraph.END;
 import static org.bsc.langgraph4j.StateGraph.START;
 
 /**
@@ -28,7 +31,28 @@ public abstract class DiagramGenerator {
     public record Context( StringBuilder sb,
                             String title,
                             boolean printConditionalEdge,
-                            boolean isSubGraph ) {
+                            boolean isSubGraph,
+                            StateGraph.Nodes<?> rootNodes
+                            ) {
+        public Context( String title, boolean printConditionalEdge, boolean isSubGraph, StateGraph.Nodes<?> rootNodes ) {
+            this( new StringBuilder(), title, printConditionalEdge, isSubGraph, rootNodes );
+        }
+
+        public boolean anySubGraphWithId(String id ) {
+
+            return rootNodes.elements.stream()
+                    .filter( node -> node instanceof SubGraphNode<?> )
+                    .flatMap( node -> {
+                        var subGraph = ((SubGraphNode<?>) node).subGraph();
+                        return Stream.concat(
+                                Stream.of(node.id()),
+                                subGraph.nodes.elements.stream()
+                                        .filter( n -> n instanceof SubGraphNode<?> )
+                                        .map(Node::id));
+                    })
+                    .anyMatch(subGraphId -> subGraphId.equals(id));
+        }
+
 
         static Builder builder() { return new Builder(); }
 
@@ -52,8 +76,8 @@ public abstract class DiagramGenerator {
                     return this;
                 }
 
-                public Context build() {
-                    return new Context( new StringBuilder(), title,printConditionalEdge, IsSubGraph );
+                public Context build( StateGraph.Nodes<?> nodes ) {
+                    return new Context( new StringBuilder(), title,printConditionalEdge, IsSubGraph, nodes );
                 }
 
         }
@@ -78,6 +102,15 @@ public abstract class DiagramGenerator {
         public String toString() {
             return sb.toString();
         }
+    }
+
+
+    protected boolean isStart( String id ) {
+        return START.equals( id );
+    }
+
+    protected boolean isEnd( String id ) {
+        return END.equals( id );
     }
 
     /**
@@ -151,13 +184,13 @@ public abstract class DiagramGenerator {
      * @param printConditionalEdge Whether to print the conditional edge condition.
      * @return A string representation of the graph.
      */
-    public final <State extends AgentState> String generate( StateGraph.Nodes<State> nodes,  StateGraph.Edges<State> edges, String title, boolean printConditionalEdge ) {
+    public final <State extends AgentState> String generate(StateGraph.Nodes<State> nodes, StateGraph.Edges<State> edges, String title, boolean printConditionalEdge ) {
 
         return generate( nodes, edges, Context.builder()
                                         .title( title )
                                         .isSubGraph( false )
                                         .printConditionalEdge( printConditionalEdge )
-                                        .build() ).toString();
+                                        .build(nodes) ).toString();
 
     }
 
@@ -187,7 +220,7 @@ public abstract class DiagramGenerator {
                                     .title( n.id() )
                                     .printConditionalEdge( ctx.printConditionalEdge )
                                     .isSubGraph( true )
-                                    .build() );
+                                    .build(ctx.rootNodes() ) );
                     ctx.sb().append( subgraphCtx );
             }
             else {

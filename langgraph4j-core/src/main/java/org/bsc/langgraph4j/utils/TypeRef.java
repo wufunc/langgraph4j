@@ -37,38 +37,42 @@ public abstract class TypeRef<T> implements Comparable<TypeRef<T>> {
         }
     }
 
+    /**
+     * Gets the captured generic type.
+     *
+     * @return the {@link Type} representing the generic type T.
+     */
     public Type getType() {
         return this._type;
     }
 
+    /**
+     * Safely casts the given object to the generic type {@code T} of this TypeRef.
+     * This method first checks if the object is an instance of the raw type (erasure)
+     * of {@code T}.
+     *
+     * @param obj the object to cast.
+     * @return an {@link Optional} containing the cast object if the cast is successful,
+     *         otherwise an empty {@link Optional}.
+     */
     @SuppressWarnings("unchecked")
     public Optional<T> cast(Object obj ) {
-        return erasureOf(this._type)
+        return Types.erasureOf(this._type)
                 .filter( c -> c.isInstance(obj) )
                 .map( c -> (T) obj )
                 ;
     }
 
-    public static Optional<Class<?>> erasureOf(Type t) {
-        if (t instanceof Class<?> c) {
-            return Optional.of(c);
-        }
-        if (t instanceof ParameterizedType pt) {
-            return Optional.of((Class<?>) pt.getRawType());
-        }
-        if (t instanceof GenericArrayType gat) {
-            return erasureOf(gat.getGenericComponentType())
-                    .map( comp -> Array.newInstance(comp, 0).getClass() );
-        }
-        if (t instanceof TypeVariable<?> tv) {
-            Type[] bounds = tv.getBounds();
-            return bounds.length == 0 ? Optional.empty() : erasureOf(bounds[0]);
-        }
-        if (t instanceof WildcardType wt) {
-            Type[] upper = wt.getUpperBounds();
-            return upper.length == 0 ? Optional.empty() : erasureOf(upper[0]);
-        }
-        return Optional.empty();
+    /**
+     * Gets the raw {@link Class} of the generic type {@code T}.
+     * This is the type erasure of the captured generic type.
+     *
+     * @return an {@link Optional} containing the raw class of {@code T},
+     *         or an empty {@link Optional} if the erasure cannot be determined.
+     */
+    @SuppressWarnings("unchecked")
+    public Optional<Class<T>> erasureOf() {
+        return Types.erasureOf(this._type).map( c -> (Class<T>)c );
     }
 
     /**

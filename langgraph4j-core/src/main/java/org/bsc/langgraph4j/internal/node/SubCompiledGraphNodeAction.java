@@ -1,11 +1,9 @@
 package org.bsc.langgraph4j.internal.node;
 
-import org.bsc.langgraph4j.CompileConfig;
-import org.bsc.langgraph4j.CompiledGraph;
-import org.bsc.langgraph4j.GraphInput;
-import org.bsc.langgraph4j.RunnableConfig;
+import org.bsc.langgraph4j.*;
 import org.bsc.langgraph4j.action.AsyncNodeActionWithConfig;
 import org.bsc.langgraph4j.state.AgentState;
+import org.bsc.langgraph4j.subgraph.SubGraphOutput;
 import org.bsc.langgraph4j.utils.TypeRef;
 
 import java.util.Map;
@@ -77,9 +75,14 @@ public record SubCompiledGraphNodeAction<State extends AgentState>(
 
         try {
 
-            var input = ( resumeSubgraph ) ? GraphInput.resume() : GraphInput.args(state.data());
+            var input =  GraphInput.args(state.data());
+            if( resumeSubgraph ) {
+                subGraphRunnableConfig = subGraph.updateState(subGraphRunnableConfig, state.data());
+                input = GraphInput.resume();
+            }
 
-            var generator = subGraph.stream(input, subGraphRunnableConfig);
+            var generator = subGraph.stream(input, subGraphRunnableConfig)
+                    .map( n -> SubGraphOutput.of( n, nodeId) );
 
             future.complete( Map.of(format("%s_%s",subGraphId(), UUID.randomUUID()), generator));
 
