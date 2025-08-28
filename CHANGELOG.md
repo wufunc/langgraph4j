@@ -2,6 +2,74 @@
 
 
 
+<!-- "name: v1.6.2" is a release tag -->
+
+## [v1.6.2](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.2) (2025-08-28)
+
+### Features
+
+ *  **core**  add SubGraphOutput to better keep track of the compiled sub graph output ([38dac5a42e7c022](https://github.com/bsorrentino/langgraph4j/commit/38dac5a42e7c022072400955b072493f9024c8bd))
+     > work on #216
+   
+ *  **Types**  Add utility class for type reflection and parameterized type handling. ([b0eac5fc92fae15](https://github.com/bsorrentino/langgraph4j/commit/b0eac5fc92fae15222f87e3ab2ecbf0ed3e35ff4))
+     > introduced Types interface with methods to traverse class hierarchy and find parameterized types, as well as to get the raw class erasure of various type subtypes. These utilities can be useful for generic type reflection in Java applications.
+   
+ *  **TypeRef**  Add method to explicitly get erased class with type erasure ([4390fab217619e2](https://github.com/bsorrentino/langgraph4j/commit/4390fab217619e2283fc3ceb2408ce85e813f986))
+   
+
+### Bug Fixes
+
+ -  **CallModel**  handle null AI response text gracefully ([3d3a3b5d833cb3d](https://github.com/bsorrentino/langgraph4j/commit/3d3a3b5d833cb3d6efd27677f93a4f6d00fba5f4))
+     > - Add null check for content.text() in mapResult method to prevent NullPointerException
+
+ -  **MermaidGenerator**  update naming convention in mermaid diagram for manage sub graph nodes ([b97f83bf7d0a058](https://github.com/bsorrentino/langgraph4j/commit/b97f83bf7d0a058ed944b07d9ce2226eb420d1c6))
+     > work on [#216](https://github.com/langgraph4j/langgraph4j/issues/216)
+
+ -  **SubCompiledGraphNodeAction**  Add support for resuming subgraph actions after syncing state with parent graph ([98cb193e00ea27c](https://github.com/bsorrentino/langgraph4j/commit/98cb193e00ea27c31e0340da1cd1dde8344a8000))
+     > work on #218
+
+ -  **PlantUMLGenerator**  Change rectangle to package syntax for subgraphs ([b3a8758246c9bf6](https://github.com/bsorrentino/langgraph4j/commit/b3a8758246c9bf6546dea409a8a907a2fbe37525))
+     > work on #216
+
+
+### Documentation
+
+ -  update readme ([e7d9e423ee1f28f](https://github.com/bsorrentino/langgraph4j/commit/e7d9e423ee1f28f222a88851342ea914d80e3c2d))
+
+ -  bump to version 1.6.2 ([f9f278ed6544d1a](https://github.com/bsorrentino/langgraph4j/commit/f9f278ed6544d1a0d6f2be36e3f6a3d88d45d936))
+
+ -  update changelog ([9efa5f539e3636e](https://github.com/bsorrentino/langgraph4j/commit/9efa5f539e3636e53d79534cd278cbfc190c99ce))
+
+
+### Refactor
+
+ -  **LangGraphStreamingServer**  Refactor node output serialization for subgraphs ([1490ab2ef39ad49](https://github.com/bsorrentino/langgraph4j/commit/1490ab2ef39ad49d4f0b4966a014ebc41fe45385))
+    > work on #216
+
+ -  **PlainTextStateSerializer**  Refactor getStateType method to use Types parameterizedType for type inference ([432b75beda3b271](https://github.com/bsorrentino/langgraph4j/commit/432b75beda3b27191b43bc7b73db4608435dede5))
+   
+ -  **TypeRef**  Refactored TypeRef methods for better type safety and clarity ([08ec14e9c74a8d3](https://github.com/bsorrentino/langgraph4j/commit/08ec14e9c74a8d3bf509ee11ca9f31220e7a7a3b))
+    > Separated concerns of getting the generic type, casting objects, and obtaining raw class into separate methods. Updated documentation for each method.
+
+ -  **PlainTextStateSerializer**  Refactor getStateType method to return Optional<Class<State>> ([62e201c6374cb4c](https://github.com/bsorrentino/langgraph4j/commit/62e201c6374cb4cde12f55bd237216b061444a5b))
+   
+
+### ALM 
+
+ -  bump to version 1.6.2 ([0c4fc3bd858e82e](https://github.com/bsorrentino/langgraph4j/commit/0c4fc3bd858e82e2fc164d940c87bc65c497cd4c))
+   
+ -  bump to SNAPSHOT ([388e433085027b9](https://github.com/bsorrentino/langgraph4j/commit/388e433085027b94ef86e66b1dc8e3ed789952bc))
+   
+
+### Test 
+
+ -  **studio**  test nested subgraph ([b2f934758f429c1](https://github.com/bsorrentino/langgraph4j/commit/b2f934758f429c126caff4aee3a196a8a458ae18))
+   
+
+
+
+
+
 <!-- "name: v1.6.1" is a release tag -->
 
 ## [v1.6.1](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.1) (2025-08-21)
