@@ -100,6 +100,7 @@ You'll typically use a `CheckpointSaver` implementation (e.g., `MemorySaver` for
 langgraph4j/
 ├── langgraph4j-bom/                     # LangGraph4j dependency management
 ├── langgraph4j-core/                    # LangGraph4j core components
+├── langgraph4j-postgres-saver           # LangGraph4j persistent checkpoint saver based on PostgresSQL
 ├── langchain4j/                         # LangChain4j integration
 │   ├── langchain4j-core/                # LangChain4j core components (integration required)
 │   └── langchain4j-agent/               # LangChain4j agent executor
@@ -442,6 +443,7 @@ We hope this guide helps you get started with LangGraph4j. Happy building!
 # References
 
 ## Articles
+* [LangGraph4j Meets AG-UI - Building UI/UX in AI Agents era](https://bsorrentino.github.io/bsorrentino/ai/2025/08/21/LangGraph4j-meets-AG-UI.html)
 * [LangGraph4j - Implementing Human-in-the-Loop at ease](https://bsorrentino.github.io/bsorrentino/ai/2025/07/13/LangGraph4j-Agent-with-approval.html)
 * [LangGraph4j - Multi-Agent handoff implementation with Spring AI](https://bsorrentino.github.io/bsorrentino/ai/2025/05/10/Langgraph4j-agent-handoff.html)
 * [Microsoft JDConf 2025 - AI Agents Graph: Your following tool in your Java AI journey](https://youtu.be/Sp36wdpobpI?si=dXDTD9k16hM8A8KQ)
@@ -452,6 +454,8 @@ We hope this guide helps you get started with LangGraph4j. Happy building!
 
 ## Projects
 
+* [A deep research assistant based on the Langgraph4j](https://github.com/imfangs/langgraph4j-deep-researcher)
+* [research4j - Build your own perplexity for your applications](https://github.com/bhavuklabs/research4j)
 * [Multi Agent Banking Assistant with Java using Langraph4j](https://github.com/Azure-Samples/agent-openai-java-banking-assistant-langgraph4j)
 * [Java Async Generator, a Java version of Javascript async generator][java-async-generator]
 * [AIDEEPIN: Ai-based productivity tools (Chat,Draw,RAG,Workflow etc)](https://github.com/moyangzhan/langchain4j-aideepin)
