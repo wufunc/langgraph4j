@@ -439,6 +439,9 @@ Now that you have a basic understanding of LangGraph4j, here's how you can conti
 
 We hope this guide helps you get started with LangGraph4j. Happy building!
 
+## Star History
+
+[![Star History Chart](https://starchart.cc/langgraph4j/langgraph4j.svg)](https://starchart.cc/langgraph4j/langgraph4j)
 
 # References
 
