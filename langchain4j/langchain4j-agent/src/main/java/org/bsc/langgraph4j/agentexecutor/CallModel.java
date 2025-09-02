@@ -68,7 +68,12 @@ public class CallModel<State extends MessagesState<ChatMessage>> implements Asyn
             return Map.of("messages", content);
         }
         if( response.finishReason() == FinishReason.STOP || response.finishReason() == null  ) {
-            return Map.of(AgentExecutor.State.FINAL_RESPONSE, content.text());
+            // 防止content.text()返回null导致Map.of()抛出NullPointerException
+            String responseText = content.text();
+            if (responseText == null) {
+                responseText = ""; // 使用空字符串替代null
+            }
+            return Map.of(AgentExecutor.State.FINAL_RESPONSE, responseText);
         }
 
         throw new IllegalStateException("Unsupported finish reason: " + response.finishReason() );

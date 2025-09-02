@@ -49,7 +49,11 @@ class CallModel<State extends MessagesState<Message>> implements NodeActionWithC
             var generator = StreamingChatGenerator.builder()
                     .startingNode("agent")
                     .startingState(state)
-                    .mapResult(response -> Map.of("messages", response.getResult().getOutput()))
+                    .mapResult(response -> {
+                        var output = response.getResult().getOutput();
+                        // Prevent NullPointerException when output is null
+                        return Map.of("messages", output != null ? output : new org.springframework.ai.chat.messages.AssistantMessage(""));
+                    })
                     .build(flux);
 
             return Map.of("messages", generator);
@@ -57,6 +61,10 @@ class CallModel<State extends MessagesState<Message>> implements NodeActionWithC
             var response = chatService.execute(messages);
 
             var output = response.getResult().getOutput();
+            // Prevent NullPointerException when output is null
+            if (output == null) {
+                output = new org.springframework.ai.chat.messages.AssistantMessage("");
+            }
 
             return Map.of("messages", output);
         }

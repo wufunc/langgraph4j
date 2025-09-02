@@ -191,7 +191,11 @@ public class StreamingTestITest {
             var generator  = StreamingChatGenerator.builder()
                     .startingNode("agent")
                     .startingState( state )
-                    .mapResult( response -> Map.of( "messages", response.getResult().getOutput()))
+                    .mapResult( response -> {
+                        var output = response.getResult().getOutput();
+                        // Prevent NullPointerException when output is null
+                        return Map.of( "messages", output != null ? output : new AssistantMessage(""));
+                    })
                     .build(flux);
 
             return Map.of("messages", generator);
