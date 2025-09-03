@@ -188,10 +188,9 @@ import org.bsc.langgraph4j.state.AgentState;
 import org.bsc.langgraph4j.state.Channels;
 import org.bsc.langgraph4j.state.Channel;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 // Define the state for our graph
 class SimpleState extends AgentState {
@@ -218,7 +217,7 @@ class SimpleState extends AgentState {
 
 ```java
 import org.bsc.langgraph4j.action.NodeAction;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 // Node that adds a greeting
@@ -253,7 +252,6 @@ import static org.bsc.langgraph4j.action.AsyncNodeAction.node_async;
 import static org.bsc.langgraph4j.StateGraph.START;
 import static org.bsc.langgraph4j.StateGraph.END;
 
-import java.util.List;
 import java.util.Map;
 
 public class SimpleGraphApp {
