@@ -18,7 +18,7 @@ import static java.util.Optional.ofNullable;
  * and stream mode, providing methods to modify these parameters safely
  * without permanently altering the original configuration.
  */
-public final class RunnableConfig implements HasMetadata<RunnableConfig.Builder> {
+public final class RunnableConfig implements HasMetadata {
     private final String threadId;
     private final String checkPointId;
     private final String nextNode;
