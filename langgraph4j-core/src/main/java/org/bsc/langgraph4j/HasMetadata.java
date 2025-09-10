@@ -6,9 +6,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 
-public interface HasMetadata<B extends HasMetadata.Builder<B>> {
+public interface HasMetadata {
+    /**
+     * private metadata prefix.
+     * WARNING: don't use it
+     */
+    String PRIVATE_PREFIX = "__";
 
     /**
      * return metadata value for key
@@ -63,10 +70,15 @@ public interface HasMetadata<B extends HasMetadata.Builder<B>> {
 
         @SuppressWarnings("unchecked")
         public B addMetadata( String key, Object value ) {
+            requireNonNull(key, "key cannot be null");
+            if( key.startsWith(PRIVATE_PREFIX) ) {
+                throw new IllegalArgumentException( format("key cannot start with %s",PRIVATE_PREFIX) );
+            }
             if( metadata == null ) {
                 // Lazy initialization of metadata map
                 metadata = new HashMap<>();
             }
+
 
             metadata.put( key, value);
 
