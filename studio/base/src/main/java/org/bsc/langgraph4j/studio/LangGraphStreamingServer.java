@@ -38,8 +38,6 @@ import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 import static org.bsc.langgraph4j.utils.CollectionsUtils.entryOf;
 
-import org.bsc.langgraph4j.diagram.MermaidGenerator;
-
 
 /**
  * Interface for a LangGraph Streaming Server.
@@ -130,6 +128,7 @@ public interface LangGraphStreamingServer {
          */
         RunnableConfig runnableConfig(PersistentConfig config) {
             return RunnableConfig.builder()
+                    .addMetadata(RunnableConfig.STUDIO_METADATA_KEY, true)
                     .threadId(config.threadId())
                     .build();
         }
@@ -218,6 +217,7 @@ public interface LangGraphStreamingServer {
                     var node = request.getParameter("node");
 
                     var runnableConfig = RunnableConfig.builder()
+                            .addMetadata(RunnableConfig.STUDIO_METADATA_KEY, true)
                             .threadId(threadId)
                             .checkPointId(checkpointId)
                             .nextNode(node)
