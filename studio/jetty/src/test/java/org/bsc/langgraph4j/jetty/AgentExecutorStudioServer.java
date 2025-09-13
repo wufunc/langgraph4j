@@ -2,20 +2,22 @@ package org.bsc.langgraph4j.jetty;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.model.ollama.OllamaChatModel;
+import jakarta.servlet.DispatcherType;
 import org.bsc.langgraph4j.StateGraph;
 import org.bsc.langgraph4j.TestTool;
 import org.bsc.langgraph4j.action.AsyncNodeAction;
 import org.bsc.langgraph4j.agentexecutor.AgentExecutor;
 import org.bsc.langgraph4j.state.AgentState;
-import org.bsc.langgraph4j.studio.LangGraphStreamingServer;
-import org.bsc.langgraph4j.studio.jetty.LangGraphStreamingServerJetty;
+import org.bsc.langgraph4j.studio.LangGraphStudioServer;
+import org.bsc.langgraph4j.studio.jetty.LangGraphStudioServer4Jetty;
 
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Objects;
 
-public interface AgentExecutorStreamingServer {
+public interface AgentExecutorStudioServer {
 
-    static LangGraphStreamingServer createAgentExecutorServer() throws Exception {
+    static Map.Entry<String, LangGraphStudioServer.Instance> agentExecutor() throws Exception {
         var llm = OllamaChatModel.builder()
                 .baseUrl( "http://localhost:11434" )
                 .temperature(0.0)
@@ -30,16 +32,15 @@ public interface AgentExecutorStreamingServer {
                 .stateSerializer( AgentExecutor.Serializers.JSON.object() )
                 .build();
 
-        return LangGraphStreamingServerJetty.builder()
-                .port(8080)
+        return Map.entry( "agent_executor", LangGraphStudioServer.Instance.builder()
                 .title("AGENT EXECUTOR")
                 .addInputStringArg("messages", true, v -> SystemMessage.from(Objects.toString(v)))
-                .stateGraph(app)
-                .build();
+                .graph(app)
+                .build());
 
     }
 
-    static LangGraphStreamingServer createIssue216Server() throws Exception {
+    static Map.Entry<String, LangGraphStudioServer.Instance> issue216() throws Exception {
 
         var mockedAction = AsyncNodeAction.node_async((ignored) -> Map.of());
 
@@ -75,20 +76,24 @@ public interface AgentExecutorStreamingServer {
                 .addEdge("main2", StateGraph.END)
                 ;
 
-
-        return LangGraphStreamingServerJetty.builder()
-                .port(8080)
+        return Map.entry( "issue216", LangGraphStudioServer.Instance.builder()
                 .title("Issue 206")
                 .addInputStringArg("messages", false)
-                .stateGraph(stateGraph)
-                .build();
+                .graph(stateGraph)
+                .build());
 
     }
 
     static void main(String[] args) throws Exception {
 
-        //createAgentExecutorServer().start().join();
-        createIssue216Server().start().join();
+        LangGraphStudioServer4Jetty.builder()
+                .port(8080)
+                .instance(agentExecutor())
+                .instance(issue216())
+                .filter( ctx -> ctx.addFilter(CorsFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST)))
+                .build()
+                .start()
+                .join();
 
     }
 
