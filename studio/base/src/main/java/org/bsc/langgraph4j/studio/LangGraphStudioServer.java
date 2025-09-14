@@ -313,18 +313,22 @@ public interface LangGraphStudioServer {
 
             public Instance build() {
 
-                var optCompileConfig = ofNullable( compileConfig );
+                if( compileConfig != null  ) {
 
-                optCompileConfig.flatMap(CompileConfig::checkpointSaver)
-                        .orElseThrow( () -> new IllegalStateException(format("checkpointSaver cannot be null in instance with title: \"%s\"", title) ));
+                    if( compileConfig.checkpointSaver().isEmpty() ) {
+                        throw new IllegalStateException(format("checkpointSaver cannot be null in instance with title: \"%s\"", title));
+                    }
+                }
+                else {
+                    compileConfig = CompileConfig.builder()
+                            .checkpointSaver( new MemorySaver() )
+                            .build();
+                }
 
                 return new Instance(
                         ofNullable(title).orElse("LangGraph Studio"),
                         graph,
-                        optCompileConfig
-                                .orElseGet( () -> CompileConfig.builder()
-                                        .checkpointSaver( new MemorySaver() )
-                                        .build()),
+                        compileConfig,
                         inputArgs
                         );
             }
