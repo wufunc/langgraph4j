@@ -64,7 +64,7 @@ public class LangGraphFlowServiceImpl  {
                         edge_async(conditionalAge), Map.of( "next", "action", "end", END ) )
                 ;
 
-        return  Map.of( "Sample", LangGraphStudioServer.Instance.builder()
+        return  Map.of( "sample", LangGraphStudioServer.Instance.builder()
                                         .title("LangGraph Studio (Sample)")
                                         .graph( workflow )
                                         .build());
