@@ -14,15 +14,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.bsc.async.AsyncGenerator;
 import org.bsc.langgraph4j.*;
 import org.bsc.langgraph4j.checkpoint.MemorySaver;
 import org.bsc.langgraph4j.serializer.plain_text.PlainTextStateSerializer;
 import org.bsc.langgraph4j.serializer.plain_text.jackson.JacksonStateSerializer;
 import org.bsc.langgraph4j.state.AgentState;
-import org.bsc.langgraph4j.state.StateSnapshot;
-import org.bsc.langgraph4j.subgraph.SubGraphOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,14 +46,6 @@ import static org.bsc.langgraph4j.utils.CollectionsUtils.entryOf;
 public interface LangGraphStudioServer {
 
     Logger log = LoggerFactory.getLogger(LangGraphStudioServer.class);
-
-    /**
-     * Starts the streaming server.
-     *
-     * @return a CompletableFuture that will complete when the server has started.
-     * @throws Exception if an error occurs during startup.
-     */
-    CompletableFuture<Void> start() throws Exception;
 
     /**
      * Configuration for persistent session data.
