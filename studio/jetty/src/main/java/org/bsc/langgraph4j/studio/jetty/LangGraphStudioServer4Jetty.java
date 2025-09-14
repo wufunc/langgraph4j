@@ -1,6 +1,5 @@
 package org.bsc.langgraph4j.studio.jetty;
 
-import jakarta.servlet.Filter;
 import org.bsc.langgraph4j.studio.LangGraphStudioServer;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
