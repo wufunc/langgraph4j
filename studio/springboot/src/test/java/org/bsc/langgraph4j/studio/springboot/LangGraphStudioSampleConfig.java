@@ -28,6 +28,7 @@ public class LangGraphStudioSampleConfig extends LangGraphStudioConfig {
     public Map<String, LangGraphStudioServer.Instance> instanceMap() {
         try {
             return Map.ofEntries(
+                    nestedSubgraph(),
                     issue241(),
                     sampleFlow(),
                     withStateSubgraphSample(),
@@ -170,7 +171,49 @@ public class LangGraphStudioSampleConfig extends LangGraphStudioConfig {
                                         .title("LangGraph Studio (Compiled Subgraph)")
                                         .graph( workflowParent )
                                         .build());
+    }
+
+    public Map.Entry<String, LangGraphStudioServer.Instance> nestedSubgraph() throws GraphStateException {
+        var mockedAction = AsyncNodeAction.node_async((ignored) -> Map.of());
+
+        var subSubGraph = new StateGraph<>(AgentState::new)
+                .addNode("foo1", mockedAction)
+                .addNode("foo2", mockedAction)
+                .addNode("foo3", mockedAction)
+                .addEdge(StateGraph.START, "foo1")
+                .addEdge("foo1", "foo2")
+                .addEdge("foo2", "foo3")
+                .addEdge("foo3", StateGraph.END)
+                .compile()
+                ;
+
+        var subGraph = new StateGraph<>(AgentState::new)
+                .addNode("bar1", mockedAction)
+                .addNode("subGraph2", subSubGraph)
+                .addNode("bar2", mockedAction)
+                .addEdge(StateGraph.START, "bar1")
+                .addEdge("bar1", "subGraph2")
+                .addEdge("subGraph2", "bar2")
+                .addEdge("bar2", StateGraph.END)
+                .compile()
+                ;
+
+        var stateGraph = new StateGraph<>(AgentState::new)
+                .addNode("main1", mockedAction)
+                .addNode("subgraph1", subGraph)
+                .addNode("main2", mockedAction)
+                .addEdge(StateGraph.START, "main1")
+                .addEdge("main1", "subgraph1")
+                .addEdge("subgraph1", "main2")
+                .addEdge("main2", StateGraph.END)
+                ;
+
+        return  Map.entry( "nested_subgraph", LangGraphStudioServer.Instance.builder()
+                .title("LangGraph Studio (Nested Subgraph)")
+                .graph( stateGraph )
+                .build());
 
     }
+
 
 }
