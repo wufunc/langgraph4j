@@ -2,6 +2,76 @@
 
 
 
+<!-- "name: v1.6.4" is a release tag -->
+
+## [v1.6.4](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.4) (2025-09-18)
+
+### Features
+
+ *  **springai-agent**  update archetype ([029c08ffca90fa0](https://github.com/bsorrentino/langgraph4j/commit/029c08ffca90fa0436dc7a4ddec4b3b2979a3f22))
+   
+
+### Bug Fixes
+
+ -  **lstudio/webui**  remove previous element if already present into DOM ([d9ea3ca4a17974d](https://github.com/bsorrentino/langgraph4j/commit/d9ea3ca4a17974d763f8e996c569f6dbe4af9bc4))
+     > move json-view componet creation from  connectedCallback to  attributeChangedCallback
+     > resolve #241
+
+
+### Documentation
+
+ -  bump to version 1.6.4 ([5d5304ea8b85849](https://github.com/bsorrentino/langgraph4j/commit/5d5304ea8b858490a035e0231b3afe4c29417865))
+
+ -  update changelog ([d6eb60f4568e066](https://github.com/bsorrentino/langgraph4j/commit/d6eb60f4568e0660251eda1f3d1c8187b917d8a1))
+
+
+### Refactor
+
+ -  **studio**  Refactor node output serialization logic to handle subgraphs node id serialization ([3d3520ca7f0a53b](https://github.com/bsorrentino/langgraph4j/commit/3d3520ca7f0a53b5c4b79da17569af3fc3592480))
+    > Refactors the NodeOutputSerializer to better handle subgraph nodes and their IDs.
+ > work on #224
+
+ -  **studio/webui**  add and use subgraphNode property for node highlight ([956a22acded3c20](https://github.com/bsorrentino/langgraph4j/commit/956a22acded3c2000340a66556846e973320eed1))
+    > work on #224
+
+ -  **studio/webui**  add id on  lg4j-node-output web element ([c45d87f1a32275d](https://github.com/bsorrentino/langgraph4j/commit/c45d87f1a32275de0001a18f59c5d7d01bd818f2))
+    > work on #241
+
+ -  **studio/webui**  shifted stack methods to maintain top-to-bottom access. ([e16027a6fd563fe](https://github.com/bsorrentino/langgraph4j/commit/e16027a6fd563fe36970633551d9bf3ead9e5116))
+    > work on #241
+
+ -  **studio/webui**  Add new properties to type definitions for consistency ([9737eac846b7156](https://github.com/bsorrentino/langgraph4j/commit/9737eac846b7156d4598e12d0ee87bdcc27ad123))
+    > work on #241
+
+
+### ALM 
+
+ -  bump to version 1.6.4 ([b225fb06eda6ed1](https://github.com/bsorrentino/langgraph4j/commit/b225fb06eda6ed13f59be518c3390526c0798010))
+   
+ -  **json-viewer**  Update dependency to latest version ([ce2ebd68aa1eb6d](https://github.com/bsorrentino/langgraph4j/commit/ce2ebd68aa1eb6da30c6f4512cdcd5aa7a87a0e1))
+    > @microlink/react-json-view updated to ^1.27.0
+ > work on #241
+
+ -  bump to version 1.6-SNAPSHOT ([3c9bffa681d9ef1](https://github.com/bsorrentino/langgraph4j/commit/3c9bffa681d9ef12331e9dba801ed0cdfc5fdb9f))
+   
+
+### Test 
+
+ -  **studio**  test subgraph and  nested subgraph ([a6868e0b606fd12](https://github.com/bsorrentino/langgraph4j/commit/a6868e0b606fd123e15d17e2a0bbe5445d7282d7))
+    > work on #224
+
+ -  **studio**  add test to verify issue #241 ([a6b65f176eb2906](https://github.com/bsorrentino/langgraph4j/commit/a6b65f176eb290633fb7da7ee25851c4a9e1b39c))
+    > work on #241
+
+ -  **springai-agent**  update test to use LangGraphStudioConfig instead of deprecated AbstractLangGraphStudioConfig ([e658435916a4a3f](https://github.com/bsorrentino/langgraph4j/commit/e658435916a4a3f40d2139bcb4b8f353f5bd2330))
+   
+ -  **springai-agent**  update test to use LangGraphStudioConfig instead of deprecated AbstractLangGraphStudioConfig ([26b51aee3672876](https://github.com/bsorrentino/langgraph4j/commit/26b51aee367287682c06db5d908f8c3e4651995c))
+   
+
+
+
+
+
 <!-- "name: v1.6.3" is a release tag -->
 
 ## [v1.6.3](https://github.com/bsorrentino/langgraph4j/releases/tag/v1.6.3) (2025-09-14)
