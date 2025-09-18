@@ -14,7 +14,7 @@ export class Stack {
      * The array holding the stack items.
      * @param  {Array<T>} items
      */
-    constructor( items = []) {
+    constructor(items = []) {
       this.items = items ;
     }
   
@@ -24,7 +24,7 @@ export class Stack {
      * @returns {number} The new length of the stack.
      */
     push(item) {
-        return this.items.push(item);
+        return this.items.unshift(item);
     }
   
     /**
@@ -32,7 +32,7 @@ export class Stack {
      * @returns {T | undefined} The removed item, or undefined if the stack is empty.
      */
     pop() {
-      return this.items.pop();
+      return this.items.shift();
     }
   
     /**
@@ -40,7 +40,7 @@ export class Stack {
      * @returns {T | undefined} The top item, or undefined if the stack is empty.
      */
     peek() {
-      return this.items.at(-1)
+      return this.items[0]
     }
   
     /**
@@ -51,7 +51,8 @@ export class Stack {
      */
     get elements() {
       // Create a reversed copy to avoid mutating the internal 'items' array
-      return this.items.toReversed()
+      //return this.items.toReversed()
+      return this.items
     }
   
     /**
