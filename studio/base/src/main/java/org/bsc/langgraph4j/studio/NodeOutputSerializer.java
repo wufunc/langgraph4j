@@ -49,12 +49,14 @@ class NodeOutputSerializer extends StdSerializer<NodeOutput> {
             }
         }
 
+        gen.writeStringField("node", nodeOutput.node());
         if( nodeOutput instanceof SubGraphOutput<?> subgraph) {
-            gen.writeStringField("node", format( "%s_%s", subgraph.node(), subgraph.subGraphId() ));
-        }
-        else {
-            gen.writeStringField("node", nodeOutput.node());
 
+            var node = (nodeOutput.isSTART() || nodeOutput.isEND() ) ?
+                        nodeOutput.node() :
+                        nodeOutput.node().concat("_");
+
+            gen.writeStringField("subgraphNode", node.concat(subgraph.subGraphId()) );
         }
 
         // serializerProvider.defaultSerializeField("state", nodeOutput.state().data(), gen);
