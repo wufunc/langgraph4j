@@ -3,8 +3,14 @@ import mermaid from 'mermaid';
 import * as d3 from 'd3'
 import { debug } from './debug.js';
 
+
+/**
+ * @file
+ * @typedef {import('./types.js').NextNodeData} NextNodeData * 
+ */
+
+const _LOG = debug( { on: false, topic: 'LG4jGraph' } )
 const _DBG = debug( { on: false, topic: 'LG4jGraph' } )
-const _TRACE = debug( { on: false, topic: 'LG4jGraph' } )
 
 /**
  * Mermaid Component
@@ -124,9 +130,9 @@ export class LG4jMermaid extends HTMLElement {
 
     return mermaid.render( 'graph', this.#textContent )
         .then( res => { 
-          _DBG( 'RENDER COMPLETE', svgContainer );
+          _LOG( 'RENDER COMPLETE', svgContainer );
           const { width, height } = svgContainer.getBoundingClientRect();
-          _DBG( 'width:', width, 'height:', height);
+          _LOG( 'width:', width, 'height:', height);
           const translated = res.svg
             .replace( /height="[\d\.]+"/, `height="${height}"`) 
             .replace( /width="[\d\.]+"/, `width="${width}"`);
@@ -134,10 +140,10 @@ export class LG4jMermaid extends HTMLElement {
         })
         .then( () => this.#svgPanZoom() )
         .then( () => {
-          _DBG( () => {
-            _DBG("boundingClientRect", svgContainer.getBoundingClientRect() );
+          _LOG( () => {
+            _LOG("boundingClientRect", svgContainer.getBoundingClientRect() );
             for( const rc of svgContainer.getClientRects() ) {
-              _DBG( rc );
+              _LOG( rc );
             }}
           )})
         .catch( e => console.error( 'RENDER ERROR', e ) )
@@ -146,7 +152,7 @@ export class LG4jMermaid extends HTMLElement {
 
   #svgPanZoom() {
 
-    _DBG( '_lastTransform', this._lastTransform )
+    _LOG( '_lastTransform', this._lastTransform )
 
     // @ts-ignore
     const svgs = d3.select( this.shadowRoot ).select(".mermaid svg");
@@ -188,7 +194,6 @@ export class LG4jMermaid extends HTMLElement {
   #onContent(e) {
     const { detail: newContent } = e;
 
-
     this._content = newContent;
     this.#renderDiagram();
   }
@@ -196,15 +201,17 @@ export class LG4jMermaid extends HTMLElement {
   /**
    * Handles the active class event to update the active class in the diagram.
    *
-   * @param {CustomEvent} e - The event object containing the active class detail.
+   * @param {CustomEvent<NextNodeData} e - The event object containing the active class detail.
    */
   #onActive(e) {
-    const { detail: activeClass } = e;
 
-    _TRACE("Active class updated:", activeClass);
+    const { detail: { node, subgraphNode } } = e;
 
-    this._activeClass = activeClass;
-    this.#renderDiagram();
+    this._activeClass = subgraphNode ?? node ;
+
+    _DBG("Active class updated:", this._activeClass);
+
+    this.#renderDiagram();  
   }
 
   /**
@@ -255,7 +262,7 @@ export class LG4jMermaid extends HTMLElement {
       nodes: pres,
       suppressErrors: true
     })
-    .then(() => _DBG("RUN COMPLETE"))
+    .then(() => _LOG("RUN COMPLETE"))
     .then(() => this.#svgPanZoom())
     .catch(e => console.error("RUN ERROR", e));
   }

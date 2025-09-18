@@ -42,24 +42,27 @@ export class LG4JNodeOutput extends HTMLElement {
    */
   attributeChangedCallback(name, oldValue, newValue) {
       if (name === 'value') {
-        if (newValue !== null) {
+        if (newValue !== null && newValue !== oldValue) {
           _DBG( 'attributeChangedCallback.value', newValue )
+
+          this.root = this.#createRoot( JSON.parse(newValue) )
         }
       }
   }
 
   connectedCallback() {
 
-      const value = this.textContent ?? '{}'
+      // const value = this.textContent ?? '{}'
       
-      _DBG( 'value', value )
+      // _DBG( 'value', value )
 
-      this.root = this.#createRoot( JSON.parse(value) )
+      // this.root = this.#createRoot( JSON.parse(value) )
       
   }
 
   disconnectedCallback() {
 
+    _DBG( 'disconnectedCallback' )
     this.root?.unmount()
 
   }
@@ -67,9 +70,6 @@ export class LG4JNodeOutput extends HTMLElement {
   get isCollapsed() {
     return this.getAttribute('collapsed') === 'true'
   }
-
-
-
 
   /**
    * 
@@ -111,7 +111,13 @@ export class LG4JNodeOutput extends HTMLElement {
    */
   #createRoot( value ) {
 
+    const mountPointId = `json-view-${this.id}`;
+    
+    // FIX #241
+    this?.shadowRoot?.getElementById( mountPointId )?.remove()
+
     const mountPoint = document.createElement('span');
+    mountPoint.setAttribute( 'id', mountPointId )
     this.shadowRoot?.appendChild(mountPoint);
 
     const root = ReactDOM.createRoot(mountPoint);
@@ -130,7 +136,7 @@ export class LG4JNodeOutput extends HTMLElement {
     } )
     
     root.render( component )
-
+    
     return root
   }
 }

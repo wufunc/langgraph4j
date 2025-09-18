@@ -5,10 +5,12 @@ import { Stack } from './stack.js';
 import { debug } from './debug.js';
 
 
-const _DBG = debug( { on: true, topic: 'LG4JResult' } )
+const _LOG = debug( { on: true, topic: 'LG4JResult' } )
+const _DBG = debug( { on: false, topic: 'LG4JResult' } )
 
 /**
  * @file
+ * @typedef {import('./types.js').NextNodeData} NextNodeData * 
  * @typedef {import('./types.js').ResultData} ResultData * 
  */
 
@@ -88,7 +90,7 @@ export class LG4JResultElement extends LitElement {
   #onInitThreads = (e) => {
     const { detail: threads  = [] } = e 
 
-    _DBG( 'threads', threads )
+    _LOG( 'threads', threads )
 
     this.threadMap = new Map( threads.map( ( /** @type {[string, ResultData[]]} */ [ thread, results ] ) => 
       [ thread, new Stack( results ) ]
@@ -103,13 +105,13 @@ export class LG4JResultElement extends LitElement {
   /**
    * Event handler for the 'result' event.
    * 
-   * @param {CustomEvent} e - The event object containing the result data.
+   * @param {CustomEvent<[string, ResultData]>} e - The event object containing the result data.
    * 
    */
   #onResult = (e) => {
 
     const [ thread, result ] = e.detail
-    _DBG( 'ON RESULT', thread, result  )
+    _LOG( 'ON RESULT', thread, result  )
     
     if( !this.threadMap.has( thread ) ) {
       throw new Error( `result doesn't contain a valid thread! ${thread}` );
@@ -126,13 +128,17 @@ export class LG4JResultElement extends LitElement {
     
     this.threadMap.set( thread, stack );
 
-    if( result.next ) {
-      this.dispatchEvent( new CustomEvent( 'graph-active', { 
-        detail: result.next,
+    if( result.next || result.node) {
+
+      /** @typedef {CustomEvent<NextNodeData>} */
+      const event = new CustomEvent( 'graph-active', { 
+        detail: { node: result.next ?? result.node, subgraphNode: result.subgraphNode },
         bubbles: true,
         composed: true,
         cancelable: true
-      }));  
+      });
+
+      this.dispatchEvent( event );
     }
     
     this.requestUpdate()
@@ -141,7 +147,7 @@ export class LG4JResultElement extends LitElement {
       const id = `#json${index-1}`
       // @ts-ignore
       const elems = this.shadowRoot.querySelectorAll(id);
-      _DBG( id, elems );
+      _LOG( id, elems );
       for (const elem of elems) {
         // @ts-ignore
         elem.expandAll()
@@ -159,7 +165,7 @@ export class LG4JResultElement extends LitElement {
     // @ts-ignore
     const { id } = event.target
 
-    _DBG( 'onSelectTab', id )
+    _LOG( 'onSelectTab', id )
 
     this.selectedTab = id
 
@@ -168,7 +174,7 @@ export class LG4JResultElement extends LitElement {
 
   // @ts-ignore
   #onNewTab(event) {
-    _DBG( 'NEW TAB', event)
+    _LOG( 'NEW TAB', event)
 
     const threadId = `Thread-${this.threadMap.size+1}`
 
@@ -186,7 +192,7 @@ export class LG4JResultElement extends LitElement {
    * 
    */
   #onNodeUpdated( e ) {
-    _DBG( 'onNodeUpdated', e )
+    _LOG( 'onNodeUpdated', e )
   }
 
   /**
@@ -194,7 +200,7 @@ export class LG4JResultElement extends LitElement {
    * @param {CustomEvent<'start'|'stop'|'interrupted'|'error'>} e 
    */
   #onStateUpdated( e ) {
-    _DBG( 'onStateUpdated', e )
+    _LOG( 'onStateUpdated', e )
     if( e.detail === 'stop' && this.selectedTab ) { 
 
       // add new elemnt into history stack
@@ -210,13 +216,13 @@ export class LG4JResultElement extends LitElement {
    */
   // @ts-ignore
   #renderResult(result, index) {
-
+    
     return html`
     <div class="collapse collapse-arrow bg-base-200">
       <input type="radio" name="item-${index}" checked="checked" />
       <div class="collapse-title text-ml font-bold">${result.node}</div>
       <div class="collapse-content">
-        <lg4j-node-output>${JSON.stringify(result).trim()}</log4j-node-output>  
+        <lg4j-node-output id="(${result.node})[${index}]" value="${JSON.stringify(result).trim()}"></lg4j-node-output>
       </div>
     </div>
     `
@@ -237,7 +243,7 @@ export class LG4JResultElement extends LitElement {
             <div class="collapse-content">
               <table class="table table-pin-rows">
                 <tbody>
-                  ${results.map( (result) => 
+                  ${results.map( result => 
                     html`<tr><td>${this.#renderResult(result, index)}</td></tr>`) }
                 </tbody>
               </table>
