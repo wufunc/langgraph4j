@@ -10,6 +10,7 @@
  * @property {string} node - node id
  * @property {string} checkpoint - checkpoint id.
  * @property {Record<string, any>} data - the modified state.
+ * 
  */
 
 /**
@@ -17,6 +18,7 @@
  * @property {string} node - node id 
  * @property {string} [checkpoint] - checkpoint id.
  * @property {Record<string,any>} state - state
+ * @property {string} next
  */
 
 /**
