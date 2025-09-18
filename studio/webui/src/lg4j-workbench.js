@@ -5,10 +5,11 @@ import { debug } from './debug.js';
 /**
  * @file
  * @typedef {import('./types.js').Instance} Instance
+ * @typedef {import('./types.js').NextNodeData} NextNodeData
  */
 
 
-const _DBG = debug( { on: true, topic: 'LG4JWorkbench' } )
+const _LOG = debug( { on: true, topic: 'LG4JWorkbench' } )
 
 
 export class LG4JWorkbenchElement extends LitElement {
@@ -35,7 +36,7 @@ export class LG4JWorkbenchElement extends LitElement {
       slot = type.split('-')[0]
     }
 
-    _DBG( 'routeEvent', type, slot )
+    _LOG( 'routeEvent', type, slot )
     
     const event = new CustomEvent( type, { detail } );
 
@@ -71,7 +72,7 @@ export class LG4JWorkbenchElement extends LitElement {
    * @param {CustomEvent} e - The event object containing the updated data.
    */
   #routeUpdateEvent( e ) {
-    _DBG( 'got updated event', e );
+    _LOG( 'got updated event', e );
     this.#routeEvent( new CustomEvent( `${e.type}`, { detail: e.detail }), 'executor');
   }
 
@@ -88,10 +89,10 @@ export class LG4JWorkbenchElement extends LitElement {
 
   /**
    * 
-   * @param {CustomEvent<string>} e 
+   * @param {CustomEvent<NextNodeData>} e 
    */
   #onGraphActive( e ) {
-    this.#writeMessage( e.detail )
+    this.#writeMessage( e.detail.node )
     this.#routeEvent( e )
   }
 

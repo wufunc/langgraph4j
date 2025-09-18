@@ -14,11 +14,18 @@
  */
 
 /**
+ * @typedef NextNodeData
+ * @property {string} node - next node id 
+ * @property {string|undefined} subgraphNode - subgraph id 
+ */
+
+/**
  * @typedef {Object} ResultData
  * @property {string} node - node id 
+ * @property {string} next - next node id 
+ * @property {string|undefined} subgraphNode - subgraph id 
  * @property {string} [checkpoint] - checkpoint id.
  * @property {Record<string,any>} state - state
- * @property {string} next
  */
 
 /**
