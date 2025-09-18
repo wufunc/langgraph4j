@@ -1,9 +1,11 @@
 package org.bsc.langgraph4j.studio.springboot;
 
+import org.bsc.langgraph4j.CompileConfig;
 import org.bsc.langgraph4j.GraphStateException;
 import org.bsc.langgraph4j.StateGraph;
 import org.bsc.langgraph4j.action.AsyncNodeAction;
 import org.bsc.langgraph4j.action.EdgeAction;
+import org.bsc.langgraph4j.checkpoint.MemorySaver;
 import org.bsc.langgraph4j.prebuilt.MessagesState;
 import org.bsc.langgraph4j.prebuilt.MessagesStateGraph;
 import org.bsc.langgraph4j.state.AgentState;
@@ -25,7 +27,11 @@ public class LangGraphStudioSampleConfig extends LangGraphStudioConfig {
     @Override
     public Map<String, LangGraphStudioServer.Instance> instanceMap() {
         try {
-            return Map.ofEntries( sampleFlow(), withStateSubgraphSample(), withCompiledSubgraphSample() );
+            return Map.ofEntries(
+                    issue241(),
+                    sampleFlow(),
+                    withStateSubgraphSample(),
+                    withCompiledSubgraphSample() );
         } catch (GraphStateException e) {
             log.error(e.getMessage(), e);
             return Map.of();
@@ -36,6 +42,26 @@ public class LangGraphStudioSampleConfig extends LangGraphStudioConfig {
         return node_async(state ->
                 Map.of("messages", id)
         );
+    }
+    private Map.Entry<String, LangGraphStudioServer.Instance> issue241() throws GraphStateException {
+
+        var workflow = new StateGraph<MessagesState<String>>(MessagesState::new)
+                .addNode("claudeNode", _makeNode("claudeNode") )
+                .addEdge(START, "claudeNode")
+                .addEdge("claudeNode", END )
+                ;
+
+        return  Map.entry( "issue241", LangGraphStudioServer.Instance.builder()
+                .title("LangGraph Studio (Issue241)")
+                 .compileConfig(CompileConfig.builder()
+                         .releaseThread(true)
+                         .checkpointSaver( new MemorySaver() )
+                         .interruptBefore("claudeNode")
+                         .build())
+                .graph( workflow )
+                .addInputStringArg( "input")
+                .build());
+
     }
 
     private Map.Entry<String, LangGraphStudioServer.Instance> sampleFlow() throws GraphStateException {
@@ -80,6 +106,7 @@ public class LangGraphStudioSampleConfig extends LangGraphStudioConfig {
     }
 
     private Map.Entry<String, LangGraphStudioServer.Instance> withStateSubgraphSample() throws GraphStateException {
+
         var workflowChild = new MessagesStateGraph<String>()
                 .addNode("B1", _makeNode("B1") )
                 .addNode("B2", _makeNode( "B2" ) )

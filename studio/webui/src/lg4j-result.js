@@ -6,6 +6,7 @@ import { debug } from './debug.js';
 
 
 const _DBG = debug( { on: true, topic: 'LG4JResult' } )
+// const _TRC = debug( { on: true, topic: 'LG4JResult' } )
 
 /**
  * @file
@@ -103,7 +104,7 @@ export class LG4JResultElement extends LitElement {
   /**
    * Event handler for the 'result' event.
    * 
-   * @param {CustomEvent} e - The event object containing the result data.
+   * @param {CustomEvent<[string, ResultData]>} e - The event object containing the result data.
    * 
    */
   #onResult = (e) => {
@@ -210,13 +211,13 @@ export class LG4JResultElement extends LitElement {
    */
   // @ts-ignore
   #renderResult(result, index) {
-
+    
     return html`
     <div class="collapse collapse-arrow bg-base-200">
       <input type="radio" name="item-${index}" checked="checked" />
       <div class="collapse-title text-ml font-bold">${result.node}</div>
       <div class="collapse-content">
-        <lg4j-node-output>${JSON.stringify(result).trim()}</log4j-node-output>  
+        <lg4j-node-output id="(${result.node})[${index}]" value="${JSON.stringify(result).trim()}"></lg4j-node-output>
       </div>
     </div>
     `
@@ -237,7 +238,7 @@ export class LG4JResultElement extends LitElement {
             <div class="collapse-content">
               <table class="table table-pin-rows">
                 <tbody>
-                  ${results.map( (result) => 
+                  ${results.map( result => 
                     html`<tr><td>${this.#renderResult(result, index)}</td></tr>`) }
                 </tbody>
               </table>
