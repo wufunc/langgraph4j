@@ -72,7 +72,10 @@ public class CallModel<State extends MessagesState<ChatMessage>> implements Asyn
             if (responseText == null) {
                 responseText = "";
             }
-            return Map.of(AgentExecutor.State.FINAL_RESPONSE, responseText);
+            return Map.of(
+                "messages", content,
+                AgentExecutor.State.FINAL_RESPONSE, responseText
+            );
         }
 
         throw new IllegalStateException("Unsupported finish reason: " + response.finishReason() );
